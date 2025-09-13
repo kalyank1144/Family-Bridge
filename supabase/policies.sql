@@ -4,10 +4,8 @@ create policy select_own_profile on profiles for select using (auth.uid() = id);
 create policy insert_own_profile on profiles for insert with check (auth.uid() = id);
 create policy update_own_profile on profiles for update using (auth.uid() = id);
 
-create policy select_member_families on families for select using (
-  exists (select 1 from family_members fm where fm.family_id = id and fm.user_id = auth.uid())
-);
-
+-- Allow authenticated users to discover families (e.g., join by code)
+create policy select_all_families_for_join on families for select to authenticated using (true);
 create policy insert_family_any_auth on families for insert to authenticated with check (true);
 
 create policy select_member_family_members on family_members for select using (
@@ -83,5 +81,14 @@ create policy using_family_scope_stories on stories for select using (
 create policy insert_family_scope_stories on stories for insert with check (
   exists (select 1 from family_members fm where fm.family_id = stories.family_id and fm.user_id = auth.uid())
 );
+
+-- Trusted devices
+create policy select_own_trusted_devices on trusted_devices for select using (auth.uid() = user_id);
+create policy insert_own_trusted_devices on trusted_devices for insert with check (auth.uid() = user_id);
+
+-- Youth approvals
+create policy select_own_approvals on user_approvals for select using (auth.uid() = youth_id);
+create policy insert_own_approvals on user_approvals for insert with check (auth.uid() = youth_id);
+create policy update_own_approvals on user_approvals for update using (auth.uid() = youth_id);
 
 commit;

@@ -22,6 +22,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authRepo = ref.watch(authRepositoryProvider);
+    final authService = ref.watch(authServiceProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Sign in')),
       body: Padding(
@@ -46,9 +47,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 label: 'Sign in',
                 loading: sending,
                 onPressed: () async {
+                  if (authService.isLockedOut) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Too many attempts. Try again later.')));
+                    return;
+                  }
                   setState(() => sending = true);
                   try {
                     await authRepo.signInWithEmail(email: emailC.text.trim(), password: passC.text);
+                    await authService.registerTrustedDevice();
+                    authService.resetFailedAttempts();
+                  } catch (_) {
+                    authService.recordFailedAttempt();
                   } finally {
                     setState(() => sending = false);
                   }
@@ -76,13 +85,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 label: 'Verify',
                 onPressed: () async {
                   await authRepo.verifyPhoneOtp(phone: phoneC.text.trim(), token: otpC.text.trim());
+                  await authService.registerTrustedDevice();
                 },
               ),
             ],
             const Spacer(),
-            TextButton(
-              onPressed: () => context.push('/register'),
-              child: const Text('Create account'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => context.push('/register'),
+                  child: const Text('Create account'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (emailC.text.isEmpty) return;
+                    await authService.resetPasswordEmail(emailC.text.trim());
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password reset email sent if account exists.')));
+                    }
+                  },
+                  child: const Text('Forgot password?'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            FutureBuilder<bool>(
+              future: authService.canCheckBiometrics(),
+              builder: (context, snap) {
+                final canBio = snap.data == true;
+                if (!canBio) return const SizedBox.shrink();
+                return AppButton(
+                  label: 'Unlock with biometrics',
+                  onPressed: () async {
+                    final ok = await authService.authenticateBiometric();
+                    if (ok && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Authenticated')));
+                    }
+                  },
+                );
+              },
             )
           ],
         ),
