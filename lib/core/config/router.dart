@@ -9,10 +9,13 @@ import '../../features/caregiver/presentation/dashboard_screen.dart' as caregive
 import '../../features/youth/presentation/dashboard_screen.dart' as youth;
 import '../constants/roles.dart';
 
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final routerProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authStateProvider);
   final role = ref.watch(userRoleProvider);
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     routes: [
       GoRoute(path: '/', builder: (c, s) => const _Splash()),
