@@ -1,0 +1,12 @@
+-- Enable realtime for key tables
+alter publication supabase_realtime add table public.users;
+alter publication supabase_realtime add table public.families;
+alter publication supabase_realtime add table public.family_members;
+alter publication supabase_realtime add table public.health_data;
+alter publication supabase_realtime add table public.medications;
+alter publication supabase_realtime add table public.medication_logs;
+alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.emergency_contacts;
+alter publication supabase_realtime add table public.appointments;
+alter publication supabase_realtime add table public.daily_checkins;
+alter publication supabase_realtime add table public.stories;
