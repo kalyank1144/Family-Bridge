@@ -11,6 +11,10 @@ import 'features/caregiver/providers/appointments_provider.dart';
 import 'features/caregiver/providers/alert_provider.dart';
 import 'features/caregiver/services/notification_service.dart';
 
+// Elder + Voice
+import 'features/elder/providers/elder_provider.dart';
+import 'core/services/voice_service.dart';
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -25,6 +29,9 @@ void main() async {
   await NotificationService.instance.initialize();
 
   final prefs = await SharedPreferences.getInstance();
+
+  final voiceService = VoiceService();
+  await voiceService.initialize();
   
   runApp(
     MultiProvider(
@@ -33,6 +40,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => HealthMonitoringProvider()),
         ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
         ChangeNotifierProvider(create: (_) => AlertProvider()),
+        ChangeNotifierProvider(create: (_) => ElderProvider()),
+        Provider.value(value: voiceService),
       ],
       child: const FamilyBridgeApp(),
     ),
