@@ -1,8 +1,6 @@
 name: family_bridge
-description: A comprehensive family care management application
-
+description: Multi-generational family care coordination app
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
@@ -12,8 +10,18 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # UI & Design
+  # Core packages
   cupertino_icons: ^1.0.6
+  flutter_riverpod: ^2.4.10
+  go_router: ^13.2.0
+  
+  # Supabase for backend
+  supabase_flutter: ^2.5.6
+  
+  # UI and animations
+  flutter_animate: ^4.5.0
+  shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
   google_fonts: ^6.1.0
   flutter_animate: ^4.3.0
   flutter_svg: ^2.0.9
@@ -31,21 +39,25 @@ dependencies:
   http: ^1.1.2
   dio: ^5.4.0
   
-  # Charts & Visualization
-  fl_chart: ^0.65.0
+  # Media handling
+  image_picker: ^1.0.7
+  video_player: ^2.8.3
+  audioplayers: ^6.0.0
+  record: ^5.0.4
   
-  # Calendar
-  table_calendar: ^3.0.9
-  
-  # Notifications
-  flutter_local_notifications: ^16.3.0
-  
-  # Date & Time
-  intl: ^0.18.1
-  
-  # Network
+  # Utilities
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  path_provider: ^2.1.2
+  permission_handler: ^11.3.0
   connectivity_plus: ^5.0.2
   
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+  
+  # Storage
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0
   # Health & Fitness
   percent_indicator: ^4.2.3
   
@@ -72,9 +84,15 @@ dependencies:
   flutter_form_builder: ^9.1.1
   form_builder_validators: ^9.1.0
   
-  # Icons
-  flutter_feather_icons: ^2.0.0+1
+  # Chat features
+  emoji_picker_flutter: ^2.1.1
+  giphy_get: ^3.5.6
+  flutter_linkify: ^6.0.0
   
+  # Voice and speech
+  speech_to_text: ^6.6.0
+  flutter_tts: ^4.0.2
+
   # Utilities
   uuid: ^4.2.2
   collection: ^1.18.0
@@ -82,6 +100,7 @@ dependencies:
 
   # Weather (optional)
   weather: ^3.1.1
+
 
 dev_dependencies:
   flutter_test:
@@ -98,12 +117,10 @@ flutter:
     - assets/sounds/
   
   fonts:
-    - family: Inter
+    - family: SF Pro Display
       fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf
+        - asset: assets/fonts/SF-Pro-Display-Regular.ttf
+        - asset: assets/fonts/SF-Pro-Display-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
+        - asset: assets/fonts/SF-Pro-Display-Bold.ttf
           weight: 700
