@@ -22,6 +22,22 @@ dependencies:
   flutter_animate: ^4.5.0
   shimmer: ^3.0.0
   cached_network_image: ^3.3.1
+  google_fonts: ^6.1.0
+  flutter_animate: ^4.3.0
+  flutter_svg: ^2.0.9
+  
+  # State Management
+  provider: ^6.1.1
+  flutter_bloc: ^8.1.3
+  
+  # Navigation
+  go_router: ^13.0.0
+  
+  # Data & Backend
+  supabase_flutter: ^2.3.2
+  shared_preferences: ^2.2.2
+  http: ^1.1.2
+  dio: ^5.4.0
   
   # Media handling
   image_picker: ^1.0.7
@@ -42,6 +58,31 @@ dependencies:
   # Storage
   shared_preferences: ^2.2.2
   flutter_secure_storage: ^9.0.0
+  # Health & Fitness
+  percent_indicator: ^4.2.3
+  
+  # Media
+  audioplayers: ^5.2.1
+  image_picker: ^1.0.5
+  camera: ^0.10.5
+  record: ^5.0.4
+  
+  # Permissions & Device
+  permission_handler: ^11.1.0
+  path_provider: ^2.1.1
+  url_launcher: ^6.2.2
+  
+  # Location
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+  
+  # Voice & Speech
+  speech_to_text: ^6.4.1
+  flutter_tts: ^4.0.2
+
+  # Forms
+  flutter_form_builder: ^9.1.1
+  form_builder_validators: ^9.1.0
   
   # Chat features
   emoji_picker_flutter: ^2.1.1
@@ -51,6 +92,15 @@ dependencies:
   # Voice and speech
   speech_to_text: ^6.6.0
   flutter_tts: ^4.0.2
+
+  # Utilities
+  uuid: ^4.2.2
+  collection: ^1.18.0
+  flutter_dotenv: ^5.1.0
+
+  # Weather (optional)
+  weather: ^3.1.1
+
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +113,8 @@ flutter:
   assets:
     - assets/images/
     - assets/fonts/
+    - assets/icons/
+    - assets/sounds/
   
   fonts:
     - family: SF Pro Display

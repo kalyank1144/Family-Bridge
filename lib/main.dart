@@ -7,15 +7,62 @@ import 'features/chat/services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Supabase
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/theme/app_theme.dart';
+import 'core/router/app_router.dart';
+import 'core/utils/env.dart';
+import 'features/caregiver/providers/family_data_provider.dart';
+import 'features/caregiver/providers/health_monitoring_provider.dart';
+import 'features/caregiver/providers/appointments_provider.dart';
+import 'features/caregiver/providers/alert_provider.dart';
+import 'features/caregiver/services/notification_service.dart';
+
+// Elder + Voice
+import 'features/elder/providers/elder_provider.dart';
+import 'core/services/voice_service.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment (optional, supports --dart-define and .env)
+  await dotenv.load(fileName: ".env", isOptional: true);
+
+
   await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
   );
+
   
   runApp(
     const ProviderScope(
       child: FamilyBridgeApp(),
+
+
+  await NotificationService.instance.initialize();
+
+  final prefs = await SharedPreferences.getInstance();
+
+  final voiceService = VoiceService();
+  await voiceService.initialize();
+  
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => FamilyDataProvider()),
+        ChangeNotifierProvider(create: (_) => HealthMonitoringProvider()),
+        ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
+        ChangeNotifierProvider(create: (_) => AlertProvider()),
+        ChangeNotifierProvider(create: (_) => ElderProvider()),
+        Provider.value(value: voiceService),
+      ],
+      child: const FamilyBridgeApp(),
     ),
   );
 }
