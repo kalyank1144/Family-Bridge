@@ -1,0 +1,391 @@
+name: Deploy to Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests (emergency deployment only)'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'production' }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: '3.16.0'
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Run quick tests
+        if: github.event.inputs.skip_tests != 'true'
+        run: |
+          flutter test --reporter=expanded
+          flutter analyze
+          
+      - name: Check version consistency
+        run: |
+          VERSION=$(grep "version:" pubspec.yaml | sed 's/version: //')
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG_VERSION=$(echo ${{ github.ref_name }} | sed 's/v//')
+            if [[ "$VERSION" != "$TAG_VERSION"* ]]; then
+              echo "Version mismatch: pubspec.yaml has $VERSION, tag is $TAG_VERSION"
+              exit 1
+            fi
+          fi
+          
+      - name: Validate environment variables
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "production" ] || [ "${{ github.event_name }}" = "release" ]; then
+            echo "Deploying to production"
+            # Add production-specific validations here
+          else
+            echo "Deploying to staging"
+            # Add staging-specific validations here
+          fi
+
+  deploy-backend:
+    name: Deploy Backend Services
+    runs-on: ubuntu-latest
+    needs: pre-deployment-checks
+    timeout-minutes: 20
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Supabase CLI
+        run: |
+          npm install -g supabase
+          
+      - name: Deploy database migrations
+        run: |
+          cd supabase
+          supabase db push --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: Deploy edge functions
+        run: |
+          cd supabase
+          if [ -d "functions" ]; then
+            for func in functions/*/; do
+              func_name=$(basename "$func")
+              echo "Deploying function: $func_name"
+              supabase functions deploy $func_name --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+            done
+          fi
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+      - name: Update environment variables
+        run: |
+          # Update Supabase environment variables if needed
+          echo "Backend deployment completed"
+
+  deploy-android:
+    name: Deploy Android App
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks, deploy-backend]
+    timeout-minutes: 30
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Generate code
+        run: |
+          if grep -q "build_runner" pubspec.yaml; then
+            flutter pub run build_runner build --delete-conflicting-outputs
+          fi
+          
+      - name: Setup Android signing
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
+          echo "storeFile=keystore.jks" >> android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+        
+      - name: Deploy to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          packageName: com.familybridge.app
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: ${{ github.event.inputs.environment == 'staging' && 'internal' || 'production' }}
+          status: completed
+          inAppUpdatePriority: 3
+          
+      - name: Create Play Store release notes
+        run: |
+          echo "## Release Notes" > release-notes.txt
+          echo "" >> release-notes.txt
+          if [ -f "CHANGELOG.md" ]; then
+            head -20 CHANGELOG.md >> release-notes.txt
+          else
+            echo "- Bug fixes and performance improvements" >> release-notes.txt
+          fi
+
+  deploy-ios:
+    name: Deploy iOS App
+    runs-on: macos-latest
+    needs: [pre-deployment-checks, deploy-backend]
+    timeout-minutes: 45
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.0'
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Generate code
+        run: |
+          if grep -q "build_runner" pubspec.yaml; then
+            flutter pub run build_runner build --delete-conflicting-outputs
+          fi
+          
+      - name: Install iOS dependencies
+        run: |
+          cd ios
+          pod install
+          cd ..
+          
+      - name: Setup iOS certificates
+        run: |
+          echo "${{ secrets.IOS_P12_BASE64 }}" | base64 -d > certificate.p12
+          echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 -d > profile.mobileprovision
+          
+          security create-keychain -p "${{ secrets.IOS_KEYCHAIN_PASSWORD }}" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "${{ secrets.IOS_KEYCHAIN_PASSWORD }}" build.keychain
+          security import certificate.p12 -k build.keychain -P "${{ secrets.IOS_P12_PASSWORD }}" -T /usr/bin/codesign
+          
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+      - name: Build iOS
+        run: flutter build ios --release
+        
+      - name: Archive and export
+        run: |
+          xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination generic/platform=iOS \
+            -archivePath build/Runner.xcarchive \
+            archive
+            
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist ios/ExportOptions.plist
+            
+      - name: Upload to TestFlight
+        if: github.event.inputs.environment == 'staging'
+        run: |
+          xcrun altool --upload-app \
+            --type ios \
+            --file build/Runner.ipa \
+            --username "${{ secrets.APPLE_ID_EMAIL }}" \
+            --password "${{ secrets.APPLE_ID_PASSWORD }}"
+            
+      - name: Upload to App Store
+        if: github.event.inputs.environment == 'production' || github.event_name == 'release'
+        run: |
+          xcrun altool --upload-app \
+            --type ios \
+            --file build/Runner.ipa \
+            --username "${{ secrets.APPLE_ID_EMAIL }}" \
+            --password "${{ secrets.APPLE_ID_PASSWORD }}"
+
+  deploy-web:
+    name: Deploy Web App
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks, deploy-backend]
+    timeout-minutes: 20
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          
+      - name: Enable web support
+        run: flutter config --enable-web
+        
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Generate code
+        run: |
+          if grep -q "build_runner" pubspec.yaml; then
+            flutter pub run build_runner build --delete-conflicting-outputs
+          fi
+          
+      - name: Build web
+        run: flutter build web --release --web-renderer canvaskit
+        
+      - name: Deploy to GitHub Pages (staging)
+        if: github.event.inputs.environment == 'staging'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+          destination_dir: staging
+          
+      - name: Deploy to production hosting
+        if: github.event.inputs.environment == 'production' || github.event_name == 'release'
+        run: |
+          # Deploy to your preferred hosting service (Netlify, Vercel, Firebase, etc.)
+          echo "Deploy web app to production hosting"
+
+  post-deployment:
+    name: Post-deployment Tasks
+    runs-on: ubuntu-latest
+    needs: [deploy-android, deploy-ios, deploy-web]
+    if: always()
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Health check
+        run: |
+          # Perform health checks on deployed services
+          echo "Running post-deployment health checks..."
+          
+          # Example: Check if web app is accessible
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            curl -f https://app.familybridge.com/health || echo "Web app health check failed"
+          fi
+          
+      - name: Update monitoring
+        run: |
+          # Update monitoring dashboards with new deployment info
+          echo "Updating monitoring systems..."
+          
+      - name: Notify team
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: |
+            🚀 FamilyBridge deployment to ${{ github.event.inputs.environment || 'production' }} completed successfully!
+            
+            📱 Android: ${{ needs.deploy-android.result }}
+            🍎 iOS: ${{ needs.deploy-ios.result }}
+            🌐 Web: ${{ needs.deploy-web.result }}
+            
+            Version: ${{ github.ref_name }}
+            Environment: ${{ github.event.inputs.environment || 'production' }}
+            
+            Deployed by: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Notify on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            ❌ FamilyBridge deployment to ${{ github.event.inputs.environment || 'production' }} failed!
+            
+            📱 Android: ${{ needs.deploy-android.result }}
+            🍎 iOS: ${{ needs.deploy-ios.result }}
+            🌐 Web: ${{ needs.deploy-web.result }}
+            
+            Please check the logs and take necessary action.
+            Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Create deployment record
+        run: |
+          # Create a deployment record for tracking
+          echo "Creating deployment record..."
+          cat << EOF > deployment-record.json
+          {
+            "version": "${{ github.ref_name }}",
+            "environment": "${{ github.event.inputs.environment || 'production' }}",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "actor": "${{ github.actor }}",
+            "android": "${{ needs.deploy-android.result }}",
+            "ios": "${{ needs.deploy-ios.result }}",
+            "web": "${{ needs.deploy-web.result }}"
+          }
+          EOF
+          
+      - name: Rollback on failure
+        if: failure() && github.event.inputs.environment == 'production'
+        run: |
+          echo "Deployment failed. Consider implementing automatic rollback logic here."
+          echo "For now, manual intervention is required."
