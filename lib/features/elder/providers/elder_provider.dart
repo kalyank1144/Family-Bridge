@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/medication_model.dart';
 import '../models/emergency_contact_model.dart';
 import '../models/daily_checkin_model.dart';
+import '../services/medication_service.dart';
+import '../services/emergency_contact_service.dart';
+import '../services/daily_checkin_service.dart';
 
 class ElderProvider extends ChangeNotifier {
-  final _supabase = Supabase.instance.client;
+  final ElderMedicationService _medicationService = ElderMedicationService();
+  final EmergencyContactService _contactService = EmergencyContactService();
+  final DailyCheckinService _checkinService = DailyCheckinService();
   
   // User Data
   String _userName = 'User';
@@ -23,6 +27,7 @@ class ElderProvider extends ChangeNotifier {
   // Daily Check-in
   DailyCheckin? _todayCheckin;
   bool _hasCheckedInToday = false;
+  Map<String, dynamic> _checkinStats = {};
   
   // Weather Data
   String _weatherDescription = 'Loading...';
@@ -42,272 +47,244 @@ class ElderProvider extends ChangeNotifier {
   bool get isLoadingMedications => _isLoadingMedications;
   DailyCheckin? get todayCheckin => _todayCheckin;
   bool get hasCheckedInToday => _hasCheckedInToday;
+  Map<String, dynamic> get checkinStats => _checkinStats;
   String get weatherDescription => _weatherDescription;
   double get temperature => _temperature;
   String get weatherIcon => _weatherIcon;
   int get unreadMessages => _unreadMessages;
-  
+
   // Initialize Elder Data
-  Future<void> initializeElderData(String userId) async {
+  Future<void> initializeElder(String userId, String userName) async {
     _userId = userId;
+    _userName = userName;
+    
     await Future.wait([
-      loadUserProfile(),
       loadEmergencyContacts(),
       loadMedications(),
-      checkTodayCheckin(),
-      loadWeatherData(),
-      loadUnreadMessages(),
+      loadTodayCheckin(),
     ]);
-    notifyListeners();
+    
+    await loadCheckinStats();
   }
-  
-  // Load User Profile
-  Future<void> loadUserProfile() async {
-    try {
-      final response = await _supabase
-          .from('users')
-          .select('name, phone, date_of_birth')
-          .eq('id', _userId)
-          .single();
-      
-      _userName = response['name'] ?? 'User';
-    } catch (e) {
-      print('Error loading user profile: $e');
-    }
-  }
-  
-  // Load Emergency Contacts
+
+  // Emergency Contacts Methods
   Future<void> loadEmergencyContacts() async {
     _isLoadingContacts = true;
     notifyListeners();
     
     try {
-      final response = await _supabase
-          .from('emergency_contacts')
-          .select()
-          .eq('elder_id', _userId)
-          .order('priority', ascending: true);
-      
-      _emergencyContacts = (response as List)
-          .map((contact) => EmergencyContact.fromJson(contact))
-          .toList();
+      await _contactService.initialize();
+      _emergencyContacts = await _contactService.getUserContacts(_userId);
     } catch (e) {
-      print('Error loading emergency contacts: $e');
+      debugPrint('Error loading emergency contacts: $e');
+      // Offline-first approach will provide local data
     } finally {
       _isLoadingContacts = false;
       notifyListeners();
     }
   }
-  
-  // Add Emergency Contact
+
   Future<void> addEmergencyContact(EmergencyContact contact) async {
     try {
-      await _supabase.from('emergency_contacts').insert({
-        'elder_id': _userId,
-        'name': contact.name,
-        'relationship': contact.relationship,
-        'phone': contact.phone,
-        'photo_url': contact.photoUrl,
-        'priority': contact.priority,
-      });
+      await _contactService.initialize();
+      final addedContact = await _contactService.addContact(contact, _userId);
       
-      await loadEmergencyContacts();
+      _emergencyContacts.add(addedContact);
+      _emergencyContacts.sort((a, b) => a.priority.compareTo(b.priority));
+      notifyListeners();
     } catch (e) {
-      print('Error adding emergency contact: $e');
+      debugPrint('Emergency contact creation queued for sync: $e');
+      // Still add to local state for optimistic UI
+      _emergencyContacts.add(contact);
+      notifyListeners();
     }
   }
-  
-  // Load Medications
+
+  Future<void> updateEmergencyContact(EmergencyContact contact) async {
+    try {
+      await _contactService.initialize();
+      await _contactService.updateContact(contact, _userId);
+      
+      final index = _emergencyContacts.indexWhere((c) => c.id == contact.id);
+      if (index != -1) {
+        _emergencyContacts[index] = contact;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Emergency contact update queued for sync: $e');
+    }
+  }
+
+  Future<void> deleteEmergencyContact(String contactId) async {
+    try {
+      // Optimistically update UI
+      _emergencyContacts.removeWhere((c) => c.id == contactId);
+      notifyListeners();
+      
+      await _contactService.initialize();
+      await _contactService.deleteContact(contactId);
+    } catch (e) {
+      debugPrint('Emergency contact deletion queued for sync: $e');
+    }
+  }
+
+  // Medications Methods
   Future<void> loadMedications() async {
     _isLoadingMedications = true;
     notifyListeners();
     
     try {
-      final response = await _supabase
-          .from('medications')
-          .select()
-          .eq('elder_id', _userId)
-          .order('next_dose_time', ascending: true);
-      
-      _medications = (response as List)
-          .map((med) => Medication.fromJson(med))
-          .toList();
-      
-      // Find next medication
-      final now = DateTime.now();
-      _nextMedication = _medications.firstWhere(
-        (med) => med.nextDoseTime.isAfter(now),
-        orElse: () => _medications.first,
-      );
+      await _medicationService.initialize();
+      _medications = await _medicationService.getActiveMedications(_userId);
+      _updateNextMedication();
     } catch (e) {
-      print('Error loading medications: $e');
+      debugPrint('Error loading medications: $e');
     } finally {
       _isLoadingMedications = false;
       notifyListeners();
     }
   }
-  
-  // Mark Medication as Taken
-  Future<void> markMedicationTaken(String medicationId, {String? photoUrl}) async {
+
+  Future<List<Medication>> getTodayDueMedications() async {
+    await _medicationService.initialize();
+    return await _medicationService.getTodayDueMedications(_userId);
+  }
+
+  void _updateNextMedication() {
+    if (_medications.isEmpty) {
+      _nextMedication = null;
+      return;
+    }
+
+    final now = DateTime.now();
+    final dueMedications = _medications.where((m) => m.nextDoseTime.isAfter(now)).toList();
+    dueMedications.sort((a, b) => a.nextDoseTime.compareTo(b.nextDoseTime));
+    
+    _nextMedication = dueMedications.isNotEmpty ? dueMedications.first : null;
+  }
+
+  Future<void> markMedicationTaken(String medicationId) async {
     try {
-      await _supabase.from('medication_logs').insert({
-        'medication_id': medicationId,
-        'elder_id': _userId,
-        'taken_at': DateTime.now().toIso8601String(),
-        'photo_url': photoUrl,
-        'confirmed': true,
-      });
+      await _medicationService.initialize();
+      await _medicationService.markMedicationTaken(medicationId, _userId);
       
-      // Update next dose time
-      final medication = _medications.firstWhere((med) => med.id == medicationId);
-      final nextDose = medication.calculateNextDose();
-      
-      await _supabase
-          .from('medications')
-          .update({'next_dose_time': nextDose.toIso8601String()})
-          .eq('id', medicationId);
-      
+      // Reload medications to get updated state
       await loadMedications();
     } catch (e) {
-      print('Error marking medication taken: $e');
+      debugPrint('Medication taken update queued for sync: $e');
+      // Still update local state optimistically
+      _updateNextMedication();
+      notifyListeners();
     }
   }
-  
-  // Skip Medication
-  Future<void> skipMedication(String medicationId, String reason) async {
+
+  Future<void> addMedication(Medication medication) async {
     try {
-      await _supabase.from('medication_logs').insert({
-        'medication_id': medicationId,
-        'elder_id': _userId,
-        'taken_at': DateTime.now().toIso8601String(),
-        'skipped': true,
-        'skip_reason': reason,
-      });
+      await _medicationService.initialize();
+      final addedMedication = await _medicationService.addMedication(medication, _userId);
       
-      await loadMedications();
+      _medications.add(addedMedication);
+      _updateNextMedication();
+      notifyListeners();
     } catch (e) {
-      print('Error skipping medication: $e');
+      debugPrint('Medication creation queued for sync: $e');
+      _medications.add(medication);
+      _updateNextMedication();
+      notifyListeners();
     }
   }
-  
-  // Check Today's Check-in
-  Future<void> checkTodayCheckin() async {
+
+  Future<double> getMedicationComplianceRate({int days = 7}) async {
+    await _medicationService.initialize();
+    return await _medicationService.getComplianceRate(_userId, days: days);
+  }
+
+  // Daily Check-in Methods
+  Future<void> loadTodayCheckin() async {
     try {
-      final today = DateTime.now();
-      final startOfDay = DateTime(today.year, today.month, today.day);
-      final endOfDay = startOfDay.add(const Duration(days: 1));
-      
-      final response = await _supabase
-          .from('daily_checkins')
-          .select()
-          .eq('elder_id', _userId)
-          .gte('created_at', startOfDay.toIso8601String())
-          .lt('created_at', endOfDay.toIso8601String())
-          .maybeSingle();
-      
-      if (response != null) {
-        _todayCheckin = DailyCheckin.fromJson(response);
-        _hasCheckedInToday = true;
-      } else {
-        _hasCheckedInToday = false;
-      }
+      await _checkinService.initialize();
+      _todayCheckin = await _checkinService.getTodayCheckin(_userId);
+      _hasCheckedInToday = _todayCheckin != null;
     } catch (e) {
-      print('Error checking today\'s check-in: $e');
+      debugPrint('Error loading today check-in: $e');
     }
     notifyListeners();
   }
-  
-  // Submit Daily Check-in
+
+  Future<void> loadCheckinStats({int days = 30}) async {
+    try {
+      await _checkinService.initialize();
+      _checkinStats = await _checkinService.getCheckinStats(_userId, days: days);
+    } catch (e) {
+      debugPrint('Error loading check-in stats: $e');
+      _checkinStats = {};
+    }
+    notifyListeners();
+  }
+
   Future<void> submitDailyCheckin(DailyCheckin checkin) async {
     try {
-      await _supabase.from('daily_checkins').insert({
-        'elder_id': _userId,
-        'mood': checkin.mood,
-        'sleep_quality': checkin.sleepQuality,
-        'meal_eaten': checkin.mealEaten,
-        'medication_taken': checkin.medicationTaken,
-        'physical_activity': checkin.physicalActivity,
-        'pain_level': checkin.painLevel,
-        'notes': checkin.notes,
-        'voice_note_url': checkin.voiceNoteUrl,
-      });
+      await _checkinService.initialize();
+      final submittedCheckin = await _checkinService.submitCheckin(checkin, _userId);
       
+      _todayCheckin = submittedCheckin;
+      _hasCheckedInToday = true;
+      notifyListeners();
+      
+      // Refresh stats
+      await loadCheckinStats();
+    } catch (e) {
+      debugPrint('Daily check-in queued for sync: $e');
+      // Still update local state optimistically
       _todayCheckin = checkin;
       _hasCheckedInToday = true;
       notifyListeners();
-    } catch (e) {
-      print('Error submitting daily check-in: $e');
     }
   }
-  
-  // Load Weather Data
-  Future<void> loadWeatherData() async {
-    try {
-      // This would integrate with a weather API
-      // For now, using mock data
-      _weatherDescription = 'Sunny';
-      _temperature = 72;
-      _weatherIcon = '☀️';
-    } catch (e) {
-      print('Error loading weather: $e');
-    }
+
+  Future<List<DailyCheckin>> getRecentCheckins({int days = 7}) async {
+    await _checkinService.initialize();
+    return await _checkinService.getUserCheckins(_userId, days: days);
+  }
+
+  // Weather Methods (simplified - could integrate with weather API)
+  void updateWeather({
+    required String description,
+    required double temperature,
+    required String icon,
+  }) {
+    _weatherDescription = description;
+    _temperature = temperature;
+    _weatherIcon = icon;
     notifyListeners();
   }
-  
-  // Load Unread Messages
-  Future<void> loadUnreadMessages() async {
-    try {
-      final response = await _supabase
-          .from('messages')
-          .select('id')
-          .eq('recipient_id', _userId)
-          .eq('read', false);
-      
-      _unreadMessages = (response as List).length;
-    } catch (e) {
-      print('Error loading unread messages: $e');
-    }
+
+  // Message Methods
+  void updateUnreadMessageCount(int count) {
+    _unreadMessages = count;
     notifyListeners();
   }
-  
-  // Real-time subscriptions
-  void setupRealtimeSubscriptions() {
-    // Subscribe to medication reminders
-    _supabase
-        .channel('medications')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.update,
-          schema: 'public',
-          table: 'medications',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'elder_id',
-            value: _userId,
-          ),
-          callback: (payload) => loadMedications(),
-        )
-        .subscribe();
-    
-    // Subscribe to messages
-    _supabase
-        .channel('messages')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          table: 'messages',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'recipient_id',
-            value: _userId,
-          ),
-          callback: (payload) => loadUnreadMessages(),
-        )
-        .subscribe();
+
+  // Helper Methods
+  bool isMedicationDue(Medication medication) {
+    return medication.isDue();
   }
-  
+
+  String getTimeUntilNextMedication() {
+    if (_nextMedication == null) return 'No medications scheduled';
+    return _nextMedication!.getTimeUntilNext();
+  }
+
+  List<Medication> getOverdueMedications() {
+    final now = DateTime.now();
+    return _medications.where((m) => m.nextDoseTime.isBefore(now)).toList();
+  }
+
   @override
   void dispose() {
-    _supabase.removeAllChannels();
+    _medicationService.dispose();
+    _contactService.dispose();
+    _checkinService.dispose();
     super.dispose();
   }
 }

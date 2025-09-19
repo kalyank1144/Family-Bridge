@@ -103,6 +103,7 @@ class HealthMonitoringProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await _service.initialize();
       final healthData = await _service.getHealthData(memberId);
       final medications = await _service.getMedicationRecords(memberId);
       
@@ -111,63 +112,28 @@ class HealthMonitoringProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = e.toString();
-      _loadMockHealthData(memberId);
+      // Don't load mock data anymore - offline-first approach will provide local data
+      debugPrint('Health data error (offline data may still be available): $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void _loadMockHealthData(String memberId) {
-    final now = DateTime.now();
-    final healthData = <HealthData>[];
-    final medications = <MedicationRecord>[];
-
-    for (int i = 6; i >= 0; i--) {
-      final date = now.subtract(Duration(days: i));
+  Future<void> addHealthData(String memberId, HealthData data) async {
+    try {
+      await _service.initialize();
+      await _service.addHealthData(memberId, data);
       
-      healthData.add(HealthData(
-        timestamp: DateTime(date.year, date.month, date.day, 8, 0),
-        bloodPressureSystolic: 115 + (i * 2).toDouble(),
-        bloodPressureDiastolic: 75 + (i * 1).toDouble(),
-        heartRate: 70 + (i * 2).toDouble(),
-        temperature: 98.2 + (i * 0.1),
-        oxygenLevel: 96 + (i * 0.5),
-        steps: 1000 + (i * 500),
-        moodScore: 3 + (i % 3),
-        medicationTaken: i != 2,
-      ));
-
-      healthData.add(HealthData(
-        timestamp: DateTime(date.year, date.month, date.day, 20, 0),
-        bloodPressureSystolic: 120 + (i * 2).toDouble(),
-        bloodPressureDiastolic: 80 + (i * 1).toDouble(),
-        heartRate: 75 + (i * 2).toDouble(),
-        steps: 5000 + (i * 1000),
-        moodScore: 4 + (i % 2),
-      ));
-
-      medications.add(MedicationRecord(
-        id: 'med_${i}_morning',
-        name: 'Lisinopril',
-        dosage: '10mg',
-        scheduledTime: DateTime(date.year, date.month, date.day, 8, 0),
-        takenTime: i != 2 ? DateTime(date.year, date.month, date.day, 8, 15) : null,
-        isTaken: i != 2,
-      ));
-
-      medications.add(MedicationRecord(
-        id: 'med_${i}_evening',
-        name: 'Metformin',
-        dosage: '500mg',
-        scheduledTime: DateTime(date.year, date.month, date.day, 20, 0),
-        takenTime: DateTime(date.year, date.month, date.day, 20, 10),
-        isTaken: true,
-      ));
+      // Update local state
+      _memberHealthData[memberId] ??= [];
+      _memberHealthData[memberId]!.add(data);
+      _memberHealthData[memberId]!.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
     }
-
-    _memberHealthData[memberId] = healthData;
-    _memberMedications[memberId] = medications;
   }
 
   void setSelectedDate(DateTime date) {
@@ -181,6 +147,7 @@ class HealthMonitoringProvider extends ChangeNotifier {
 
     final index = medications.indexWhere((m) => m.id == medicationId);
     if (index != -1) {
+      // Optimistically update UI
       medications[index] = MedicationRecord(
         id: medications[index].id,
         name: medications[index].name,
@@ -192,7 +159,14 @@ class HealthMonitoringProvider extends ChangeNotifier {
       );
       notifyListeners();
       
-      await _service.markMedicationTaken(memberId, medicationId);
+      // Update backend (offline-first)
+      try {
+        await _service.initialize();
+        await _service.markMedicationTaken(memberId, medicationId);
+      } catch (e) {
+        // Offline-first approach will queue this for later sync
+        debugPrint('Medication update queued for sync: $e');
+      }
     }
   }
 
@@ -200,6 +174,7 @@ class HealthMonitoringProvider extends ChangeNotifier {
     _service.subscribeToHealthUpdates(memberId, (data) {
       _memberHealthData[memberId] ??= [];
       _memberHealthData[memberId]!.add(data);
+      _memberHealthData[memberId]!.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       notifyListeners();
     });
   }

@@ -10,6 +10,8 @@ import '../../models/hive/message_model.dart';
 import '../../models/hive/health_data_model.dart';
 import '../../models/hive/appointment_model.dart';
 import '../../models/hive/medication_model.dart';
+import '../../models/hive/emergency_contact_model.dart';
+import '../../models/hive/daily_checkin_model.dart';
 import '../network/network_manager.dart';
 import 'conflict_resolver.dart';
 import 'sync_queue.dart';
@@ -27,6 +29,8 @@ class DataSyncService {
   late Box<HiveHealthRecord> healthBox;
   late Box<HiveAppointment> appointmentsBox;
   late Box<HiveMedicationSchedule> medicationsBox;
+  late Box<HiveEmergencyContact> emergencyContactsBox;
+  late Box<HiveDailyCheckin> dailyCheckinsBox;
   late Box<dynamic> metaBox; // for cursors
 
   bool _initialized = false;
@@ -39,12 +43,16 @@ class DataSyncService {
     if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(HiveHealthRecordAdapter());
     if (!Hive.isAdapterRegistered(4)) Hive.registerAdapter(HiveAppointmentAdapter());
     if (!Hive.isAdapterRegistered(5)) Hive.registerAdapter(HiveMedicationScheduleAdapter());
+    if (!Hive.isAdapterRegistered(7)) Hive.registerAdapter(HiveEmergencyContactAdapter());
+    if (!Hive.isAdapterRegistered(8)) Hive.registerAdapter(HiveDailyCheckinAdapter());
 
     usersBox = await Hive.openBox<HiveUserProfile>('users');
     messagesBox = await Hive.openBox<HiveChatMessage>('messages');
     healthBox = await Hive.openBox<HiveHealthRecord>('health_records');
     appointmentsBox = await Hive.openBox<HiveAppointment>('appointments');
     medicationsBox = await Hive.openBox<HiveMedicationSchedule>('medications');
+    emergencyContactsBox = await Hive.openBox<HiveEmergencyContact>('emergency_contacts');
+    dailyCheckinsBox = await Hive.openBox<HiveDailyCheckin>('daily_checkins');
     metaBox = await Hive.openBox('sync_meta');
 
     await SyncQueue.instance.initialize();
@@ -72,6 +80,8 @@ class DataSyncService {
       await _pullUpdates('health_records', healthBox);
       await _pullUpdates('appointments', appointmentsBox);
       await _pullUpdates('medications', medicationsBox);
+      await _pullUpdates('emergency_contacts', emergencyContactsBox);
+      await _pullUpdates('daily_checkins', dailyCheckinsBox);
     } catch (e, st) {
       debugPrint('Sync error: $e\n$st');
     }
@@ -132,6 +142,14 @@ class DataSyncService {
         case 'medications':
           final model = HiveMedicationSchedule.fromMap(row);
           await medicationsBox.put(model.id, model);
+          break;
+        case 'emergency_contacts':
+          final model = HiveEmergencyContact.fromMap(row);
+          await emergencyContactsBox.put(model.id, model);
+          break;
+        case 'daily_checkins':
+          final model = HiveDailyCheckin.fromMap(row);
+          await dailyCheckinsBox.put(model.id, model);
           break;
       }
     }
