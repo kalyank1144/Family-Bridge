@@ -9,6 +9,7 @@ import '../widgets/typing_indicator.dart';
 import '../widgets/chat_input_bar.dart';
 import '../widgets/online_status_bar.dart';
 import '../widgets/voice_recorder_overlay.dart';
+import '../widgets/sync_status_banner.dart';
 
 class FamilyChatScreen extends ConsumerStatefulWidget {
   final String familyId;
@@ -450,6 +451,7 @@ class _FamilyChatScreenState extends ConsumerState<FamilyChatScreen> {
         children: [
           Column(
             children: [
+              SyncStatusBanner(),
               OnlineStatusBar(
                 familyId: widget.familyId,
                 userType: widget.userType,
