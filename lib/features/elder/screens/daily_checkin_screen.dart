@@ -6,6 +6,9 @@ import '../providers/elder_provider.dart';
 import '../models/daily_checkin_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../widgets/elder_image_picker.dart';
+import '../widgets/voice_checkin_widget.dart';
+import '../../../services/storage/media_storage_service.dart';
 
 class DailyCheckinScreen extends StatefulWidget {
   const DailyCheckinScreen({super.key});
@@ -26,6 +29,7 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
   bool _physicalActivity = false;
   int _painLevel = 0;
   String _notes = '';
+  String? _environmentPhotoUrl;
   String? _voiceNoteUrl;
   
   bool _isRecording = false;
@@ -423,55 +427,33 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
               ),
               const SizedBox(height: 20),
               
-              // Voice Note
-              GestureDetector(
-                onTap: _toggleRecording,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: _isRecording
-                        ? AppTheme.emergencyRed.withOpacity(0.1)
-                        : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: _isRecording
-                          ? AppTheme.emergencyRed
-                          : Colors.grey.shade400,
-                      width: 2,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _isRecording ? Icons.stop : Icons.mic,
-                        size: 32,
-                        color: _isRecording
-                            ? AppTheme.emergencyRed
-                            : AppTheme.darkText,
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        _isRecording
-                            ? 'Recording... $_recordingDuration/30s'
-                            : _voiceNoteUrl != null
-                                ? 'Voice note recorded ✓'
-                                : 'Record voice note',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: _isRecording
-                              ? AppTheme.emergencyRed
-                              : AppTheme.darkText,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              // Environment Photo (optional)
+              Text(
+                'Add a photo (optional)',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 12),
+              // Simplified camera for elders
+              // ignore: prefer_const_constructors
+              ElderImagePicker(
+                bucket: MediaStorageService.bucketMedicationPhotos,
+                buttonText: 'Take Photo',
+                onUploaded: (url) {
+                  _environmentPhotoUrl = url;
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // Voice Note (record, playback, upload)
+              VoiceCheckinWidget(
+                onUploaded: (url) {
+                  setState(() {
+                    _voiceNoteUrl = url;
+                  });
+                },
               ),
               const SizedBox(height: 40),
-              
+
               // Submit Button
               ElevatedButton(
                 onPressed: _submitCheckin,

@@ -5,6 +5,12 @@ import '../providers/elder_provider.dart';
 import '../models/emergency_contact_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import '../../elder/widgets/voice_checkin_widget.dart';
+import '../../../services/storage/media_storage_service.dart';
 
 class EmergencyContactsScreen extends StatefulWidget {
   const EmergencyContactsScreen({super.key});
@@ -58,6 +64,43 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
     await launchUrl(launchUri);
   }
 
+  Future<void> _shareLocationToContacts() async {
+    final perm = await Permission.locationWhenInUse.request();
+    if (!perm.isGranted) return;
+    try {
+      final pos = await Geolocator.getCurrentPosition();
+      final link = 'https://maps.google.com/?q=${pos.latitude},${pos.longitude}';
+      final elderProvider = context.read<ElderProvider>();
+      for (final c in elderProvider.emergencyContacts) {
+        final sms = Uri(scheme: 'sms', path: c.phone, queryParameters: {
+          'body': 'Emergency: Here is my location: $link'
+        });
+        await launchUrl(sms);
+      }
+      await _voiceService.confirmAction('Location shared');
+    } catch (e) {
+      await _voiceService.announceError('Could not get location');
+    }
+  }
+
+  Future<void> _takeEmergencyPhoto() async {
+    final picker = ImagePicker();
+    final camPerm = await Permission.camera.request();
+    if (!camPerm.isGranted) return;
+    final x = await picker.pickImage(source: ImageSource.camera, imageQuality: 85);
+    if (x == null) return;
+    try {
+      await MediaStorageService().uploadFile(
+        file: File(x.path),
+        bucket: MediaStorageService.bucketMedicationPhotos,
+        contentType: 'image/jpeg',
+      );
+      await _voiceService.confirmAction('Emergency photo captured');
+    } catch (_) {
+      await _voiceService.speak('Photo saved to send later');
+    }
+  }
+
   void _showAddContactDialog() {
     showDialog(
       context: context,
@@ -90,45 +133,48 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                 // Emergency 911 Button
                 Container(
                   margin: const EdgeInsets.all(20),
-                  child: ElevatedButton(
-                    onPressed: _call911,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.emergencyRed,
-                      minimumSize: const Size(double.infinity, 100),
-                      shape: RoundedRectangleBorder(
+                  child: GestureDetector(
+                    onTap: () async {
+                      await _voiceService.speak('Long press to confirm calling 911');
+                    },
+                    onLongPress: _call911,
+                    child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: AppTheme.emergencyRed,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.emergency,
-                          size: 40,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 20),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'EMERGENCY',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.emergency,
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 20),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'EMERGENCY',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            const Text(
-                              'Call 911',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white70,
+                              const Text(
+                                'Long press to call 911',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white70,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -153,7 +199,42 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                           },
                         ),
                 ),
-                
+
+                // Emergency Actions Bar
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _shareLocationToContacts,
+                              icon: const Icon(Icons.location_on, color: Colors.white),
+                              label: const Text('Share Location', style: TextStyle(fontSize: 20, color: Colors.white)),
+                              style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 64)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _takeEmergencyPhoto,
+                              icon: const Icon(Icons.camera, color: Colors.white),
+                              label: const Text('Take Photo', style: TextStyle(fontSize: 20, color: Colors.white)),
+                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, minimumSize: const Size(double.infinity, 64)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      VoiceCheckinWidget(onUploaded: (url) {
+                        // Could store into emergency_events table from a service
+                      }),
+                    ],
+                  ),
+                ),
+
                 // Add Contact Button
                 Padding(
                   padding: const EdgeInsets.all(20),
