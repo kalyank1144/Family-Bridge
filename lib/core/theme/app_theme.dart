@@ -7,6 +7,12 @@ class AppTheme {
   static const Color secondaryColor = Color(0xFF9333EA);
   static const Color accentColor = Color(0xFFF59E0B);
   static const Color backgroundColor = Color(0xFFF9FAFB);
+  
+  // Onboarding minimalist palette
+  static const Color onboardingPrimary = Color(0xFF333333);
+  static const Color onboardingSecondary = Color(0xFF666666);
+  static const Color onboardingBackground = Color(0xFFF5F5F5);
+  static const Color onboardingBorder = Color(0xFFE0E0E0);
   static const Color surfaceColor = Colors.white;
   static const Color errorColor = Color(0xFFEF4444);
   static const Color successColor = Color(0xFF10B981);
@@ -32,6 +38,77 @@ class AppTheme {
   static const double spacingLg = 24.0;
   static const double spacingXl = 32.0;
 
+  // Onboarding minimalist theme
+  static ThemeData get onboardingTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: onboardingBackground,
+      colorScheme: const ColorScheme.light(
+        primary: onboardingPrimary,
+        secondary: onboardingSecondary,
+        background: onboardingBackground,
+        surface: Colors.white,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onBackground: Colors.black,
+        onSurface: Colors.black,
+      ),
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(
+          fontSize: 36,
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+          letterSpacing: -0.5,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+          letterSpacing: 0.5,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+          height: 1.2,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w400,
+          color: onboardingSecondary,
+          height: 1.4,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: onboardingSecondary,
+          height: 1.3,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: onboardingPrimary,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFFCCCCCC),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+          textStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+  
   // Default light theme (existing)
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,

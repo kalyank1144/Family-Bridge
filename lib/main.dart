@@ -71,7 +71,7 @@ class FamilyBridgeApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'FamilyBridge',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.onboardingTheme,
       darkTheme: AppTheme.darkTheme,
       routerConfig: router,
     );

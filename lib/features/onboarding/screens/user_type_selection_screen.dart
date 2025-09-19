@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../core/theme/app_theme.dart';
 import '../providers/user_type_provider.dart';
 
 class UserTypeSelectionScreen extends StatefulWidget {
@@ -38,84 +37,93 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
     final provider = context.watch<UserTypeProvider>();
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-          tooltip: 'Back',
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Select User Type'),
-      ),
-      body: SafeArea(
-        child: Padding(
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(20),
           padding: const EdgeInsets.all(24),
+          constraints: const BoxConstraints(maxWidth: 400),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Who are you?',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
-                ),
+              // Header
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
+                    onPressed: () => context.pop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 16),
+                  const Text(
+                    'USER TYPE SELECTION',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Choose your role to personalize your experience',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _RoleCard(
-                icon: Icons.elderly,
+              const SizedBox(height: 32),
+              
+              // Elder Card
+              _UserTypeCard(
+                icon: const ElderIcon(),
                 title: 'I am an Elder',
-                subtitle: 'Simple interface with voice commands',
-                color: AppTheme.primaryBlue,
+                subtitle: 'Simple interface\nwith voice commands',
                 selected: _selected == UserType.elder,
                 onTap: () => setState(() => _selected = UserType.elder),
               ),
               const SizedBox(height: 16),
-              _RoleCard(
-                icon: Icons.volunteer_activism,
+              
+              // Caregiver Card
+              _UserTypeCard(
+                icon: const CaregiverIcon(),
                 title: 'I am a Caregiver',
-                subtitle: 'Monitor and coordinate family care',
-                color: AppTheme.successGreen,
+                subtitle: 'Monitor and\ncoordinate family care',
                 selected: _selected == UserType.caregiver,
                 onTap: () => setState(() => _selected = UserType.caregiver),
               ),
               const SizedBox(height: 16),
-              _RoleCard(
-                icon: Icons.group,
-                title: 'I am Youth/Family',
-                subtitle: 'Help and connect with family',
-                color: AppTheme.secondaryColor,
+              
+              // Youth Card
+              _UserTypeCard(
+                icon: const YouthIcon(),
+                title: 'I am\nYouth/Family',
+                subtitle: 'Help and connect\nwith family',
                 selected: _selected == UserType.youth,
                 onTap: () => setState(() => _selected = UserType.youth),
               ),
-              const Spacer(),
-              Semantics(
-                button: true,
-                enabled: _selected != null,
-                label: 'Continue',
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _selected == null ? null : () => _onContinue(provider),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(64),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+              const SizedBox(height: 32),
+              
+              // Continue Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _selected == null ? null : () => _onContinue(provider),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF333333),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: const Color(0xFFCCCCCC),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -128,105 +136,315 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
   }
 }
 
-class _RoleCard extends StatelessWidget {
-  final IconData icon;
+class _UserTypeCard extends StatelessWidget {
+  final Widget icon;
   final String title;
   final String subtitle;
-  final Color color;
   final bool selected;
   final VoidCallback onTap;
 
-  const _RoleCard({
+  const _UserTypeCard({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.color,
     required this.selected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      selected: selected,
-      button: true,
-      label: title,
-      hint: subtitle,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selected ? color : Colors.grey.shade200,
-              width: selected ? 3 : 1,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? Colors.black : const Color(0xFFE0E0E0),
+            width: selected ? 3 : 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: icon,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.all(20),
-          constraints: const BoxConstraints(minHeight: 96),
-          child: Row(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(icon, color: color, size: 36),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textPrimary,
-                      ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      height: 1.2,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.textSecondary,
-                        height: 1.4,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF666666),
+                      height: 1.3,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: selected ? color : Colors.transparent,
-                  border: Border.all(color: selected ? color : Colors.grey.shade300, width: 2),
-                ),
-                child: selected
-                    ? const Icon(Icons.check, color: Colors.white, size: 18)
-                    : null,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+// Custom Icon Widgets
+class ElderIcon extends StatelessWidget {
+  const ElderIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: ElderIconPainter(),
+      size: const Size(60, 60),
+    );
+  }
+}
+
+class CaregiverIcon extends StatelessWidget {
+  const CaregiverIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: CaregiverIconPainter(),
+      size: const Size(60, 60),
+    );
+  }
+}
+
+class YouthIcon extends StatelessWidget {
+  const YouthIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: YouthIconPainter(),
+      size: const Size(60, 60),
+    );
+  }
+}
+
+// Custom Painters for Icons
+class ElderIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final fillPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    // Head
+    canvas.drawCircle(Offset(centerX, centerY - 12), 8, paint);
+    
+    // Glasses
+    canvas.drawCircle(Offset(centerX - 5, centerY - 12), 4, paint);
+    canvas.drawCircle(Offset(centerX + 5, centerY - 12), 4, paint);
+    canvas.drawLine(
+      Offset(centerX - 1, centerY - 12),
+      Offset(centerX + 1, centerY - 12),
+      paint,
+    );
+
+    // Body
+    canvas.drawLine(
+      Offset(centerX, centerY - 4),
+      Offset(centerX, centerY + 12),
+      paint,
+    );
+
+    // Arms
+    canvas.drawLine(
+      Offset(centerX, centerY + 2),
+      Offset(centerX - 8, centerY + 8),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX, centerY + 2),
+      Offset(centerX + 8, centerY + 8),
+      paint,
+    );
+
+    // Legs
+    canvas.drawLine(
+      Offset(centerX, centerY + 12),
+      Offset(centerX - 6, centerY + 20),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX, centerY + 12),
+      Offset(centerX + 6, centerY + 20),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class CaregiverIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final fillPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    // Adult figure (larger, left)
+    // Head
+    canvas.drawCircle(Offset(centerX - 8, centerY - 10), 6, paint);
+    // Body
+    canvas.drawLine(
+      Offset(centerX - 8, centerY - 4),
+      Offset(centerX - 8, centerY + 8),
+      paint,
+    );
+    // Arms
+    canvas.drawLine(
+      Offset(centerX - 8, centerY),
+      Offset(centerX - 2, centerY + 3),
+      paint,
+    );
+    // Legs
+    canvas.drawLine(
+      Offset(centerX - 8, centerY + 8),
+      Offset(centerX - 12, centerY + 16),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX - 8, centerY + 8),
+      Offset(centerX - 4, centerY + 16),
+      paint,
+    );
+
+    // Child figure (smaller, right)
+    // Head
+    canvas.drawCircle(Offset(centerX + 8, centerY - 4), 4, paint);
+    // Body
+    canvas.drawLine(
+      Offset(centerX + 8, centerY),
+      Offset(centerX + 8, centerY + 8),
+      paint,
+    );
+    // Arms (one connected to adult)
+    canvas.drawLine(
+      Offset(centerX + 8, centerY + 2),
+      Offset(centerX + 2, centerY + 3),
+      paint,
+    );
+    // Legs
+    canvas.drawLine(
+      Offset(centerX + 8, centerY + 8),
+      Offset(centerX + 5, centerY + 14),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX + 8, centerY + 8),
+      Offset(centerX + 11, centerY + 14),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class YouthIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final fillPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    // Head
+    canvas.drawCircle(Offset(centerX, centerY - 8), 8, paint);
+    
+    // Hair (simple curved lines)
+    final hairPath = Path();
+    hairPath.moveTo(centerX - 6, centerY - 14);
+    hairPath.quadraticBezierTo(centerX, centerY - 18, centerX + 6, centerY - 14);
+    canvas.drawPath(hairPath, paint);
+
+    // Body
+    canvas.drawLine(
+      Offset(centerX, centerY),
+      Offset(centerX, centerY + 12),
+      paint,
+    );
+
+    // Arms
+    canvas.drawLine(
+      Offset(centerX, centerY + 3),
+      Offset(centerX - 10, centerY + 8),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX, centerY + 3),
+      Offset(centerX + 10, centerY + 8),
+      paint,
+    );
+
+    // Legs
+    canvas.drawLine(
+      Offset(centerX, centerY + 12),
+      Offset(centerX - 8, centerY + 20),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX, centerY + 12),
+      Offset(centerX + 8, centerY + 20),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
