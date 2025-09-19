@@ -17,7 +17,7 @@ class CaregiverRepository {
 
       final data = await client
           .from('caregiver_patients')
-          .select('elder_id, profiles!caregiver_patients_elder_id_fkey ( id, email, full_name, user_type, role )')
+          .select('elder_id, profiles!fk_caregiver_patients_elder_profile ( id, email, full_name, user_type, role )')
           .eq('caregiver_id', caregiverId) as List;
 
       final list = (data as List)
@@ -65,7 +65,7 @@ class CaregiverRepository {
   Future<void> _refetch(String caregiverId, String key, StreamController<List<Map<String, dynamic>>> ctrl) async {
     final data = await client
         .from('caregiver_patients')
-        .select('elder_id, profiles!caregiver_patients_elder_id_fkey ( id, email, full_name, user_type, role )')
+        .select('elder_id, profiles!fk_caregiver_patients_elder_profile ( id, email, full_name, user_type, role )')
         .eq('caregiver_id', caregiverId) as List;
 
     final list = (data as List)
