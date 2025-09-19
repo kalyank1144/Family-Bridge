@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-// Caregiver screens
 import '../../features/caregiver/screens/caregiver_dashboard_screen.dart';
 import '../../features/caregiver/screens/health_monitoring_screen.dart';
 import '../../features/caregiver/screens/appointments_calendar_screen.dart';
@@ -10,19 +9,21 @@ import '../../features/caregiver/screens/add_appointment_screen.dart';
 import '../../features/caregiver/screens/alert_settings_screen.dart';
 import '../../features/caregiver/screens/reports_screen.dart';
 
-// Elder screens
 import '../../features/elder/screens/elder_home_screen.dart';
 import '../../features/elder/screens/emergency_contacts_screen.dart';
 import '../../features/elder/screens/medication_reminder_screen.dart';
 import '../../features/elder/screens/daily_checkin_screen.dart';
 import '../../features/elder/screens/family_chat_screen.dart';
 
+import '../../features/youth/screens/youth_home_dashboard.dart';
+import '../../features/youth/screens/story_recording_screen.dart';
+import '../../features/youth/screens/youth_games_screen.dart';
+import '../../features/youth/screens/photo_sharing_screen.dart';
+
 class AppRouter {
   static final GoRouter router = GoRouter(
-    // Keep caregiver dashboard as initial to avoid breaking existing flows
     initialLocation: '/caregiver',
     routes: [
-      // Caregiver routes
       GoRoute(
         path: '/caregiver',
         name: 'caregiver_dashboard',
@@ -68,8 +69,6 @@ class AppRouter {
           ),
         ],
       ),
-
-      // Elder routes
       GoRoute(
         path: '/elder',
         name: 'elder_home',
@@ -94,6 +93,28 @@ class AppRouter {
             path: 'family',
             name: 'elder_family',
             builder: (context, state) => const FamilyChatScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/youth',
+        name: 'youth_home',
+        builder: (context, state) => const YouthHomeDashboard(),
+        routes: [
+          GoRoute(
+            path: 'story',
+            name: 'youth_story',
+            builder: (context, state) => const StoryRecordingScreen(),
+          ),
+          GoRoute(
+            path: 'games',
+            name: 'youth_games',
+            builder: (context, state) => const YouthGamesScreen(),
+          ),
+          GoRoute(
+            path: 'photos',
+            name: 'youth_photos',
+            builder: (context, state) => const PhotoSharingScreen(),
           ),
         ],
       ),
