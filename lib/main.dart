@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'features/chat/screens/family_chat_screen.dart';
-import 'features/chat/services/notification_service.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -33,17 +26,10 @@ void main() async {
   // Load environment (optional, supports --dart-define and .env)
   await dotenv.load(fileName: ".env", isOptional: true);
 
-
   await Supabase.initialize(
     url: Env.supabaseUrl,
     anonKey: Env.supabaseAnonKey,
   );
-
-  
-  runApp(
-    const ProviderScope(
-      child: FamilyBridgeApp(),
-
 
   await NotificationService.instance.initialize();
 
@@ -72,15 +58,11 @@ class FamilyBridgeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'FamilyBridge',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        fontFamily: 'SF Pro Display',
-      ),
-      home: const ChatDemoScreen(),
+      theme: AppTheme.lightTheme,
+      routerConfig: AppRouter.router,
     );
   }
 }

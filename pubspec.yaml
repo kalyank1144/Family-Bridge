@@ -60,6 +60,11 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   # Health & Fitness
   percent_indicator: ^4.2.3
+  fl_chart: ^0.66.2
+  
+  # Professional reporting
+  pdf: ^3.10.7
+  printing: ^5.12.0
   
   # Media
   audioplayers: ^5.2.1
