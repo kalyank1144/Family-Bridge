@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/elder_provider.dart';
+import '../widgets/voice_navigation_widget.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -16,6 +18,8 @@ class _FamilyChatScreenState extends State<FamilyChatScreen> {
   late VoiceService _voiceService;
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _highContrastMode = false;
+  bool _isRecordingVoice = false;
   
   // Mock messages for demonstration
   final List<ChatMessage> _messages = [
