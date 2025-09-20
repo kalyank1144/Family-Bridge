@@ -29,65 +29,94 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: isMe ? 40 : 8,
-        right: isMe ? 8 : 40,
-        top: showAvatar ? 12 : 2,
-        bottom: 4,
+    final isElder = userType == 'elder';
+    
+    return Container(
+      margin: EdgeInsets.only(
+        left: isMe ? 50 : 16,
+        right: isMe ? 16 : 50,
+        top: showAvatar ? 16 : 4,
+        bottom: 6,
       ),
       child: Row(
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!isMe && showAvatar) _buildAvatar(),
-          if (!isMe && !showAvatar) const SizedBox(width: 40),
+          // Avatar for incoming messages
+          if (!isMe) ..[
+            if (showAvatar) 
+              _buildModernAvatar()
+            else 
+              SizedBox(width: isElder ? 48 : 42),
+            const SizedBox(width: 8),
+          ],
+          
+          // Message content
           Flexible(
             child: GestureDetector(
               onLongPress: () => _showMessageOptions(context),
               child: Column(
                 crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
+                  // Sender name for incoming messages
                   if (showAvatar && !isMe)
                     Padding(
-                      padding: const EdgeInsets.only(left: 8, bottom: 4),
+                      padding: const EdgeInsets.only(bottom: 6, left: 4),
                       child: Text(
                         message.senderName,
                         style: TextStyle(
-                          fontSize: userType == 'elder' ? 14 : 12,
-                          fontWeight: FontWeight.w600,
+                          fontSize: isElder ? 16 : 14,
+                          fontWeight: FontWeight.w700,
                           color: _getSenderColor(),
+                          letterSpacing: 0.2,
                         ),
                       ),
                     ),
+                  
+                  // Reply preview
                   if (message.replyToId != null && message.replyToMessage != null)
-                    _buildReplyPreview(),
+                    _buildModernReplyPreview(),
+                  
+                  // Message bubble
                   Container(
                     decoration: BoxDecoration(
                       color: _getBubbleColor(context),
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(isMe ? 16 : 4),
-                        topRight: Radius.circular(isMe ? 4 : 16),
-                        bottomLeft: const Radius.circular(16),
-                        bottomRight: const Radius.circular(16),
+                        topLeft: Radius.circular(isMe ? 20 : (showAvatar ? 4 : 20)),
+                        topRight: Radius.circular(isMe ? (showAvatar ? 4 : 20) : 20),
+                        bottomLeft: const Radius.circular(20),
+                        bottomRight: const Radius.circular(20),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 4,
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 8,
                           offset: const Offset(0, 2),
+                          spreadRadius: 0,
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                          spreadRadius: 0,
                         ),
                       ],
                     ),
                     child: _buildMessageContent(context),
                   ),
-                  if (message.reactions.isNotEmpty)
+                  
+                  // Reactions
+                  if (message.reactions.isNotEmpty) ..[
+                    const SizedBox(height: 4),
                     MessageReactions(
                       reactions: message.reactions,
                       userType: userType,
                       onAddReaction: onReact,
                     ),
-                  _buildMessageFooter(),
+                  ],
+                  
+                  // Message footer with timestamp and status
+                  _buildModernMessageFooter(),
                 ],
               ),
             ),
@@ -97,66 +126,102 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
-    return CircleAvatar(
-      radius: 16,
-      backgroundColor: _getSenderColor(),
-      backgroundImage: message.senderAvatar != null
-          ? NetworkImage(message.senderAvatar!)
-          : null,
-      child: message.senderAvatar == null
-          ? Text(
-              message.senderName[0].toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          : null,
+  Widget _buildModernAvatar() {
+    final isElder = userType == 'elder';
+    final avatarRadius = isElder ? 24.0 : 21.0;
+    
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: _getSenderColor().withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: CircleAvatar(
+        radius: avatarRadius,
+        backgroundColor: _getSenderColor(),
+        backgroundImage: message.senderAvatar != null
+            ? NetworkImage(message.senderAvatar!)
+            : null,
+        child: message.senderAvatar == null
+            ? Text(
+                message.senderName[0].toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isElder ? 20 : 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              )
+            : null,
+      ),
     );
   }
 
-  Widget _buildReplyPreview() {
+  Widget _buildModernReplyPreview() {
+    final isElder = userType == 'elder';
+    
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(8),
+        color: isMe 
+            ? Colors.white.withOpacity(0.15) 
+            : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isMe 
+              ? Colors.white.withOpacity(0.2) 
+              : Colors.grey.shade200,
+          width: 1,
+        ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 3,
-            height: 30,
-            color: _getSenderColor(),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  message.replyToMessage!.senderName,
-                  style: TextStyle(
-                    fontSize: userType == 'elder' ? 13 : 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  message.replyToMessage!.content ?? '[Media]',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: userType == 'elder' ? 13 : 11,
-                  ),
-                ),
-              ],
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: _getSenderColor(),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.replyToMessage!.senderName,
+                    style: TextStyle(
+                      fontSize: isElder ? 14 : 12,
+                      fontWeight: FontWeight.bold,
+                      color: _getSenderColor(),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    message.replyToMessage!.content ?? '[Media]',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: isElder ? 14 : 12,
+                      color: isMe 
+                          ? Colors.white.withOpacity(0.8) 
+                          : Colors.grey.shade700,
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -206,33 +271,133 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildImageContent() {
+    final isElder = userType == 'elder';
+    final imageSize = isElder ? 280.0 : 240.0;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            message.mediaUrl ?? '',
-            width: 200,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 200,
-                height: 150,
-                color: Colors.grey.shade300,
-                child: const Icon(Icons.broken_image, size: 50),
-              );
-            },
+        // Image with modern styling
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: imageSize,
+            maxHeight: imageSize * 0.75,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              children: [
+                Image.network(
+                  message.mediaUrl ?? '',
+                  width: imageSize,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: imageSize,
+                      height: imageSize * 0.6,
+                      color: Colors.grey.shade200,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                          color: _getAccentColor(),
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: imageSize,
+                      height: imageSize * 0.6,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.broken_image_rounded,
+                            size: isElder ? 60 : 50,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Image not available',
+                            style: TextStyle(
+                              fontSize: isElder ? 16 : 14,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                // Image overlay for better readability of caption
+                if (message.content != null && message.content!.isNotEmpty)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.black.withOpacity(0.3),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        message.content!,
+                        style: TextStyle(
+                          fontSize: _getTextSize(),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          height: 1.3,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
+        
+        // Caption below image (if image has overlay, this won't show)
         if (message.content != null && message.content!.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
             child: Text(
               message.content!,
               style: TextStyle(
                 fontSize: _getTextSize(),
-                color: isMe ? Colors.white : Colors.black87,
+                color: isMe ? Colors.white.withOpacity(0.9) : Colors.black87,
+                height: 1.3,
               ),
             ),
           ),
@@ -447,36 +612,58 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageFooter() {
+  Widget _buildModernMessageFooter() {
+    final isElder = userType == 'elder';
+    
     return Padding(
-      padding: const EdgeInsets.only(top: 2, left: 8, right: 8),
+      padding: const EdgeInsets.only(top: 6, left: 4, right: 4),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
+          // Timestamp
           Text(
             DateFormat('HH:mm').format(message.timestamp),
             style: TextStyle(
-              fontSize: userType == 'elder' ? 11 : 10,
-              color: Colors.grey.shade600,
+              fontSize: isElder ? 12 : 11,
+              color: Colors.grey.shade500,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          if (isMe) ...[
-            const SizedBox(width: 4),
-            Icon(
-              _getStatusIcon(),
-              size: userType == 'elder' ? 14 : 12,
-              color: _getStatusColor(),
+          
+          // Status indicator for sent messages
+          if (isMe) ..[
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: _getStatusColor().withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _getStatusIcon(),
+                size: isElder ? 16 : 14,
+                color: _getStatusColor(),
+              ),
             ),
           ],
-          if (message.isEdited) ...[
-            const SizedBox(width: 4),
-            Text(
-              '(edited)',
-              style: TextStyle(
-                fontSize: userType == 'elder' ? 11 : 10,
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
+          
+          // Edited indicator
+          if (message.isEdited) ..[
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'edited',
+                style: TextStyle(
+                  fontSize: isElder ? 10 : 9,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -509,7 +696,20 @@ class MessageBubble extends StatelessWidget {
           return Theme.of(context).primaryColor;
       }
     } else {
-      return Colors.grey.shade200;
+      return Colors.white;
+    }
+  }
+  
+  Color _getAccentColor() {
+    switch (userType) {
+      case 'elder':
+        return Colors.blue.shade600;
+      case 'caregiver':
+        return Colors.teal.shade600;
+      case 'youth':
+        return Colors.purple.shade600;
+      default:
+        return Colors.blue;
     }
   }
 
