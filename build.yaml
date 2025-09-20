@@ -1,0 +1,70 @@
+targets:
+  $default:
+    builders:
+      # JSON Serialization
+      json_serializable:
+        options:
+          # Generate toJson methods
+          explicit_to_json: true
+          # Don't include null values in JSON
+          include_if_null: false
+          # Use snake_case for JSON keys
+          field_rename: snake
+          # Generate helper methods
+          create_to_json: true
+          create_factory: true
+          # Strict type checking
+          checked: true
+          # Handle generic types
+          generic_argument_factories: true
+          
+      # Freezed for immutable models
+      freezed:
+        options:
+          # Generate copyWith method
+          copy_with: true
+          # Generate equality operators
+          equal: true
+          # Make all fields final
+          make_collections_unmodifiable: true
+          
+      # Hive Type Adapters
+      hive_generator:
+        options:
+          # Generate adapters for all annotated classes
+          output_extensions:
+            '.dart': '.g.dart'
+            
+      # Source Generation
+      source_gen|combining_builder:
+        options:
+          ignore_for_file:
+            - type=lint
+            - invalid_annotation_target
+            
+global_options:
+  # Improve build performance
+  build_runner:
+    # Use persistent workers for faster builds
+    use_persistent_workers: true
+    # Number of concurrent builds
+    build_max_workers: 4
+    
+  # Analyzer options for generated code
+  analyzer:
+    errors:
+      # Ignore issues in generated files
+      uri_has_not_been_generated: ignore
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      
+# Builder configuration
+builders:
+  # Custom builder for app-specific code generation
+  app_builder:
+    import: "tool/builders.dart"
+    builder_factories: ["appBuilder"]
+    build_extensions: {".dart": [".app.g.dart"]}
+    auto_apply: dependents
+    build_to: source

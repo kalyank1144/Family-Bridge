@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,14 +18,25 @@ import 'core/models/message_model.dart';
 
 // Provider imports
 import 'features/auth/providers/auth_provider.dart';
+import 'features/onboarding/providers/user_type_provider.dart';
 import 'features/caregiver/providers/family_data_provider.dart';
 import 'features/caregiver/providers/health_monitoring_provider.dart';
 import 'features/caregiver/providers/appointments_provider.dart';
 import 'features/caregiver/providers/alert_provider.dart';
 import 'features/elder/providers/elder_provider.dart';
-import 'features/onboarding/providers/user_type_provider.dart';
+import 'features/youth/providers/youth_provider.dart';
+import 'features/youth/providers/games_provider.dart';
+import 'features/youth/providers/photo_sharing_provider.dart';
+import 'features/youth/providers/story_recording_provider.dart';
+import 'features/chat/providers/chat_provider.dart';
 import 'features/admin/providers/hipaa_compliance_provider.dart';
-import 'features/chat/providers/chat_providers.dart';
+
+import 'services/sync/data_sync_service.dart';
+import 'services/offline/offline_manager.dart';
+import 'services/network/network_manager.dart';
+import 'shared/services/analytics_service.dart';
+import 'shared/services/crash_reporting_service.dart';
+import 'shared/services/performance_service.dart';
 
 /// Application entry point
 Future<void> main() async {
@@ -34,7 +44,6 @@ Future<void> main() async {
 
   try {
     await _initializeApp();
-    runApp(const FamilyBridgeApp());
   } catch (error, stackTrace) {
     debugPrint('Failed to initialize app: $error');
     debugPrint('Stack trace: $stackTrace');
@@ -68,6 +77,26 @@ Future<void> _initializeApp() async {
   // Initialize core services
   await AuthService.instance.initialize();
   await NotificationService.instance.initialize();
+
+  // Initialize additional services
+  final voiceService = VoiceService();
+  await voiceService.initialize();
+
+  final prefs = await SharedPreferences.getInstance();
+
+  final userTypeProvider = UserTypeProvider();
+  await userTypeProvider.load();
+
+  // Initialize monitoring services
+  PerformanceService.instance.initialize();
+  AnalyticsService.instance.initialize();
+  CrashReportingService.instance.initialize();
+
+  runApp(FamilyBridgeApp(
+    prefs: prefs,
+    voiceService: voiceService,
+    userTypeProvider: userTypeProvider,
+  ));
 }
 
 /// Register Hive adapters for local storage
@@ -77,65 +106,72 @@ Future<void> _registerHiveAdapters() async {
   Hive.registerAdapter(MessageStatusAdapter());
   Hive.registerAdapter(MessagePriorityAdapter());
   Hive.registerAdapter(MessageReactionAdapter());
-
-  // Initialize Supabase if configured
-  if (Env.supabaseUrl.isNotEmpty && Env.supabaseAnonKey.isNotEmpty) {
-    await Supabase.initialize(
-      url: Env.supabaseUrl,
-      anonKey: Env.supabaseAnonKey,
-    );
-  }
-
-  // Initialize auth service
-  await AuthService.instance.initialize();
-
-  // Initialize notification service
-  await NotificationService.instance.initialize(userType: 'elder');
 }
 
 /// Main application widget with providers and routing
 class FamilyBridgeApp extends StatelessWidget {
-  const FamilyBridgeApp({super.key});
+  final SharedPreferences prefs;
+  final VoiceService voiceService;
+  final UserTypeProvider userTypeProvider;
+
+  const FamilyBridgeApp({
+    super.key,
+    required this.prefs,
+    required this.voiceService,
+    required this.userTypeProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MultiProvider(
-        providers: [
-          // Core providers
-          ChangeNotifierProvider(create: (_) => AuthProvider()),
-          ChangeNotifierProvider(create: (_) => UserTypeProvider()),
-
-          // Feature providers
-          ChangeNotifierProvider(create: (_) => FamilyDataProvider()),
-          ChangeNotifierProvider(create: (_) => HealthMonitoringProvider()),
-          ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
-          ChangeNotifierProvider(create: (_) => AlertProvider()),
-          ChangeNotifierProvider(create: (_) => ElderProvider()),
-          ChangeNotifierProvider(create: (_) => HipaaComplianceProvider()),
-
-          // Services as providers
-          Provider<VoiceService>(create: (_) => VoiceService()),
-          Provider<NotificationService>.value(value: NotificationService.instance),
-        ],
-        child: Consumer<AuthProvider>(
-          builder: (context, authProvider, _) {
-            return MaterialApp.router(
-              title: 'FamilyBridge',
-              debugShowCheckedModeBanner: false,
-              theme: _getThemeForUser(authProvider),
-              routerConfig: AppRouter.createRouter(context),
-              builder: (context, child) {
-                return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    textScaleFactor: _getTextScaleForUser(authProvider),
-                  ),
-                  child: child ?? const SizedBox.shrink(),
-                );
-              },
-            );
-          },
-        ),
+    return MultiProvider(
+      providers: [
+        // Core value providers
+        Provider.value(value: voiceService),
+        Provider.value(value: prefs),
+        Provider.value(value: NotificationService.instance),
+        
+        // Core state providers
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider.value(value: userTypeProvider),
+        
+        // Feature providers
+        ChangeNotifierProvider(create: (_) => FamilyDataProvider()),
+        ChangeNotifierProvider(create: (_) => HealthMonitoringProvider()),
+        ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
+        ChangeNotifierProvider(create: (_) => AlertProvider()),
+        ChangeNotifierProvider(create: (_) => ElderProvider()),
+        ChangeNotifierProvider(create: (_) => YouthProvider()),
+        ChangeNotifierProvider(create: (_) => GamesProvider()),
+        ChangeNotifierProvider(create: (_) => PhotoSharingProvider()),
+        ChangeNotifierProvider(create: (_) => StoryRecordingProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => HipaaComplianceProvider()),
+        
+        // Service providers
+        Provider(create: (_) => DataSyncService()),
+        Provider(create: (_) => OfflineManager()),
+        Provider(create: (_) => NetworkManager()),
+      ],
+      child: Consumer<AuthProvider>(
+        builder: (context, authProvider, _) {
+          final router = AppRouter(userTypeProvider).router;
+          
+          return MaterialApp.router(
+            title: 'FamilyBridge',
+            debugShowCheckedModeBanner: false,
+            theme: _getThemeForUser(authProvider),
+            darkTheme: AppTheme.darkTheme,
+            routerConfig: router,
+            builder: (context, child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(_getTextScaleForUser(authProvider)),
+                ),
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -156,6 +192,11 @@ class FamilyBridgeApp extends StatelessWidget {
       return AppTheme.onboardingTheme;
     }
     
+    // Use youth theme for youth users
+    if (profile?.role == UserRole.youth) {
+      return AppTheme.youthTheme;
+    }
+    
     return AppTheme.lightTheme;
   }
 
@@ -165,6 +206,8 @@ class FamilyBridgeApp extends StatelessWidget {
     
     if (profile?.accessibility.largeText == true) {
       return 1.3;
+    } else if (profile?.accessibility.extraLargeText == true) {
+      return 1.5;
     }
     
     return 1.0;
@@ -201,60 +244,64 @@ class ErrorScreen extends StatelessWidget {
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 80,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Failed to start FamilyBridge',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 80,
                 color: Colors.red,
-                fontWeight: FontWeight.bold,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Please try restarting the application. If the problem persists, contact support.',
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                error,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontFamily: 'monospace',
-                  color: Colors.red[800],
+              const SizedBox(height: 24),
+              Text(
+                'Failed to Start',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
                 ),
-                textAlign: TextAlign.left,
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                SystemNavigator.pop();
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text('Restart App'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+              const SizedBox(height: 16),
+              Text(
+                'Please try restarting the application. If the problem persists, contact support.',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  error,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontFamily: 'monospace',
+                    color: Colors.red[800],
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: () => SystemNavigator.pop(),
+                icon: const Icon(Icons.restart_alt),
+                label: const Text('Restart App'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

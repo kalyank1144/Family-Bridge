@@ -4,9 +4,10 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
-
     - "**/*.gr.dart"
     - "**/generated/**"
+    - "**/generated_plugin_registrant.dart"
+    - "lib/generated_plugin_registrant.dart"
     - "build/**"
     - ".dart_tool/**"
   
@@ -14,118 +15,209 @@ analyzer:
     - dart_code_metrics
   
   errors:
-    # Treat missing required parameters as errors
     missing_required_param: error
-    # Treat missing returns as errors
     missing_return: error
-    # Treat unused imports as errors
     unused_import: error
-    # Treat unused local variables as warnings
     unused_local_variable: warning
+    todo: info
+    deprecated_member_use_from_same_package: info
+    invalid_annotation_target: ignore
     
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
+  
+  language:
+    strict-casts: true
+    strict-raw-types: true
 
 linter:
   rules:
-    # Style rules
-    - prefer_const_constructors
-    - prefer_const_literals_to_create_immutables
-    - prefer_const_declarations
-    - prefer_final_fields
-    - prefer_final_locals
-    - prefer_final_in_for_each
-    - sort_child_properties_last
-    - use_key_in_widget_constructors
-    - use_full_hex_values_for_flutter_colors
-    - use_raw_strings
-    - use_string_buffers
+    # Error prevention & Core rules
+    avoid_empty_else: true
+    avoid_print: false
+    avoid_slow_async_io: true
+    avoid_types_as_parameter_names: true
+    avoid_web_libraries_in_flutter: true
+    cancel_subscriptions: true
+    close_sinks: true
+    no_duplicate_case_values: true
+    no_logic_in_create_state: true
+    prefer_void_to_null: true
+    test_types_in_equals: true
+    throw_in_finally: true
+    unnecessary_statements: true
+    valid_regexps: true
     
-    # Error prevention rules
-    - avoid_unnecessary_containers
-    - avoid_empty_else
-    - avoid_print
-    - avoid_slow_async_io
-    - avoid_types_as_parameter_names
-    - avoid_web_libraries_in_flutter
-    - no_duplicate_case_values
-    - no_logic_in_create_state
-    - prefer_void_to_null
-    - unnecessary_string_interpolations
-    - unnecessary_string_escapes
-    - valid_regexps
+    # Style & Formatting
+    always_declare_return_types: true
+    annotate_overrides: true
+    avoid_unnecessary_containers: true
+    camel_case_extensions: true
+    camel_case_types: true
+    file_names: true
+    library_names: true
+    library_prefixes: true
+    non_constant_identifier_names: true
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_fields: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    sized_box_for_whitespace: true
+    sort_child_properties_last: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    unnecessary_lambdas: true
+    unnecessary_parenthesis: true
+    unnecessary_string_escapes: true
+    unnecessary_string_interpolations: true
+    use_colored_box: true
+    use_decorated_box: true
+    use_full_hex_values_for_flutter_colors: true
+    use_key_in_widget_constructors: true
+    use_raw_strings: true
+    use_string_buffers: true
+    use_super_parameters: true
     
-    # Performance rules
-    - avoid_function_literals_in_foreach_calls
-    - prefer_spread_collections
-    - prefer_for_elements_to_map_fromIterable
-    - prefer_if_elements_to_conditional_expressions
-    - prefer_collection_literals
+    # Performance
+    avoid_function_literals_in_foreach_calls: true
+    prefer_collection_literals: true
+    prefer_for_elements_to_map_fromIterable: true
+    prefer_if_elements_to_conditional_expressions: true
+    prefer_inlined_adds: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_iterable_whereType: true
+    prefer_spread_collections: true
+    unnecessary_await_in_return: true
     
-    # Documentation rules
-    - public_member_api_docs
-    - comment_references
+    # Widget specific
+    avoid_unnecessary_containers: true
+    prefer_const_constructors_in_immutables: true
+    sized_box_for_whitespace: true
+    sized_box_shrink_expand: true
+    use_colored_box: true
+    use_decorated_box: true
+    use_key_in_widget_constructors: true
     
-    # Design rules
-    - avoid_classes_with_only_static_members
-    - avoid_catching_errors
-    - prefer_mixin
-    - one_member_abstracts
-    - prefer_expression_function_bodies
-    - prefer_single_quotes
-    - require_trailing_commas
-    - sized_box_for_whitespace
-    - sort_constructors_first
-    - sort_unnamed_constructors_first
-    - unnecessary_lambdas
-    - unnecessary_parenthesis
-    - use_colored_box
-    - use_decorated_box
-    - use_super_parameters
-
+    # Documentation (disabled for initial development, enable for production)
+    # public_member_api_docs: true
+    # comment_references: true
+    
+    # Null safety
+    unnecessary_null_checks: true
+    unnecessary_null_in_if_null_operators: true
+    unnecessary_nullable_for_final_variable_declarations: true
+    
+    # Async patterns
+    avoid_void_async: true
+    unawaited_futures: true
+    use_build_context_synchronously: false
+    
+    # Import organization
+    always_use_package_imports: false
+    avoid_relative_lib_imports: true
+    directives_ordering: true
+    
+    # Flutter specific
+    avoid_field_initializers_in_const_classes: true
+    avoid_web_libraries_in_flutter: true
+    no_logic_in_create_state: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    use_build_context_synchronously: false
+    use_full_hex_values_for_flutter_colors: true
+    use_key_in_widget_constructors: true
+    
+    # Accessibility & HIPAA compliance
+    use_if_null_to_convert_nulls_to_bools: true
+    avoid_bool_literals_in_conditional_expressions: true
+    
 dart_code_metrics:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated/**"
+    - "test/**"
+    - "integration_test/**"
+    
   metrics:
     cyclomatic-complexity: 20
     maximum-nesting-level: 5
     number-of-parameters: 4
     source-lines-of-code: 50
+    weight-of-class: 0.5
+    number-of-methods: 20
+    maintainability-index: 50
+    technical-debt: 0.5
+    
+  metrics-exclude:
+    - test/**
+    - integration_test/**
     
   rules:
-    - newline-before-return
-    - no-boolean-literal-compare
-    - no-empty-block
-    - prefer-trailing-comma
-    - prefer-conditional-expressions
-    - no-equal-then-else
-    - avoid-unnecessary-type-casts
-    - avoid-unnecessary-type-assertions
-    - prefer-first
-    - prefer-last
-
-    - "**/generated_plugin_registrant.dart"
-    - "lib/generated_plugin_registrant.dart"
-
-linter:
-  rules:
-    # General
-    avoid_print: false # Allow for development
-    prefer_const_constructors: true
-    prefer_const_literals_to_create_immutables: true
-    prefer_const_declarations: true
-    prefer_final_fields: true
+    # Code quality rules
+    - avoid-dynamic: true
+    - avoid-ignoring-return-values: true
+    - avoid-missing-enum-constant-in-map: true
+    - avoid-nested-conditional-expressions:
+        acceptable-level: 2
+    - avoid-throw-in-catch-block: true
+    - avoid-unnecessary-type-assertions: true
+    - avoid-unnecessary-type-casts: true
+    - avoid-unrelated-type-assertions: true
+    - avoid-unused-parameters: true
+    - binary-expression-operand-order: true
+    - double-literal-format: true
+    - newline-before-return: true
+    - no-boolean-literal-compare: true
+    - no-empty-block: true
+    - no-equal-arguments: true
+    - no-equal-then-else: true
+    - no-magic-number:
+        allowed: [-1, 0, 1, 2, 10, 100]
+    - prefer-async-await: true
+    - prefer-conditional-expressions: true
+    - prefer-correct-identifier-length:
+        max-identifier-length: 40
+        min-identifier-length: 2
+    - prefer-correct-type-name:
+        min-length: 3
+        max-length: 40
+    - prefer-enums-by-name: true
+    - prefer-first: true
+    - prefer-last: true
+    - prefer-match-file-name: true
+    - prefer-trailing-comma:
+        break-on: 2
     
-    # Dart style
-    avoid_unnecessary_containers: true
-    use_key_in_widget_constructors: true
-    sized_box_for_whitespace: true
-    avoid_web_libraries_in_flutter: true
+    # Flutter specific metrics
+    - always-remove-listener: true
+    - avoid-border-all: true
+    - avoid-returning-widgets: true
+    - avoid-shrink-wrap-in-lists: true
+    - avoid-unnecessary-setstate: true
+    - avoid-wrapping-in-padding: true
+    - prefer-const-border-radius: true
+    - prefer-extracting-callbacks: true
+    - prefer-single-widget-per-file: false
+    - use-setstate-synchronously: true
     
-    # Performance
-    avoid_function_literals_in_foreach_calls: true
-    prefer_collection_literals: true
-    unnecessary_await_in_return: true
-    
-    # Accessibility
-    use_build_context_synchronously: false # Can be tricky with async operations
+    # HIPAA & Security compliance
+    - avoid-print: true
+    - avoid-hard-coded-credentials: true
+    - avoid-insecure-random: true
 
+  anti-patterns:
+    - long-method:
+        severity: warning
+        method-lines-threshold: 50
+    - long-parameter-list:
+        severity: warning
+        parameter-list-size-threshold: 4
