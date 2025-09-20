@@ -5,6 +5,8 @@ import '../../../repositories/offline_first/daily_checkin_repository.dart';
 import '../../../services/sync/data_sync_service.dart';
 import '../../../models/hive/daily_checkin_model.dart';
 import '../models/daily_checkin_model.dart';
+import '../../../core/services/notification_service.dart';
+import 'package:flutter/material.dart';
 
 class DailyCheckinService {
   final _uuid = const Uuid();
@@ -162,7 +164,15 @@ class DailyCheckinService {
   }
 
   void dispose() {
-    // Nothing to dispose for offline-first approach
+    
+  }
+
+  Future<void> scheduleDailyReminder({required TimeOfDay time}) async {
+    await NotificationService.instance.scheduleDailyCheckinReminder(
+      title: 'Daily Check-in',
+      message: 'Please complete your daily check-in',
+      time: time,
+    );
   }
 
   // Conversion helpers

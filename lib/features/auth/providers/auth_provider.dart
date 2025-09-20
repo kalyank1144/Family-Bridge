@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/models/user_model.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/push_notification_service.dart';
 
 enum AuthStatus { unknown, unauthenticated, authenticated, onboarding }
 
@@ -57,6 +58,12 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _loadProfile() async {
     _profile = await _auth.getCurrentProfile();
+    if (_profile != null) {
+      await PushNotificationService.instance.syncUser(
+        userId: _profile!.id,
+        role: _profile!.role.name,
+      );
+    }
   }
 
   void setSelectedRole(UserRole role) {

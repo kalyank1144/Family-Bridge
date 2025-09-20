@@ -12,6 +12,9 @@ import '../../../services/sync/data_sync_service.dart';
 import '../../../services/sync/sync_queue.dart';
 import '../../../core/models/message_model.dart';
 import '../../../core/services/notification_service.dart';
+import '../../../core/services/notification_preferences_service.dart';
+import '../../../core/services/notification_router.dart';
+import '../../../core/models/notification_preferences.dart';
 import '../models/presence_model.dart';
 
 class ChatService {
@@ -232,13 +235,42 @@ class ChatService {
               preview = 'Achievement';
               break;
           }
-          await NotificationService.instance.showMessageNotification(
-            model.senderName,
-            preview,
-            model.priority,
-            familyId: model.familyId,
-            messageId: model.id,
+          final prefs = _currentUserId != null
+              ? await NotificationPreferencesService.instance.getPreferences(_currentUserId!)
+              : const NotificationPreferences();
+          final decision = NotificationRouter.instance.decide(
+            userType: _currentUserType ?? 'elder',
+            prefs: prefs,
+            priority: model.priority,
+            category: 'chat',
           );
+          if (decision.deliverNow) {
+            await NotificationService.instance.showMessageNotification(
+              model.senderName,
+              preview,
+              model.priority,
+              familyId: model.familyId,
+              messageId: model.id,
+            );
+          } else {
+            NotificationRouter.instance.enqueueBatch(
+              key: 'chat_${_currentFamilyId ?? ''}',
+              window: decision.delay ?? const Duration(minutes: 2),
+              item: _BatchItem(model.senderName, preview, model.priority, {
+                'family_id': model.familyId,
+                'message_id': model.id,
+              }),
+              onFlush: (items) async {
+                final count = items.length;
+                await NotificationService.instance.showMessageNotification(
+                  'Family Chat',
+                  '$count new messages',
+                  MessagePriority.important,
+                  familyId: model.familyId,
+                );
+              },
+            );
+          }
         }
       } else if (payload.eventType == PostgresChangeEvent.delete) {
         final id = payload.oldRecord?['id'] as String?;

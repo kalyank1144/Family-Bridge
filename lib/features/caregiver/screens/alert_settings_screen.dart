@@ -4,6 +4,9 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/alert_provider.dart';
 import '../models/alert.dart';
+import '../../../core/services/notification_preferences_service.dart';
+import '../../../core/models/notification_preferences.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class AlertSettingsScreen extends StatelessWidget {
   const AlertSettingsScreen({super.key});
@@ -141,6 +144,7 @@ class AlertSettingsScreen extends StatelessWidget {
   }
 
   Widget _buildNotificationSettings(BuildContext context) {
+    final auth = context.read<AuthProvider>();
     return Card(
       margin: const EdgeInsets.all(AppTheme.spacingMd),
       child: Padding(
@@ -162,22 +166,30 @@ class AlertSettingsScreen extends StatelessWidget {
                 onChanged: (value) {},
               ),
             ),
-            ListTile(
-              leading: const Icon(FeatherIcons.mail),
-              title: const Text('Email Notifications'),
-              subtitle: const Text('Get daily summaries via email'),
-              trailing: Switch(
-                value: false,
-                onChanged: (value) {},
-              ),
+            SwitchListTile(
+              title: const Text('Quiet Hours'),
+              subtitle: const Text('Mute non-critical alerts 10 PM - 7 AM'),
+              value: false,
+              onChanged: (value) async {
+                final uid = auth.profile?.id;
+                if (uid == null) return;
+                final prefs = NotificationPreferences(quietHours: QuietHours(enabled: value, startHour: 22, endHour: 7));
+                await NotificationPreferencesService.instance.updatePreferences(uid, prefs);
+              },
+              secondary: const Icon(FeatherIcons.moon),
             ),
             ListTile(
-              leading: const Icon(FeatherIcons.messageSquare),
-              title: const Text('SMS Alerts'),
-              subtitle: const Text('Critical alerts via text message'),
+              leading: const Icon(FeatherIcons.bellOff),
+              title: const Text('Do Not Disturb'),
+              subtitle: const Text('Only emergency alerts will bypass'),
               trailing: Switch(
-                value: true,
-                onChanged: (value) {},
+                value: false,
+                onChanged: (value) async {
+                  final uid = auth.profile?.id;
+                  if (uid == null) return;
+                  final prefs = NotificationPreferences(quietHours: QuietHours(enabled: value, startHour: 0, endHour: 0));
+                  await NotificationPreferencesService.instance.updatePreferences(uid, prefs);
+                },
               ),
             ),
           ],

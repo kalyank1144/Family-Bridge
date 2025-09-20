@@ -6,6 +6,7 @@ import '../../../repositories/offline_first/appointment_repository.dart';
 import '../../../services/sync/data_sync_service.dart';
 import '../../../models/hive/appointment_model.dart';
 import '../models/appointment.dart';
+import '../../../core/services/notification_service.dart';
 
 class AppointmentsService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -62,6 +63,14 @@ class AppointmentsService {
     final hiveAppointment = _toHiveAppointment(appointment, id);
     
     await _repo.create(hiveAppointment);
+    if (appointment.reminderDateTime != null) {
+      await NotificationService.instance.scheduleAppointmentReminder(
+        title: 'Appointment Reminder',
+        message: appointment.title,
+        scheduledTime: appointment.reminderDateTime!,
+        appointmentId: id,
+      );
+    }
     
     return appointment.copyWith(id: id);
   }
@@ -71,6 +80,14 @@ class AppointmentsService {
     
     final hiveAppointment = _toHiveAppointment(appointment, appointment.id);
     await _repo.upsert(hiveAppointment);
+    if (appointment.reminderDateTime != null) {
+      await NotificationService.instance.scheduleAppointmentReminder(
+        title: 'Appointment Reminder',
+        message: appointment.title,
+        scheduledTime: appointment.reminderDateTime!,
+        appointmentId: appointment.id,
+      );
+    }
   }
 
   Future<void> cancelAppointment(String appointmentId) async {

@@ -5,6 +5,8 @@ import '../../../repositories/offline_first/medication_repository.dart';
 import '../../../services/sync/data_sync_service.dart';
 import '../../../models/hive/medication_model.dart';
 import '../models/medication_model.dart';
+import '../../../core/services/notification_service.dart';
+import 'package:flutter/material.dart';
 
 class ElderMedicationService {
   final _uuid = const Uuid();
@@ -77,6 +79,19 @@ class ElderMedicationService {
     
     await _repo.create(hiveMedication);
     
+    for (final t in medication.times) {
+      final parts = t.split(':');
+      if (parts.length == 2) {
+        final h = int.tryParse(parts[0]) ?? 8;
+        final m = int.tryParse(parts[1]) ?? 0;
+        await NotificationService.instance.scheduleDailyCheckinReminder(
+          title: 'Medication Reminder: ${medication.name}',
+          message: 'Take ${medication.dosage}',
+          time: TimeOfDay(hour: h, minute: m),
+        );
+      }
+    }
+    
     return medication.copyWith(id: id);
   }
 
@@ -85,6 +100,18 @@ class ElderMedicationService {
     
     final hiveMedication = _toHiveMedication(medication, medication.id, userId);
     await _repo.upsert(hiveMedication);
+    for (final t in medication.times) {
+      final parts = t.split(':');
+      if (parts.length == 2) {
+        final h = int.tryParse(parts[0]) ?? 8;
+        final m = int.tryParse(parts[1]) ?? 0;
+        await NotificationService.instance.scheduleDailyCheckinReminder(
+          title: 'Medication Reminder: ${medication.name}',
+          message: 'Take ${medication.dosage}',
+          time: TimeOfDay(hour: h, minute: m),
+        );
+      }
+    }
   }
 
   Future<void> deleteMedication(String medicationId) async {
