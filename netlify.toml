@@ -1,0 +1,140 @@
+# Netlify Configuration for FamilyBridge Flutter Web App
+# Production-ready hosting configuration with HIPAA compliance considerations
+
+[build]
+  # Build command for Flutter Web
+  command = "scripts/build-web.sh release"
+  
+  # Output directory
+  publish = "build/web"
+  
+  # Environment variables
+  environment = { ENVIRONMENT = "production", FLUTTER_WEB_USE_SKIA = "true" }
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# Security headers for HIPAA compliance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # HIPAA compliance headers
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    """
+    
+    # Cache control for healthcare data
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# Special headers for sensitive pages
+[[headers]]
+  for = "/health/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate, private"
+    X-Robots-Tag = "noindex, nofollow, nosnippet, noarchive"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate, private"
+    X-Robots-Tag = "noindex, nofollow, nosnippet, noarchive"
+
+# Static assets caching (non-sensitive)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Service Worker caching
+[[headers]]
+  for = "/flutter_service_worker.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# PWA manifest
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Redirects for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin", "user"]}
+
+# Health check endpoint
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+# API redirects to Supabase
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-supabase-url.supabase.co/rest/v1/:splat"
+  status = 200
+  headers = {Authorization = "Bearer YOUR_SUPABASE_ANON_KEY"}
+
+# Edge Functions for HIPAA compliance
+[[edge_functions]]
+  function = "audit-logger"
+  path = "/api/*"
+
+[[edge_functions]]
+  function = "security-headers"
+  path = "/*"
+
+# Deploy contexts
+[context.production]
+  environment = { ENVIRONMENT = "production" }
+
+[context.deploy-preview]
+  environment = { ENVIRONMENT = "staging" }
+
+[context.branch-deploy]
+  environment = { ENVIRONMENT = "development"}
+
+# Form handling (if needed for contact forms)
+[forms]
+  spam_filter = true
+
+# HIPAA-compliant logging
+[dev]
+  command = "flutter run -d web-server --web-port 3000"
+  port = 3000
+  targetPort = 3000
+  publish = "build/web"
+  autoLaunch = false
