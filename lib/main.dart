@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
+
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -22,10 +24,9 @@ import 'features/caregiver/providers/health_monitoring_provider.dart';
 import 'features/caregiver/providers/appointments_provider.dart';
 import 'features/caregiver/providers/alert_provider.dart';
 import 'features/caregiver/services/notification_service.dart';
-
-// Elder + Voice
 import 'features/elder/providers/elder_provider.dart';
 import 'core/services/voice_service.dart';
+import 'features/chat/screens/family_chat_screen.dart';
 
 // Chat
 import 'features/chat/providers/chat_providers.dart';
@@ -43,19 +44,25 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+
   // Load environment variables
   await dotenv.load(fileName: ".env", isOptional: true);
 
   // Initialize Supabase
+
+
   await Supabase.initialize(
     url: Env.supabaseUrl,
     anonKey: Env.supabaseAnonKey,
   );
 
+
   // Initialize auth service
   await AuthService.instance.initialize();
 
   // Initialize notifications
+
+
   await NotificationService.instance.initialize();
   await chat_notifications.NotificationService().initialize(userType: 'elder');
 
@@ -141,6 +148,7 @@ class FamilyBridgeApp extends StatelessWidget {
     return AppTheme.lightTheme;
   }
 
+
   double _getTextScaleFactor(AuthProvider authProvider) {
     final profile = authProvider.profile;
     
@@ -149,6 +157,9 @@ class FamilyBridgeApp extends StatelessWidget {
     }
     
     return 1.0;
+
+  Future<void> _initializeNotifications() async {
+    await NotificationService.instance.initialize();
   }
 }
 
