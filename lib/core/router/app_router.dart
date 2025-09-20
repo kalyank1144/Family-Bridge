@@ -13,7 +13,6 @@ import '../../features/auth/screens/family_setup_screen.dart';
 import '../../features/auth/screens/family_members_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 
-// Caregiver screens
 import '../../features/caregiver/screens/caregiver_dashboard_screen.dart';
 import '../../features/caregiver/screens/health_monitoring_screen.dart';
 import '../../features/caregiver/screens/appointments_calendar_screen.dart';
@@ -29,14 +28,23 @@ import '../../features/caregiver/screens/professional_reports_screen.dart';
 import '../../features/admin/screens/compliance_dashboard_screen.dart';
 import '../../features/admin/screens/audit_logs_screen.dart';
 
-// Elder screens
 import '../../features/elder/screens/elder_home_screen.dart';
 import '../../features/elder/screens/emergency_contacts_screen.dart';
 import '../../features/elder/screens/medication_reminder_screen.dart';
 import '../../features/elder/screens/daily_checkin_screen.dart';
 import '../../features/elder/screens/family_chat_screen.dart';
 
+import '../../features/youth/screens/youth_home_dashboard.dart';
+import '../../features/youth/screens/story_recording_screen.dart';
+import '../../features/youth/screens/youth_games_screen.dart';
+import '../../features/youth/screens/photo_sharing_screen.dart';
+
 class AppRouter {
+
+  static final GoRouter router = GoRouter(
+    initialLocation: '/caregiver',
+    routes: [
+
   static GoRouter createRouter(BuildContext context) {
     return GoRouter(
       initialLocation: '/onboarding',
@@ -173,8 +181,6 @@ class AppRouter {
           ),
         ],
       ),
-
-      // Elder routes
       GoRoute(
         path: '/elder',
         name: 'elder_home',
@@ -203,6 +209,27 @@ class AppRouter {
         ],
       ),
 
+      GoRoute(
+        path: '/youth',
+        name: 'youth_home',
+        builder: (context, state) => const YouthHomeDashboard(),
+        routes: [
+          GoRoute(
+            path: 'story',
+            name: 'youth_story',
+            builder: (context, state) => const StoryRecordingScreen(),
+          ),
+          GoRoute(
+            path: 'games',
+            name: 'youth_games',
+            builder: (context, state) => const YouthGamesScreen(),
+          ),
+          GoRoute(
+            path: 'photos',
+            name: 'youth_photos',
+            builder: (context, state) => const PhotoSharingScreen(),
+
+
       // Admin routes (HIPAA Compliance)
       GoRoute(
         path: '/admin',
@@ -213,6 +240,7 @@ class AppRouter {
             path: 'audit-logs',
             name: 'audit_logs',
             builder: (context, state) => const AuditLogsScreen(),
+
           ),
         ],
       ),
