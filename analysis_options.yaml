@@ -1,0 +1,31 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated_plugin_registrant.dart"
+    - "lib/generated_plugin_registrant.dart"
+
+linter:
+  rules:
+    # General
+    avoid_print: false # Allow for development
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_const_declarations: true
+    prefer_final_fields: true
+    
+    # Dart style
+    avoid_unnecessary_containers: true
+    use_key_in_widget_constructors: true
+    sized_box_for_whitespace: true
+    avoid_web_libraries_in_flutter: true
+    
+    # Performance
+    avoid_function_literals_in_foreach_calls: true
+    prefer_collection_literals: true
+    unnecessary_await_in_return: true
+    
+    # Accessibility
+    use_build_context_synchronously: false # Can be tricky with async operations

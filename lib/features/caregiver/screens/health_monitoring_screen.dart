@@ -8,6 +8,7 @@ import '../../../core/mixins/hipaa_compliance_mixin.dart';
 import '../../../core/services/access_control_service.dart';
 import '../providers/family_data_provider.dart';
 import '../providers/health_monitoring_provider.dart';
+import '../models/family_member.dart';
 import '../widgets/vitals_card.dart';
 import '../widgets/medication_compliance_card.dart';
 import '../widgets/mood_chart.dart';

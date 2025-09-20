@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+// Auth
+import '../../features/auth/providers/auth_provider.dart';
+import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/screens/signup_screen.dart';
+import '../../features/auth/screens/forgot_password_screen.dart';
+import '../../features/auth/screens/profile_setup_screen.dart';
+import '../../features/auth/screens/profile_screen.dart';
+import '../../features/auth/screens/family_setup_screen.dart';
+import '../../features/auth/screens/family_members_screen.dart';
+import '../../features/auth/screens/onboarding_screen.dart';
 
 // Caregiver screens
 import '../../features/caregiver/screens/caregiver_dashboard_screen.dart';
@@ -25,10 +37,81 @@ import '../../features/elder/screens/daily_checkin_screen.dart';
 import '../../features/elder/screens/family_chat_screen.dart';
 
 class AppRouter {
-  static final GoRouter router = GoRouter(
-    // Keep caregiver dashboard as initial to avoid breaking existing flows
-    initialLocation: '/caregiver',
-    routes: [
+  static GoRouter createRouter(BuildContext context) {
+    return GoRouter(
+      initialLocation: '/onboarding',
+      redirect: (context, state) {
+        final authProvider = context.read<AuthProvider>();
+        final isAuthenticated = authProvider.status == AuthStatus.authenticated;
+        final isOnboardingRoute = state.matchedLocation.startsWith('/onboarding');
+        final isOnAuthRoute = state.matchedLocation.startsWith('/login') ||
+            state.matchedLocation.startsWith('/signup') ||
+            state.matchedLocation.startsWith('/forgot-password');
+        
+        // If user has selected a role but isn't authenticated, skip onboarding
+        final hasSelectedRole = authProvider.selectedRole != null;
+        if (!isAuthenticated && hasSelectedRole && isOnboardingRoute) {
+          return '/login';
+        }
+        
+        // If not authenticated and not on auth/onboarding route, redirect to onboarding
+        if (!isAuthenticated && !isOnAuthRoute && !isOnboardingRoute &&
+            !state.matchedLocation.startsWith('/profile-setup') &&
+            !state.matchedLocation.startsWith('/family-setup')) {
+          return '/onboarding';
+        }
+        
+        // If authenticated and on auth/onboarding route, redirect to appropriate home
+        if (isAuthenticated && (isOnAuthRoute || isOnboardingRoute)) {
+          return authProvider.roleBasedHomePath();
+        }
+        
+        return null;
+      },
+      routes: [
+        // Onboarding route
+        GoRoute(
+          path: '/onboarding',
+          name: 'onboarding',
+          builder: (context, state) => const OnboardingScreen(),
+        ),
+        
+        // Auth routes
+        GoRoute(
+          path: '/login',
+          name: 'login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/signup',
+          name: 'signup',
+          builder: (context, state) => const SignupScreen(),
+        ),
+        GoRoute(
+          path: '/forgot-password',
+          name: 'forgot_password',
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+        GoRoute(
+          path: '/profile-setup',
+          name: 'profile_setup',
+          builder: (context, state) => const ProfileSetupScreen(),
+        ),
+        GoRoute(
+          path: '/family-setup',
+          name: 'family_setup',
+          builder: (context, state) => const FamilySetupScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          builder: (context, state) => const ProfileScreen(),
+        ),
+        GoRoute(
+          path: '/family-members',
+          name: 'family_members',
+          builder: (context, state) => const FamilyMembersScreen(),
+        ),
       // Caregiver routes
       GoRoute(
         path: '/caregiver',
@@ -135,4 +218,9 @@ class AppRouter {
       ),
     ],
   );
+        ),
+      ],
+    );
+  }
+
 }
