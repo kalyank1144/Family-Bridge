@@ -86,6 +86,11 @@ class GamesProvider extends ChangeNotifier {
     _triviaIndex = (_triviaIndex + 1) % _trivia.length;
     notifyListeners();
   }
+
+  void nextTrivia() {
+    _triviaIndex = (_triviaIndex + 1) % _trivia.length;
+    notifyListeners();
+  }
 }
 
 class _CardItem {
