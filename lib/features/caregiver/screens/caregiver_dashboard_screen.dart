@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/mixins/hipaa_compliance_mixin.dart';
+import '../../../core/services/access_control_service.dart';
 import '../providers/family_data_provider.dart';
 import '../providers/alert_provider.dart';
 import '../models/alert.dart';
@@ -19,7 +21,7 @@ class CaregiverDashboardScreen extends StatefulWidget {
   State<CaregiverDashboardScreen> createState() => _CaregiverDashboardScreenState();
 }
 
-class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
+class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> with HipaaComplianceMixin {
   @override
   void initState() {
     super.initState();
@@ -85,9 +87,15 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
         icon: const Icon(FeatherIcons.menu, color: AppTheme.textPrimary),
         onPressed: () => Scaffold.of(context).openDrawer(),
       ),
-      title: Text(
-        'Family Care Dashboard',
-        style: Theme.of(context).textTheme.headlineSmall,
+      title: Row(
+        children: [
+          Text(
+            'Family Care Dashboard',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(width: 12),
+          buildComplianceStatusIndicator(),
+        ],
       ),
       actions: [
         Stack(
@@ -123,6 +131,13 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
               ),
           ],
         ),
+        if (hasPermission(Permission.manageCompliance)) ...[
+          IconButton(
+            icon: const Icon(FeatherIcons.shield, color: AppTheme.textPrimary),
+            onPressed: () => context.push('/admin'),
+            tooltip: 'HIPAA Compliance',
+          ),
+        ],
         const SizedBox(width: 8),
       ],
     );

@@ -13,6 +13,10 @@ import '../../features/caregiver/screens/advanced_health_monitoring_screen.dart'
 import '../../features/caregiver/screens/care_plan_screen.dart';
 import '../../features/caregiver/screens/professional_reports_screen.dart';
 
+// Admin screens
+import '../../features/admin/screens/compliance_dashboard_screen.dart';
+import '../../features/admin/screens/audit_logs_screen.dart';
+
 // Elder screens
 import '../../features/elder/screens/elder_home_screen.dart';
 import '../../features/elder/screens/emergency_contacts_screen.dart';
@@ -112,6 +116,20 @@ class AppRouter {
             path: 'family',
             name: 'elder_family',
             builder: (context, state) => const FamilyChatScreen(),
+          ),
+        ],
+      ),
+
+      // Admin routes (HIPAA Compliance)
+      GoRoute(
+        path: '/admin',
+        name: 'admin_dashboard',
+        builder: (context, state) => const ComplianceDashboardScreen(),
+        routes: [
+          GoRoute(
+            path: 'audit-logs',
+            name: 'audit_logs',
+            builder: (context, state) => const AuditLogsScreen(),
           ),
         ],
       ),

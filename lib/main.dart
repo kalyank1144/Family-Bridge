@@ -17,6 +17,9 @@ import 'features/caregiver/services/notification_service.dart';
 import 'features/elder/providers/elder_provider.dart';
 import 'core/services/voice_service.dart';
 
+// HIPAA Compliance
+import 'features/admin/providers/hipaa_compliance_provider.dart';
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -46,6 +49,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
         ChangeNotifierProvider(create: (_) => AlertProvider()),
         ChangeNotifierProvider(create: (_) => ElderProvider()),
+        ChangeNotifierProvider(create: (_) => HipaaComplianceProvider()),
         Provider.value(value: voiceService),
       ],
       child: const FamilyBridgeApp(),
