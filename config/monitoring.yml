@@ -1,0 +1,371 @@
+# FamilyBridge Production Monitoring Configuration
+# Comprehensive monitoring, analytics, and alerting setup for healthcare compliance
+
+monitoring:
+  # Application Performance Monitoring
+  performance:
+    sentry:
+      enabled: true
+      dsn: ${SENTRY_DSN}
+      environment: ${ENVIRONMENT}
+      release: ${APP_VERSION}
+      traces_sample_rate: 1.0
+      profiles_sample_rate: 1.0
+      before_send: |
+        # Remove sensitive data before sending to Sentry
+        def before_send(event, hint):
+            if 'extra' in event and 'user_data' in event['extra']:
+                del event['extra']['user_data']
+            return event
+    
+    firebase_performance:
+      enabled: true
+      automatic_data_collection: true
+      instrumentation_enabled: true
+      custom_traces:
+        - name: "hipaa_audit_log"
+          description: "Time taken to create HIPAA audit log entries"
+        - name: "encryption_operation"
+          description: "Time taken for encryption/decryption operations"
+        - name: "family_chat_sync"
+          description: "Time taken to sync family chat messages"
+    
+    datadog:
+      enabled: true
+      api_key: ${DATADOG_API_KEY}
+      app_key: ${DATADOG_APP_KEY}
+      service_name: "familybridge"
+      environment: ${ENVIRONMENT}
+      version: ${APP_VERSION}
+      
+      custom_metrics:
+        - name: "familybridge.user.daily_checkins"
+          description: "Number of daily check-ins completed"
+          tags: ["environment:${ENVIRONMENT}", "user_type"]
+        
+        - name: "familybridge.compliance.audit_events"
+          description: "Number of HIPAA audit events generated"
+          tags: ["environment:${ENVIRONMENT}", "event_type"]
+        
+        - name: "familybridge.security.failed_logins"
+          description: "Number of failed login attempts"
+          tags: ["environment:${ENVIRONMENT}", "user_type"]
+        
+        - name: "familybridge.chat.message_delivery_time"
+          description: "Time taken to deliver chat messages"
+          tags: ["environment:${ENVIRONMENT}", "message_type"]
+
+  # Error Tracking and Crash Reporting
+  error_tracking:
+    crashlytics:
+      enabled: true
+      collection_enabled: true
+      custom_keys:
+        - user_type
+        - feature_flag_state
+        - hipaa_compliance_version
+      
+      breadcrumbs:
+        navigation: true
+        network: true
+        user_interaction: true
+        system_events: true
+    
+    error_boundaries:
+      react:
+        enabled: true
+        fallback_component: "ErrorFallback"
+        on_error: "logErrorToSentry"
+      
+      flutter:
+        enabled: true
+        global_error_handler: true
+        isolate_error_handler: true
+
+  # Real User Monitoring
+  rum:
+    google_analytics:
+      enabled: true
+      measurement_id: ${GA4_MEASUREMENT_ID}
+      
+      events:
+        # Healthcare-specific events
+        - name: "daily_checkin_completed"
+          parameters: ["user_type", "checkin_duration", "compliance_score"]
+        
+        - name: "medication_reminder_viewed"
+          parameters: ["reminder_type", "response_time", "adherence_rate"]
+        
+        - name: "family_chat_message_sent"
+          parameters: ["message_type", "delivery_success", "encryption_status"]
+        
+        - name: "hipaa_audit_event"
+          parameters: ["event_type", "user_role", "data_accessed"]
+    
+    mixpanel:
+      enabled: true
+      project_token: ${MIXPANEL_PROJECT_TOKEN}
+      
+      # Privacy-compliant user tracking
+      distinct_id_strategy: "anonymous_hash"
+      ip_collection: false
+      
+      custom_properties:
+        - name: "user_type"
+          description: "Elder, Caregiver, or Youth"
+        
+        - name: "compliance_level"
+          description: "HIPAA compliance status"
+        
+        - name: "feature_usage"
+          description: "Which features are actively used"
+
+  # Infrastructure Monitoring
+  infrastructure:
+    uptime_monitoring:
+      endpoints:
+        - name: "Main App Health Check"
+          url: "https://app.familybridge.com/health"
+          method: "GET"
+          timeout: 30s
+          interval: 60s
+          expected_status: 200
+          regions: ["us-east-1", "us-west-2", "eu-west-1"]
+        
+        - name: "Caregiver Dashboard Health"
+          url: "https://caregiver.familybridge.com/api/health"
+          method: "GET"
+          timeout: 30s
+          interval: 60s
+          expected_status: 200
+        
+        - name: "Supabase API Health"
+          url: "${SUPABASE_URL}/rest/v1/"
+          method: "GET"
+          timeout: 15s
+          interval: 30s
+          expected_status: 200
+          headers:
+            apikey: "${SUPABASE_ANON_KEY}"
+    
+    cdn_monitoring:
+      cloudflare:
+        enabled: true
+        zone_id: ${CLOUDFLARE_ZONE_ID}
+        api_token: ${CLOUDFLARE_API_TOKEN}
+        
+        metrics:
+          - requests_per_minute
+          - bandwidth_usage
+          - cache_hit_ratio
+          - error_rate_4xx
+          - error_rate_5xx
+
+  # Security Monitoring
+  security:
+    breach_detection:
+      enabled: true
+      real_time_monitoring: true
+      
+      triggers:
+        - name: "Multiple Failed Logins"
+          condition: "failed_logins > 5 in 10 minutes"
+          severity: "high"
+          action: "lock_account_and_alert"
+        
+        - name: "Unusual Data Access"
+          condition: "phi_access_outside_normal_hours"
+          severity: "critical"
+          action: "immediate_alert_and_audit"
+        
+        - name: "Encryption Key Rotation Failure"
+          condition: "key_rotation_failed"
+          severity: "critical"
+          action: "immediate_alert_and_remediate"
+    
+    vulnerability_scanning:
+      snyk:
+        enabled: true
+        api_token: ${SNYK_API_TOKEN}
+        scan_frequency: "daily"
+        
+        thresholds:
+          critical: 0
+          high: 2
+          medium: 10
+          low: unlimited
+
+  # Business Metrics
+  business_metrics:
+    user_engagement:
+      - name: "Daily Active Users"
+        query: "count(distinct user_id) where last_activity > now() - 1 day"
+        breakdown: ["user_type", "age_group"]
+      
+      - name: "Family Connection Rate"
+        query: "count(families with >1 active member) / count(all families)"
+        target: 0.85
+      
+      - name: "Medication Adherence Rate"
+        query: "count(medications taken on time) / count(medication reminders)"
+        target: 0.90
+        compliance_critical: true
+    
+    healthcare_outcomes:
+      - name: "Daily Check-in Completion Rate"
+        query: "count(completed daily checkins) / count(expected daily checkins)"
+        target: 0.80
+        breakdown: ["user_type", "health_condition"]
+      
+      - name: "Emergency Response Time"
+        query: "avg(time_to_first_response) for emergency_alerts"
+        target: "< 5 minutes"
+        sla_critical: true
+
+# Alerting Configuration
+alerting:
+  channels:
+    slack:
+      webhook_url: ${SLACK_WEBHOOK_URL}
+      channel: "#familybridge-alerts"
+      mention_on_critical: "@channel"
+    
+    pagerduty:
+      integration_key: ${PAGERDUTY_INTEGRATION_KEY}
+      service_id: ${PAGERDUTY_SERVICE_ID}
+    
+    email:
+      smtp_host: ${SMTP_HOST}
+      smtp_user: ${SMTP_USER}
+      smtp_password: ${SMTP_PASSWORD}
+      recipients:
+        - devops@familybridge.com
+        - security@familybridge.com
+        - compliance@familybridge.com
+
+  rules:
+    # Critical System Alerts
+    - name: "Application Down"
+      condition: "uptime < 99%"
+      severity: "critical"
+      channels: ["slack", "pagerduty", "email"]
+      escalation_time: "5 minutes"
+    
+    - name: "High Error Rate"
+      condition: "error_rate > 5% for 5 minutes"
+      severity: "high"
+      channels: ["slack", "email"]
+    
+    - name: "Database Connection Issues"
+      condition: "database_connection_errors > 10 in 5 minutes"
+      severity: "high"
+      channels: ["slack", "pagerduty"]
+    
+    # HIPAA Compliance Alerts
+    - name: "HIPAA Audit Log Failure"
+      condition: "audit_log_failures > 0"
+      severity: "critical"
+      channels: ["slack", "pagerduty", "email"]
+      required_response_time: "15 minutes"
+    
+    - name: "Unauthorized PHI Access"
+      condition: "unauthorized_phi_access_detected"
+      severity: "critical"
+      channels: ["slack", "pagerduty", "email"]
+      auto_actions: ["lock_user_account", "create_incident"]
+    
+    - name: "Encryption Service Down"
+      condition: "encryption_service_unavailable"
+      severity: "critical"
+      channels: ["slack", "pagerduty", "email"]
+      auto_actions: ["failover_to_backup", "create_incident"]
+    
+    # Performance Alerts
+    - name: "Slow Response Time"
+      condition: "avg_response_time > 2000ms for 10 minutes"
+      severity: "medium"
+      channels: ["slack"]
+    
+    - name: "Memory Usage High"
+      condition: "memory_usage > 85%"
+      severity: "medium"
+      channels: ["slack"]
+    
+    # Business Critical Alerts
+    - name: "Low Medication Adherence"
+      condition: "medication_adherence_rate < 0.75"
+      severity: "high"
+      channels: ["slack", "email"]
+      business_critical: true
+    
+    - name: "Family Engagement Drop"
+      condition: "daily_active_families < 80% of weekly average"
+      severity: "medium"
+      channels: ["slack"]
+
+# Dashboard Configuration
+dashboards:
+  operations:
+    - name: "System Health"
+      widgets:
+        - uptime_status
+        - error_rates
+        - response_times
+        - active_users
+        - database_performance
+    
+    - name: "HIPAA Compliance"
+      widgets:
+        - audit_events_timeline
+        - access_control_status
+        - encryption_status
+        - breach_detection_alerts
+        - compliance_score
+
+  business:
+    - name: "User Engagement"
+      widgets:
+        - daily_active_users
+        - family_connections
+        - feature_usage
+        - user_satisfaction_score
+    
+    - name: "Healthcare Outcomes"
+      widgets:
+        - medication_adherence
+        - daily_checkin_rates
+        - emergency_response_times
+        - caregiver_burnout_indicators
+
+# Compliance Reporting
+compliance_reporting:
+  hipaa:
+    enabled: true
+    reports:
+      - name: "Monthly Access Log Report"
+        frequency: "monthly"
+        recipients: ["compliance@familybridge.com"]
+        format: "PDF"
+      
+      - name: "Security Incident Summary"
+        frequency: "weekly"
+        recipients: ["security@familybridge.com", "compliance@familybridge.com"]
+        format: "JSON"
+      
+      - name: "Audit Trail Export"
+        frequency: "daily"
+        storage: "s3://familybridge-compliance-backups/"
+        retention: "7 years"
+        encryption: "AES-256"
+
+  performance:
+    enabled: true
+    reports:
+      - name: "Monthly Performance Summary"
+        frequency: "monthly"
+        recipients: ["devops@familybridge.com"]
+        metrics:
+          - uptime_percentage
+          - average_response_time
+          - error_rates
+          - user_satisfaction

@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "name": "familybridge-caregiver-dashboard",
+  "builds": [
+    {
+      "src": "caregiver-dashboard/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "cd caregiver-dashboard && npm run build",
+        "outputDirectory": "caregiver-dashboard/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff", 
+        "X-XSS-Protection": "1; mode=block",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+      }
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://app.familybridge.com"
+        },
+        {
+          "key": "Access-Control-Allow-Methods", 
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "VITE_APP_NAME": "FamilyBridge Caregiver Dashboard",
+    "VITE_ENVIRONMENT": "production",
+    "VITE_API_URL": "https://your-supabase-url.supabase.co",
+    "VITE_SUPABASE_URL": "@supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@supabase_anon_key"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production",
+      "VITE_BUILD_TIME": "@vercel-build-time"
+    }
+  },
+  "functions": {
+    "caregiver-dashboard/api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cleanup",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+# FamilyBridge Environment Configuration
+# This file defines environment-specific settings for all deployment targets
+
+environments:
+  development:
+    flutter:
+      debug_mode: true
+      web_renderer: html
+      obfuscate: false
+    
+    supabase:
+      url: ${SUPABASE_DEV_URL}
+      anon_key: ${SUPABASE_DEV_ANON_KEY}
+      service_role_key: ${SUPABASE_DEV_SERVICE_ROLE_KEY}
+    
+    firebase:
+      project_id: familybridge-dev
+      app_id_android: 1:123456789:android:abc123def456
+      app_id_ios: 1:123456789:ios:abc123def456
+    
+    analytics:
+      enabled: false
+      debug: true
+      crash_reporting: false
+    
+    security:
+      certificate_pinning: false
+      biometric_auth: true
+      session_timeout: 3600 # 1 hour
+    
+    features:
+      family_chat: true
+      voice_messages: true
+      offline_mode: true
+      hipaa_compliance: true
+      advanced_monitoring: false
+
+  staging:
+    flutter:
+      debug_mode: false
+      web_renderer: canvaskit
+      obfuscate: true
+    
+    supabase:
+      url: ${SUPABASE_STAGING_URL}
+      anon_key: ${SUPABASE_STAGING_ANON_KEY}
+      service_role_key: ${SUPABASE_STAGING_SERVICE_ROLE_KEY}
+    
+    firebase:
+      project_id: familybridge-staging
+      app_id_android: 1:123456789:android:staging123def456
+      app_id_ios: 1:123456789:ios:staging123def456
+    
+    analytics:
+      enabled: true
+      debug: true
+      crash_reporting: true
+    
+    security:
+      certificate_pinning: true
+      biometric_auth: true
+      session_timeout: 3600 # 1 hour
+    
+    features:
+      family_chat: true
+      voice_messages: true
+      offline_mode: true
+      hipaa_compliance: true
+      advanced_monitoring: true
+    
+    app_store:
+      android:
+        track: internal
+        rollout_percentage: 100
+      ios:
+        testflight_only: true
+
+  production:
+    flutter:
+      debug_mode: false
+      web_renderer: canvaskit
+      obfuscate: true
+    
+    supabase:
+      url: ${SUPABASE_PROD_URL}
+      anon_key: ${SUPABASE_PROD_ANON_KEY}
+      service_role_key: ${SUPABASE_PROD_SERVICE_ROLE_KEY}
+    
+    firebase:
+      project_id: familybridge-prod
+      app_id_android: 1:987654321:android:prod123def456
+      app_id_ios: 1:987654321:ios:prod123def456
+    
+    analytics:
+      enabled: true
+      debug: false
+      crash_reporting: true
+      performance_monitoring: true
+    
+    security:
+      certificate_pinning: true
+      biometric_auth: true
+      session_timeout: 1800 # 30 minutes
+      encryption_key_rotation_days: 90
+    
+    features:
+      family_chat: true
+      voice_messages: true
+      offline_mode: true
+      hipaa_compliance: true
+      advanced_monitoring: true
+    
+    app_store:
+      android:
+        track: production
+        rollout_percentage: 10  # Gradual rollout
+        staged_rollout: true
+      ios:
+        app_store: true
+        phased_release: true
+    
+    monitoring:
+      sentry:
+        enabled: true
+        dsn: ${SENTRY_DSN}
+        environment: production
+      
+      datadog:
+        enabled: true
+        api_key: ${DATADOG_API_KEY}
+        app_key: ${DATADOG_APP_KEY}
+      
+      new_relic:
+        enabled: true
+        license_key: ${NEW_RELIC_LICENSE_KEY}
+      
+      health_check:
+        endpoints:
+          - url: https://api.familybridge.com/health
+            timeout: 5s
+          - url: https://app.familybridge.com/health
+            timeout: 5s
+    
+    compliance:
+      hipaa:
+        audit_logging: true
+        encryption_at_rest: true
+        encryption_in_transit: true
+        access_logging: true
+        breach_detection: true
+      
+      gdpr:
+        data_retention_days: 2555 # 7 years for healthcare data
+        right_to_be_forgotten: true
+        consent_management: true
+      
+      backup:
+        retention_days: 2555 # 7 years
+        frequency: daily
+        cross_region: true
