@@ -16,6 +16,14 @@ dependencies:
   flutter_svg: ^2.0.9
   flutter_feather_icons: ^2.0.0+1
 
+  # UI & Animations
+  flutter_animate: ^4.5.0
+  shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
+  percent_indicator: ^4.2.3
+  fl_chart: ^0.66.2
+  table_calendar: ^3.0.9
+
   # State Management (Using Provider for consistency)
   provider: ^6.1.1
 
@@ -36,14 +44,12 @@ dependencies:
   # Environment & Configuration
   flutter_dotenv: ^5.1.0
   shared_preferences: ^2.2.2
+  url_launcher: ^6.2.2
 
-  # UI & Animations
-  flutter_animate: ^4.5.0
-  shimmer: ^3.0.0
-  cached_network_image: ^3.3.1
-  percent_indicator: ^4.2.3
-  fl_chart: ^0.66.2
-  table_calendar: ^3.0.9
+  # Storage & File Management
+  path_provider: ^2.1.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
   # Media Handling
   image_picker: ^1.0.7
@@ -60,15 +66,11 @@ dependencies:
   geolocator: ^10.1.0
   geocoding: ^2.1.1
 
-  # Notifications
+  # Notifications & Timezones
   flutter_local_notifications: ^17.0.0
+  timezone: ^0.9.2
 
-  # Storage & File Management
-  path_provider: ^2.1.2
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-
-  # Permissions
+  # Permissions & Device Info
   permission_handler: ^11.3.0
   device_info_plus: ^9.1.1
 
@@ -85,7 +87,6 @@ dependencies:
   intl: ^0.19.0
   uuid: ^4.3.3
   collection: ^1.18.0
-  url_launcher: ^6.2.2
 
   # Security & Encryption (HIPAA)
   encrypt: ^5.0.1

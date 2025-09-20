@@ -6,7 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../models/hive/user_model.dart';
-import '../../models/hive/message_model.dart';
+import '../../core/models/message_model.dart';
 import '../../models/hive/health_data_model.dart';
 import '../../models/hive/appointment_model.dart';
 import '../../models/hive/medication_model.dart';
@@ -25,7 +25,7 @@ class DataSyncService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   late Box<HiveUserProfile> usersBox;
-  late Box<HiveChatMessage> messagesBox;
+  late Box<Message> messagesBox;
   late Box<HiveHealthRecord> healthBox;
   late Box<HiveAppointment> appointmentsBox;
   late Box<HiveMedicationSchedule> medicationsBox;
@@ -39,7 +39,7 @@ class DataSyncService {
   Future<void> initialize() async {
     try { await Hive.initFlutter(); } catch (_) {}
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(HiveUserProfileAdapter());
-    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(HiveChatMessageAdapter());
+    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(MessageAdapter());
     if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(HiveHealthRecordAdapter());
     if (!Hive.isAdapterRegistered(4)) Hive.registerAdapter(HiveAppointmentAdapter());
     if (!Hive.isAdapterRegistered(5)) Hive.registerAdapter(HiveMedicationScheduleAdapter());
@@ -47,7 +47,7 @@ class DataSyncService {
     if (!Hive.isAdapterRegistered(8)) Hive.registerAdapter(HiveDailyCheckinAdapter());
 
     usersBox = await Hive.openBox<HiveUserProfile>('users');
-    messagesBox = await Hive.openBox<HiveChatMessage>('messages');
+    messagesBox = await Hive.openBox<Message>('messages');
     healthBox = await Hive.openBox<HiveHealthRecord>('health_records');
     appointmentsBox = await Hive.openBox<HiveAppointment>('appointments');
     medicationsBox = await Hive.openBox<HiveMedicationSchedule>('medications');
@@ -128,7 +128,7 @@ class DataSyncService {
           await usersBox.put(model.id, model);
           break;
         case 'messages':
-          final model = HiveChatMessage.fromMap(row);
+          final model = Message.fromMap(row);
           await messagesBox.put(model.id, model);
           break;
         case 'health_records':

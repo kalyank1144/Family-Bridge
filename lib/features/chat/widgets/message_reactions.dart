@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 
 class MessageReactions extends StatelessWidget {
   final List<MessageReaction> reactions;
