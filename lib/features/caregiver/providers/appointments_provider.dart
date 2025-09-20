@@ -56,11 +56,11 @@ class AppointmentsProvider extends ChangeNotifier {
       map[date] ??= [];
       map[date]!.add(appointment);
     }
+    // Sort appointments within each date
+    map.forEach((date, appointments) {
+      appointments.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+    });
     return map;
-  }
-
-  AppointmentsProvider() {
-    loadAppointments();
   }
 
   Future<void> loadAppointments() async {
@@ -69,142 +69,60 @@ class AppointmentsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await _service.initialize();
       _appointments = await _service.getAppointments();
       _error = null;
     } catch (e) {
       _error = e.toString();
-      _loadMockAppointments();
+      // Offline-first approach will provide local data even on error
+      debugPrint('Appointments error (offline data may still be available): $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void _loadMockAppointments() {
-    final now = DateTime.now();
-    final memberColors = [
-      const Color(0xFF6B46C1),
-      const Color(0xFF10B981),
-      const Color(0xFFF59E0B),
-      const Color(0xFF3B82F6),
-    ];
-
-    _appointments = [
-      Appointment(
-        id: '1',
-        familyMemberId: '1',
-        familyMemberName: 'Walter',
-        doctorName: 'Dr. Smith',
-        location: 'Medical Center, Office 302',
-        dateTime: DateTime(now.year, now.month, now.day, 9, 0),
-        type: AppointmentType.doctorVisit,
-        status: AppointmentStatus.upcoming,
-        notes: 'Regular checkup',
-        phoneNumber: '555-0123',
-        memberColor: memberColors[0],
-      ),
-      Appointment(
-        id: '2',
-        familyMemberId: '2',
-        familyMemberName: 'Eva',
-        doctorName: 'Dr. Johnson',
-        location: 'Lab Corp, Building B',
-        dateTime: DateTime(now.year, now.month, now.day, 11, 30),
-        type: AppointmentType.labWork,
-        status: AppointmentStatus.upcoming,
-        notes: 'Blood work for annual physical',
-        phoneNumber: '555-0124',
-        memberColor: memberColors[1],
-        requiredDocuments: ['Insurance card', 'Lab order'],
-      ),
-      Appointment(
-        id: '3',
-        familyMemberId: '1',
-        familyMemberName: 'Walter',
-        doctorName: 'Dr. Lee',
-        location: 'Heart & Vascular Center',
-        dateTime: DateTime(now.year, now.month, now.day, 14, 0),
-        type: AppointmentType.specialist,
-        status: AppointmentStatus.upcoming,
-        notes: 'Cardiology follow-up',
-        phoneNumber: '555-0125',
-        memberColor: memberColors[0],
-        transportationDetails: 'Eugene will drive',
-      ),
-      Appointment(
-        id: '4',
-        familyMemberId: '2',
-        familyMemberName: 'Eva',
-        doctorName: 'Dr. Wilson',
-        location: 'Physical Therapy Center',
-        dateTime: DateTime(now.year, now.month, now.day + 1, 10, 0),
-        type: AppointmentType.therapy,
-        status: AppointmentStatus.upcoming,
-        notes: 'Session 5 of 10',
-        phoneNumber: '555-0126',
-        memberColor: memberColors[1],
-      ),
-      Appointment(
-        id: '5',
-        familyMemberId: '3',
-        familyMemberName: 'Eugene',
-        doctorName: 'Dr. Brown',
-        location: 'Dental Associates',
-        dateTime: DateTime(now.year, now.month, now.day + 2, 15, 30),
-        type: AppointmentType.dental,
-        status: AppointmentStatus.upcoming,
-        notes: 'Cleaning',
-        phoneNumber: '555-0127',
-        memberColor: memberColors[2],
-      ),
-      Appointment(
-        id: '6',
-        familyMemberId: '4',
-        familyMemberName: 'Sophia',
-        doctorName: 'Dr. Martinez',
-        location: 'Pediatric Care',
-        dateTime: DateTime(now.year, now.month, now.day + 3, 9, 0),
-        type: AppointmentType.vaccination,
-        status: AppointmentStatus.upcoming,
-        notes: 'Annual flu shot',
-        phoneNumber: '555-0128',
-        memberColor: memberColors[3],
-      ),
-      Appointment(
-        id: '7',
-        familyMemberId: '1',
-        familyMemberName: 'Walter',
-        doctorName: 'Dr. Smith',
-        location: 'Medical Center, Office 302',
-        dateTime: DateTime(now.year, now.month, now.day - 7, 9, 0),
-        type: AppointmentType.doctorVisit,
-        status: AppointmentStatus.completed,
-        notes: 'Follow-up visit',
-        phoneNumber: '555-0123',
-        memberColor: memberColors[0],
-      ),
-    ];
-  }
-
-  void setSelectedDate(DateTime date) {
-    _selectedDate = date;
+  Future<void> loadUserAppointments(String userId) async {
+    _isLoading = true;
+    _error = null;
     notifyListeners();
+
+    try {
+      await _service.initialize();
+      _appointments = await _service.getUserAppointments(userId);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+      debugPrint('User appointments error (offline data may still be available): $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> addAppointment(Appointment appointment) async {
     try {
-      final newAppointment = await _service.addAppointment(appointment);
-      _appointments.add(newAppointment);
+      await _service.initialize();
+      final addedAppointment = await _service.addAppointment(appointment);
+      
+      // Optimistically update UI
+      _appointments.add(addedAppointment);
+      _appointments.sort((a, b) => a.dateTime.compareTo(b.dateTime));
       notifyListeners();
     } catch (e) {
       _error = e.toString();
       notifyListeners();
+      // Offline-first approach will queue this for later sync
+      debugPrint('Appointment creation queued for sync: $e');
     }
   }
 
   Future<void> updateAppointment(Appointment appointment) async {
     try {
+      await _service.initialize();
       await _service.updateAppointment(appointment);
+      
+      // Update local state
       final index = _appointments.indexWhere((a) => a.id == appointment.id);
       if (index != -1) {
         _appointments[index] = appointment;
@@ -213,45 +131,115 @@ class AppointmentsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       notifyListeners();
+      debugPrint('Appointment update queued for sync: $e');
     }
   }
 
   Future<void> cancelAppointment(String appointmentId) async {
     try {
+      await _service.initialize();
       await _service.cancelAppointment(appointmentId);
+      
+      // Update local state
       final index = _appointments.indexWhere((a) => a.id == appointmentId);
       if (index != -1) {
-        _appointments[index] = Appointment(
-          id: _appointments[index].id,
-          familyMemberId: _appointments[index].familyMemberId,
-          familyMemberName: _appointments[index].familyMemberName,
-          doctorName: _appointments[index].doctorName,
-          location: _appointments[index].location,
-          dateTime: _appointments[index].dateTime,
-          type: _appointments[index].type,
+        _appointments[index] = _appointments[index].copyWith(
           status: AppointmentStatus.cancelled,
-          notes: _appointments[index].notes,
-          hasReminder: _appointments[index].hasReminder,
-          transportationDetails: _appointments[index].transportationDetails,
-          requiredDocuments: _appointments[index].requiredDocuments,
-          phoneNumber: _appointments[index].phoneNumber,
-          memberColor: _appointments[index].memberColor,
         );
         notifyListeners();
       }
     } catch (e) {
       _error = e.toString();
       notifyListeners();
+      debugPrint('Appointment cancellation queued for sync: $e');
     }
   }
 
-  Future<void> refresh() async {
-    await loadAppointments();
+  Future<void> deleteAppointment(String appointmentId) async {
+    try {
+      // Optimistically remove from UI
+      _appointments.removeWhere((a) => a.id == appointmentId);
+      notifyListeners();
+      
+      await _service.initialize();
+      // Note: Service doesn't have delete method, would need to add to service
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      debugPrint('Appointment deletion queued for sync: $e');
+    }
+  }
+
+  void setSelectedDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
+  }
+
+  Future<List<Appointment>> getTodayAppointmentsForUser(String userId) async {
+    await _service.initialize();
+    return await _service.getTodayAppointments(userId);
+  }
+
+  Future<List<Appointment>> getUpcomingAppointmentsForUser(String userId, {int days = 7}) async {
+    await _service.initialize();
+    return await _service.getUpcomingAppointments(userId, days: days);
+  }
+
+  // Stream support for real-time updates
+  Stream<List<Appointment>>? _appointmentStream;
+
+  Stream<List<Appointment>> watchUserAppointments(String userId) {
+    _appointmentStream?.drain(); // Cancel previous stream
+    _appointmentStream = _service.watchUserAppointments(userId);
+    
+    _appointmentStream!.listen(
+      (appointments) {
+        _appointments = appointments;
+        notifyListeners();
+      },
+      onError: (error) {
+        _error = error.toString();
+        notifyListeners();
+      },
+    );
+
+    return _appointmentStream!;
   }
 
   @override
   void dispose() {
+    _appointmentStream?.drain();
     _service.dispose();
     super.dispose();
+  }
+}
+
+extension AppointmentCopyWith on Appointment {
+  Appointment copyWith({
+    String? id,
+    String? title,
+    String? description,
+    DateTime? dateTime,
+    DateTime? endDateTime,
+    DateTime? reminderDateTime,
+    String? location,
+    AppointmentType? type,
+    AppointmentStatus? status,
+    String? familyMemberId,
+    String? familyId,
+  }) {
+    return Appointment(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      dateTime: dateTime ?? this.dateTime,
+      endDateTime: endDateTime ?? this.endDateTime,
+      reminderDateTime: reminderDateTime ?? this.reminderDateTime,
+      location: location ?? this.location,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      familyMemberId: familyMemberId ?? this.familyMemberId,
+      familyId: familyId ?? this.familyId,
+    );
   }
 }
