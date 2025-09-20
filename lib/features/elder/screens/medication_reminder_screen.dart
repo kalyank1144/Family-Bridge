@@ -7,8 +7,12 @@ import '../providers/elder_provider.dart';
 import '../models/medication_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+
 import '../widgets/medication_photo_widget.dart';
 import '../../../services/storage/media_storage_service.dart';
+
+import '../../../core/services/storage_service.dart';
+
 
 class MedicationReminderScreen extends StatefulWidget {
   const MedicationReminderScreen({super.key});
@@ -47,7 +51,6 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
     // Register voice commands
     _voiceService.registerCommand('take medicine', () => _takeMedication());
     _voiceService.registerCommand('i took my medicine', () => _takeMedication());
-    _voiceService.registerCommand('skip medicine', () => _skipMedication());
     _voiceService.registerCommand('take photo', () => _takePhoto());
   }
 
@@ -58,13 +61,6 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
         await _takePhoto();
       }
       await _confirmMedicationTaken(elderProvider.nextMedication!);
-    }
-  }
-
-  Future<void> _skipMedication() async {
-    final elderProvider = context.read<ElderProvider>();
-    if (elderProvider.nextMedication != null) {
-      await _showSkipDialog(elderProvider.nextMedication!);
     }
   }
 
@@ -96,10 +92,24 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
 
   Future<void> _confirmMedicationTaken(Medication medication) async {
     final elderProvider = context.read<ElderProvider>();
+
+    String? photoUrl;
+    if (_capturedImage != null) {
+      await _voiceService.speak('Uploading confirmation photo');
+      photoUrl = await StorageService.uploadMedicationPhoto(
+        file: _capturedImage!,
+        elderId: elderProvider.userId,
+        medicationId: medication.id,
+      );
+    }
     
     await elderProvider.markMedicationTaken(
       medication.id,
+
       photoUrl: _capturedImageUrl ?? _capturedImage?.path,
+
+      photoUrl: photoUrl,
+
     );
     
     await _voiceService.confirmAction('Medication marked as taken');
@@ -109,73 +119,26 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
     });
   }
 
-  Future<void> _showSkipDialog(Medication medication) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Text(
-          'Skip Medication?',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Why are you skipping ${medication.name}?',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 20),
-            _SkipReasonButton(
-              reason: 'Not feeling well',
-              onTap: () => _skipWithReason(medication, 'Not feeling well'),
-            ),
-            _SkipReasonButton(
-              reason: 'Out of medication',
-              onTap: () => _skipWithReason(medication, 'Out of medication'),
-            ),
-            _SkipReasonButton(
-              reason: 'Doctor advised to skip',
-              onTap: () => _skipWithReason(medication, 'Doctor advised'),
-            ),
-            _SkipReasonButton(
-              reason: 'Other reason',
-              onTap: () => _skipWithReason(medication, 'Other'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(fontSize: 20),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _skipWithReason(Medication medication, String reason) async {
-    final elderProvider = context.read<ElderProvider>();
-    await elderProvider.skipMedication(medication.id, reason);
-    Navigator.pop(context);
-    await _voiceService.confirmAction('Medication skipped');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.lightBackground,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('My Medications'),
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, size: 32),
+          icon: const Icon(Icons.arrow_back, size: 32, color: AppTheme.darkText),
           onPressed: () => Navigator.pop(context),
         ),
+        title: const Text(
+          'My Medications',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.darkText,
+          ),
+        ),
+        centerTitle: false,
       ),
       body: SafeArea(
         child: Consumer<ElderProvider>(
@@ -197,31 +160,48 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
                       color: AppTheme.neutralGray,
                     ),
                     const SizedBox(height: 20),
-                    Text(
+                    const Text(
                       'No medications scheduled',
-                      style: Theme.of(context).textTheme.headlineMedium,
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: AppTheme.darkText,
+                      ),
                     ),
                   ],
                 ),
               );
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: elderProvider.medications.length,
-              itemBuilder: (context, index) {
-                final medication = elderProvider.medications[index];
-                final isNext = medication.id == elderProvider.nextMedication?.id;
-                
-                return MedicationCard(
-                  medication: medication,
-                  isNext: isNext,
-                  onTake: () => _confirmMedicationTaken(medication),
-                  onSkip: () => _showSkipDialog(medication),
-                  onTakePhoto: medication.requiresPhotoConfirmation ? _takePhoto : null,
-                  capturedImage: _capturedImage,
-                );
-              },
+            // Show only the next/current medication in a simplified view
+            final nextMedication = elderProvider.nextMedication;
+            if (nextMedication == null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.medication,
+                      size: 80,
+                      color: AppTheme.neutralGray,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'No medications scheduled',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: AppTheme.darkText,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            
+            return _SimplifiedMedicationView(
+              medication: nextMedication,
+              onTake: () => _confirmMedicationTaken(nextMedication),
+              onTakePhoto: nextMedication.requiresPhotoConfirmation ? _takePhoto : null,
+              capturedImage: _capturedImage,
             );
           },
         ),
@@ -230,20 +210,15 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
   }
 }
 
-class MedicationCard extends StatelessWidget {
+class _SimplifiedMedicationView extends StatelessWidget {
   final Medication medication;
-  final bool isNext;
   final VoidCallback onTake;
-  final VoidCallback onSkip;
   final VoidCallback? onTakePhoto;
   final File? capturedImage;
 
-  const MedicationCard({
-    super.key,
+  const _SimplifiedMedicationView({
     required this.medication,
-    required this.isNext,
     required this.onTake,
-    required this.onSkip,
     this.onTakePhoto,
     this.capturedImage,
   });
@@ -252,265 +227,202 @@ class MedicationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final timeFormat = DateFormat('h:mm a');
     
-    return Card(
-      margin: const EdgeInsets.only(bottom: 20),
-      elevation: isNext ? 8 : 2,
-      color: isNext ? Colors.white : Colors.grey.shade50,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: isNext
-            ? BorderSide(color: AppTheme.primaryBlue, width: 3)
-            : BorderSide.none,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isNext)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: medication.isDue()
-                      ? AppTheme.emergencyRed
-                      : AppTheme.warningYellow,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  medication.isDue() ? 'TAKE NOW' : 'NEXT DOSE',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          
+          // Medication Image Placeholder - matching design
+          Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: medication.photoUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      medication.photoUrl!,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : CustomPaint(
+                    painter: _XPainter(),
+                    size: const Size(200, 200),
                   ),
+          ),
+          const SizedBox(height: 40),
+          
+          // Medication Name - Large and Bold
+          Text(
+            medication.name,
+            style: const TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkText,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          
+          // Dosage and Time - Side by Side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                medication.dosage,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.darkText,
                 ),
               ),
-            if (isNext) const SizedBox(height: 16),
-            
-            // Medication Image
-            if (medication.photoUrl != null)
-              Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  margin: const EdgeInsets.only(bottom: 20),
+              const SizedBox(width: 40),
+              Text(
+                timeFormat.format(medication.nextDoseTime),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.darkText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 60),
+          
+          // Take Now Button - Large and Prominent
+          Container(
+            width: double.infinity,
+            height: 80,
+            margin: const EdgeInsets.only(bottom: 16),
+            child: ElevatedButton(
+              onPressed: onTake,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.darkText,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'TAKE NOW',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ),
+          
+          // Taken Button - Outlined
+          Container(
+            width: double.infinity,
+            height: 80,
+            margin: const EdgeInsets.only(bottom: 32),
+            child: OutlinedButton(
+              onPressed: onTake, // Same action for now
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.darkText,
+                side: const BorderSide(
+                  color: AppTheme.darkText,
+                  width: 2,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'TAKEN',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ),
+          
+          // Take Photo to Confirm
+          if (medication.requiresPhotoConfirmation && onTakePhoto != null) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(16),
-                    image: DecorationImage(
-                      image: NetworkImage(medication.photoUrl!),
-                      fit: BoxFit.cover,
+                    color: AppTheme.darkText,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: IconButton(
+                    onPressed: onTakePhoto,
+                    icon: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 28,
                     ),
                   ),
                 ),
-              )
-            else
-              Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    Icons.medication,
-                    size: 60,
-                    color: AppTheme.primaryBlue,
-                  ),
-                ),
-              ),
-            
-            // Medication Name
-            Text(
-              medication.name,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.darkText,
-              ),
-            ),
-            const SizedBox(height: 8),
-            
-            // Dosage
-            Text(
-              medication.dosage,
-              style: const TextStyle(
-                fontSize: 24,
-                color: AppTheme.darkText,
-              ),
-            ),
-            const SizedBox(height: 8),
-            
-            // Time
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time,
-                  size: 24,
-                  color: AppTheme.neutralGray,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  timeFormat.format(medication.nextDoseTime),
+                const SizedBox(width: 16),
+                const Text(
+                  'Take Photo to Confirm',
                   style: TextStyle(
                     fontSize: 20,
-                    color: AppTheme.neutralGray,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  medication.getTimeUntilNext(),
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: medication.isDue()
-                        ? AppTheme.emergencyRed
-                        : AppTheme.neutralGray,
-                    fontWeight: medication.isDue() ? FontWeight.bold : FontWeight.normal,
+                    color: AppTheme.darkText,
                   ),
                 ),
               ],
             ),
-            
-            // Instructions
-            if (medication.instructions != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: AppTheme.primaryBlue,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        medication.instructions!,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: AppTheme.darkText,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            
-            // Photo Confirmation
-            if (medication.requiresPhotoConfirmation && isNext) ...[
-              const SizedBox(height: 20),
-              if (capturedImage != null)
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    image: DecorationImage(
-                      image: FileImage(capturedImage!),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-              else
-                OutlinedButton.icon(
-                  onPressed: onTakePhoto,
-                  icon: const Icon(Icons.camera_alt, size: 28),
-                  label: const Text(
-                    'Take Photo to Confirm',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 70),
-                  ),
-                ),
-            ],
-            
-            // Action Buttons
-            if (isNext) ...[
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onTake,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.successGreen,
-                        minimumSize: const Size(double.infinity, 70),
-                      ),
-                      child: const Text(
-                        'TAKEN',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: onSkip,
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 70),
-                        side: const BorderSide(
-                          color: AppTheme.neutralGray,
-                          width: 2,
-                        ),
-                      ),
-                      child: Text(
-                        'SKIP',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.neutralGray,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            const SizedBox(height: 40),
           ],
-        ),
+          
+          const Spacer(),
+          
+          // Next Medication Time
+          Text(
+            'Next: 2:00 PM', // This should be dynamic based on next medication
+            style: TextStyle(
+              fontSize: 18,
+              color: AppTheme.neutralGray,
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
       ),
     );
   }
 }
 
-class _SkipReasonButton extends StatelessWidget {
-  final String reason;
-  final VoidCallback onTap;
-
-  const _SkipReasonButton({
-    required this.reason,
-    required this.onTap,
-  });
-
+// Custom painter for the X in the medication placeholder
+class _XPainter extends CustomPainter {
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 60),
-        ),
-        child: Text(
-          reason,
-          style: const TextStyle(fontSize: 18),
-        ),
-      ),
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey.shade400
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+
+    const margin = 40.0;
+    
+    // Draw X
+    canvas.drawLine(
+      Offset(margin, margin),
+      Offset(size.width - margin, size.height - margin),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width - margin, margin),
+      Offset(margin, size.height - margin),
+      paint,
     );
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

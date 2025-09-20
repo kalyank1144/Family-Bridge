@@ -10,10 +10,33 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Core packages
+  # Core UI & State
   cupertino_icons: ^1.0.6
+
+  provider: ^6.1.1
   flutter_riverpod: ^2.4.10
   go_router: ^13.2.0
+
+  # Backend & Auth
+  supabase_flutter: ^2.5.6
+  flutter_secure_storage: ^9.0.0
+  local_auth: ^2.3.0
+  sign_in_with_apple: ^6.1.0
+  shared_preferences: ^2.2.2
+  http: ^1.1.2
+  dio: ^5.4.0
+  connectivity_plus: ^5.0.2
+  flutter_dotenv: ^5.1.0
+  url_launcher: ^6.2.2
+
+  # Utilities
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  collection: ^1.18.0
+
+  # Media & Device
+
+  go_router: ^16.2.2
   
   # Supabase for backend
   supabase_flutter: ^2.5.6
@@ -23,43 +46,67 @@ dependencies:
   shimmer: ^3.0.0
   cached_network_image: ^3.3.1
   google_fonts: ^6.1.0
-  flutter_animate: ^4.3.0
   flutter_svg: ^2.0.9
+  flutter_feather_icons: ^2.0.0
   
   # State Management
   provider: ^6.1.1
-  flutter_bloc: ^8.1.3
-  
-  # Navigation
-  go_router: ^13.0.0
+  flutter_riverpod: ^2.4.0
   
   # Data & Backend
-  supabase_flutter: ^2.3.2
   shared_preferences: ^2.2.2
   http: ^1.1.2
   dio: ^5.4.0
+  flutter_secure_storage: ^9.0.0
   
   # Media handling
   image_picker: ^1.0.7
+  camera: ^0.10.5
   video_player: ^2.8.3
   audioplayers: ^6.0.0
+
   record: ^5.0.4
-  
-  # Utilities
-  intl: ^0.19.0
-  uuid: ^4.3.3
   path_provider: ^2.1.2
   permission_handler: ^11.3.0
-  connectivity_plus: ^5.0.2
+
+  # Location
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+
+  # Voice & Accessibility
+
+  record: ^6.1.1
+  camera: ^0.11.2
+  
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.3.3
+  path_provider: ^2.1.2
+  permission_handler: ^12.0.1
+  connectivity_plus: ^7.0.0
+  collection: ^1.18.0
+  flutter_dotenv: ^6.0.0
+  url_launcher: ^6.2.2
   
   # Notifications
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^19.4.2
   
-  # Storage
-  shared_preferences: ^2.2.2
-  flutter_secure_storage: ^9.0.0
   # Health & Fitness
   percent_indicator: ^4.2.3
+  fl_chart: ^0.66.2
+  
+  # Professional reporting
+  pdf: ^3.10.7
+  printing: ^5.12.0
+  
+  # HIPAA Compliance & Security
+  encrypt: ^5.0.1
+  crypto: ^3.0.3
+  flutter_secure_storage: ^9.0.0
+  device_info_plus: ^9.1.1
+  
+  # Icons
+  flutter_feather_icons: ^2.0.0+1
   
   # Media
   audioplayers: ^5.2.1
@@ -71,51 +118,54 @@ dependencies:
   permission_handler: ^11.1.0
   path_provider: ^2.1.1
   url_launcher: ^6.2.2
+
+  table_calendar: ^3.0.9
+  fl_chart: ^1.1.1
   
   # Location
-  geolocator: ^10.1.0
-  geocoding: ^2.1.1
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
   
   # Voice & Speech
-  speech_to_text: ^6.4.1
-  flutter_tts: ^4.0.2
+  speech_to_text: ^7.3.0
 
-  # Forms
-  flutter_form_builder: ^9.1.1
-  form_builder_validators: ^9.1.0
-  
-  # Chat features
+  flutter_tts: ^4.0.2
+  speech_to_text: ^6.6.0
+
+
+
+  # Chat & UI extras
   emoji_picker_flutter: ^2.1.1
   giphy_get: ^3.5.6
   flutter_linkify: ^6.0.0
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+
+  flutter_form_builder: ^10.2.0
+  form_builder_validators: ^11.2.0
   
-  # Voice and speech
-  speech_to_text: ^6.6.0
-  flutter_tts: ^4.0.2
+  # Chat features
+  emoji_picker_flutter: ^4.3.0
+  giphy_get: ^3.5.6
+  flutter_linkify: ^6.0.0
 
-  # Utilities
-  uuid: ^4.2.2
-  collection: ^1.18.0
-  flutter_dotenv: ^5.1.0
 
-  # Weather (optional)
+  # Optional
   weather: ^3.1.1
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
-  
   assets:
     - assets/images/
     - assets/fonts/
     - assets/icons/
     - assets/sounds/
-  
   fonts:
     - family: SF Pro Display
       fonts:

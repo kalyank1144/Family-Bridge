@@ -88,262 +88,154 @@ class _ElderHomeScreenState extends State<ElderHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.lightBackground,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Consumer<ElderProvider>(
           builder: (context, elderProvider, child) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Greeting Section
-                    Text(
-                      '${_getGreeting()},',
-                      style: Theme.of(context).textTheme.displayMedium,
+            return Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 32),
+                  
+                  // Large Greeting Header - matching design exactly
+                  Text(
+                    '${_getGreeting()},',
+                    style: const TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkText,
+                      height: 1.1,
                     ),
-                    Text(
-                      elderProvider.userName,
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        color: AppTheme.primaryBlue,
-                      ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    'Name', // Will be dynamic
+                    style: const TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkText,
+                      height: 1.1,
                     ),
-                    const SizedBox(height: 24),
-                    
-                    // Date and Weather
-                    Row(
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 60),
+                  
+                  // Four Main Action Buttons - vertical layout matching design
+                  Expanded(
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                DateFormat('EEEE').format(DateTime.now()),
-                                style: Theme.of(context).textTheme.headlineMedium,
-                              ),
-                              Text(
-                                DateFormat('MMMM d, yyyy').format(DateTime.now()),
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: AppTheme.neutralGray,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        WeatherWidget(
-                          temperature: elderProvider.temperature,
-                          description: elderProvider.weatherDescription,
-                          icon: elderProvider.weatherIcon,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    
-                    // Quick Status Button
-                    if (!elderProvider.hasCheckedInToday)
-                      GestureDetector(
-                        onTap: () {
-                          _voiceService.speak('You haven\'t checked in today. Tap to complete your daily check-in.');
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: AppTheme.successGreen,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.check_circle_outline,
-                                size: 36,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                'I\'m OK Today',
-                                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 24),
-                    
-                    // Action Cards Grid
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.1,
-                      children: [
-                        ActionCard(
-                          title: 'Emergency\nContacts',
-                          icon: Icons.phone,
-                          color: AppTheme.emergencyRed,
-                          subtitle: 'Call for Help',
-                          onTap: _navigateToEmergency,
-                          isUrgent: true,
-                        ),
-                        ActionCard(
-                          title: 'My\nMedications',
-                          icon: Icons.medication,
-                          color: AppTheme.primaryBlue,
-                          subtitle: elderProvider.nextMedication != null
-                              ? elderProvider.nextMedication!.getTimeUntilNext()
-                              : 'View Schedule',
-                          onTap: _navigateToMedication,
-                          badge: elderProvider.nextMedication?.isDue() == true ? '!' : null,
-                        ),
-                        ActionCard(
-                          title: 'Daily\nCheck-in',
-                          icon: Icons.favorite,
-                          color: elderProvider.hasCheckedInToday
-                              ? AppTheme.successGreen
-                              : AppTheme.warningYellow,
-                          subtitle: elderProvider.hasCheckedInToday
-                              ? 'Completed ✓'
-                              : 'Not Done',
+                        // 1. I'm OK Today Button (Green)
+                        _LargeActionButton(
+                          title: "I'm OK Today",
+                          icon: Icons.check_circle_outline,
+                          backgroundColor: AppTheme.successGreen,
                           onTap: _navigateToCheckin,
                         ),
-                        ActionCard(
-                          title: 'Family\nMessages',
-                          icon: Icons.chat_bubble,
-                          color: Colors.purple,
-                          subtitle: elderProvider.unreadMessages > 0
-                              ? '${elderProvider.unreadMessages} New'
-                              : 'Stay Connected',
+                        const SizedBox(height: 20),
+                        
+                        // 2. Call for Help Button (Red)
+                        _LargeActionButton(
+                          title: 'Call for Help',
+                          icon: Icons.phone,
+                          backgroundColor: AppTheme.emergencyRed,
+                          onTap: _navigateToEmergency,
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // 3. My Medications Button (Blue)
+                        _LargeActionButton(
+                          title: 'My Medications',
+                          icon: Icons.medication_outlined,
+                          backgroundColor: AppTheme.primaryBlue,
+                          onTap: _navigateToMedication,
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // 4. Family Messages Button (Purple)
+                        _LargeActionButton(
+                          title: 'Family Messages',
+                          icon: Icons.chat_bubble_outline,
+                          backgroundColor: AppTheme.familyPurple,
                           onTap: _navigateToFamily,
-                          badge: elderProvider.unreadMessages > 0
-                              ? elderProvider.unreadMessages.toString()
-                              : null,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
-                    
-                    // Recent Activities
-                    if (elderProvider.todayCheckin != null) ...[
-                      Text(
-                        'Today\'s Wellness',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              elderProvider.todayCheckin!.getMoodEmoji(),
-                              style: const TextStyle(fontSize: 48),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Feeling ${elderProvider.todayCheckin!.mood}',
-                                    style: Theme.of(context).textTheme.headlineSmall,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Wellness Score: ${elderProvider.todayCheckin!.getWellnessScore()}/100',
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: AppTheme.neutralGray,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                  ),
+                  
+                  const SizedBox(height: 32),
+                ],
               ),
             );
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          switch (index) {
-            case 0:
-              _voiceService.announceScreen('Home');
-              break;
-            case 1:
-              _navigateToMedication();
-              break;
-            case 2:
-              _navigateToFamily();
-              break;
-            case 3:
-              _voiceService.speak('Opening settings');
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medication),
-            label: 'Medicine',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Family',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (_voiceService.isListening) {
-            await _voiceService.stopListening();
-          } else {
-            await _voiceService.startListening(
-              onResult: (words) {
-                print('Voice input: $words');
-              },
-            );
-          }
-          setState(() {});
-        },
-        backgroundColor: _voiceService.isListening
-            ? AppTheme.emergencyRed
-            : AppTheme.primaryBlue,
-        child: Icon(
-          _voiceService.isListening ? Icons.mic : Icons.mic_none,
-          size: 32,
+    );
+  }
+}
+
+class _LargeActionButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color backgroundColor;
+  final VoidCallback onTap;
+
+  const _LargeActionButton({
+    required this.title,
+    required this.icon,
+    required this.backgroundColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 100,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: backgroundColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(width: 24),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: backgroundColor,
+              ),
+            ),
+            const SizedBox(width: 32),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

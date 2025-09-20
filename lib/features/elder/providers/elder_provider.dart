@@ -72,7 +72,7 @@ class ElderProvider extends ChangeNotifier {
       
       _userName = response['name'] ?? 'User';
     } catch (e) {
-      print('Error loading user profile: $e');
+      debugPrint('Error loading user profile: $e');
     }
   }
   
@@ -92,7 +92,7 @@ class ElderProvider extends ChangeNotifier {
           .map((contact) => EmergencyContact.fromJson(contact))
           .toList();
     } catch (e) {
-      print('Error loading emergency contacts: $e');
+      debugPrint('Error loading emergency contacts: $e');
     } finally {
       _isLoadingContacts = false;
       notifyListeners();
@@ -113,7 +113,7 @@ class ElderProvider extends ChangeNotifier {
       
       await loadEmergencyContacts();
     } catch (e) {
-      print('Error adding emergency contact: $e');
+      debugPrint('Error adding emergency contact: $e');
     }
   }
   
@@ -140,7 +140,7 @@ class ElderProvider extends ChangeNotifier {
         orElse: () => _medications.first,
       );
     } catch (e) {
-      print('Error loading medications: $e');
+      debugPrint('Error loading medications: $e');
     } finally {
       _isLoadingMedications = false;
       notifyListeners();
@@ -170,7 +170,7 @@ class ElderProvider extends ChangeNotifier {
       
       await loadMedications();
     } catch (e) {
-      print('Error marking medication taken: $e');
+      debugPrint('Error marking medication taken: $e');
     }
   }
   
@@ -187,7 +187,7 @@ class ElderProvider extends ChangeNotifier {
       
       await loadMedications();
     } catch (e) {
-      print('Error skipping medication: $e');
+      debugPrint('Error skipping medication: $e');
     }
   }
   
@@ -213,7 +213,7 @@ class ElderProvider extends ChangeNotifier {
         _hasCheckedInToday = false;
       }
     } catch (e) {
-      print('Error checking today\'s check-in: $e');
+      debugPrint('Error checking today\'s check-in: $e');
     }
     notifyListeners();
   }
@@ -237,7 +237,7 @@ class ElderProvider extends ChangeNotifier {
       _hasCheckedInToday = true;
       notifyListeners();
     } catch (e) {
-      print('Error submitting daily check-in: $e');
+      debugPrint('Error submitting daily check-in: $e');
     }
   }
   
@@ -250,7 +250,7 @@ class ElderProvider extends ChangeNotifier {
       _temperature = 72;
       _weatherIcon = '☀️';
     } catch (e) {
-      print('Error loading weather: $e');
+      debugPrint('Error loading weather: $e');
     }
     notifyListeners();
   }
@@ -266,7 +266,7 @@ class ElderProvider extends ChangeNotifier {
       
       _unreadMessages = (response as List).length;
     } catch (e) {
-      print('Error loading unread messages: $e');
+      debugPrint('Error loading unread messages: $e');
     }
     notifyListeners();
   }
