@@ -7,6 +7,7 @@ import '../providers/elder_provider.dart';
 import '../models/medication_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/services/storage_service.dart';
 
 class MedicationReminderScreen extends StatefulWidget {
   const MedicationReminderScreen({super.key});
@@ -77,10 +78,20 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
 
   Future<void> _confirmMedicationTaken(Medication medication) async {
     final elderProvider = context.read<ElderProvider>();
+
+    String? photoUrl;
+    if (_capturedImage != null) {
+      await _voiceService.speak('Uploading confirmation photo');
+      photoUrl = await StorageService.uploadMedicationPhoto(
+        file: _capturedImage!,
+        elderId: elderProvider.userId,
+        medicationId: medication.id,
+      );
+    }
     
     await elderProvider.markMedicationTaken(
       medication.id,
-      photoUrl: _capturedImage?.path,
+      photoUrl: photoUrl,
     );
     
     await _voiceService.confirmAction('Medication marked as taken');

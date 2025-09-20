@@ -6,6 +6,8 @@ import '../providers/elder_provider.dart';
 import '../models/daily_checkin_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/services/storage_service.dart';
+import 'dart:io';
 
 class DailyCheckinScreen extends StatefulWidget {
   const DailyCheckinScreen({super.key});
@@ -109,12 +111,24 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
 
   Future<void> _stopRecording() async {
     try {
-      _voiceNoteUrl = await _audioRecorder.stop();
+      final path = await _audioRecorder.stop();
       _recordingTimer?.cancel();
-      
+
       setState(() {
         _isRecording = false;
       });
+
+      if (path != null) {
+        final elderProvider = context.read<ElderProvider>();
+        await _voiceService.speak('Uploading voice note');
+        final uploadedUrl = await StorageService.uploadVoiceNote(
+          file: File(path),
+          elderId: elderProvider.userId,
+        );
+        setState(() {
+          _voiceNoteUrl = uploadedUrl;
+        });
+      }
       
       await _voiceService.confirmAction('Voice note recorded');
     } catch (e) {
@@ -129,6 +143,20 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
     }
     
     final elderProvider = context.read<ElderProvider>();
+
+    // If we have a local voice note path, upload it to Supabase first
+    if (_voiceNoteUrl != null && _voiceNoteUrl!.startsWith('/')) {
+      try {
+        await _voiceService.speak('Uploading voice note');
+        final uploaded = await StorageService.uploadVoiceNote(
+          file: File(_voiceNoteUrl!),
+          elderId: elderProvider.userId,
+        );
+        if (uploaded != null) {
+          _voiceNoteUrl = uploaded;
+        }
+      } catch (_) {}
+    }
     
     final checkin = DailyCheckin(
       elderId: elderProvider.userId,
