@@ -302,3 +302,11 @@ USING (bucket_id = 'profile-photos' AND (storage.foldername(name))[1] = auth.uid
 CREATE POLICY "Users delete own profile photos" ON storage.objects
 FOR DELETE TO authenticated
 USING (bucket_id = 'profile-photos' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_family_groups_created_by ON public.family_groups(created_by);
+CREATE INDEX IF NOT EXISTS idx_family_members_family ON public.family_members(family_id);
+CREATE INDEX IF NOT EXISTS idx_family_members_user ON public.family_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_updated_at ON public.user_profiles(updated_at);
+CREATE INDEX IF NOT EXISTS idx_family_invites_family ON public.family_invites(family_id);
+CREATE INDEX IF NOT EXISTS idx_family_invites_email ON public.family_invites(email);
