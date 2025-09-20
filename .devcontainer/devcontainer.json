@@ -1,0 +1,30 @@
+{
+  "name": "Flutter Development",
+  "image": "cirrusci/flutter:stable",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dart-code.dart-code",
+        "dart-code.flutter",
+        "alexisvt.flutter-snippets",
+        "nash.awesome-flutter-snippets",
+        "github.copilot"
+      ],
+      "settings": {
+        "dart.flutterSdkPath": "/usr/local/flutter",
+        "dart.lineLength": 100
+      }
+    }
+  },
+  "postCreateCommand": "flutter pub get",
+  "forwardPorts": [3000, 8080],
+  "mounts": [
+    "source=${localWorkspaceFolder}/.flutter-devtools,target=/home/cirrus/.flutter-devtools,type=bind,consistency=cached"
+  ],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace"
+}
