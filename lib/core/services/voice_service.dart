@@ -33,12 +33,12 @@ class VoiceService {
     
     // Initialize Speech to Text
     bool available = await _speechToText.initialize(
-      onError: (error) => print('Speech recognition error: $error'),
-      onStatus: (status) => print('Speech recognition status: $status'),
+      onError: (error) => debugPrint('Speech recognition error: $error'),
+      onStatus: (status) => debugPrint('Speech recognition status: $status'),
     );
     
     if (!available) {
-      print('Speech recognition not available');
+      debugPrint('Speech recognition not available');
     }
     
     // Register default voice commands
