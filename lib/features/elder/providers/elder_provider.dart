@@ -155,6 +155,7 @@ class ElderProvider extends ChangeNotifier {
         'elder_id': _userId,
         'taken_at': DateTime.now().toIso8601String(),
         'photo_url': photoUrl,
+        'confirmation_photo_url': photoUrl,
         'confirmed': true,
       });
       

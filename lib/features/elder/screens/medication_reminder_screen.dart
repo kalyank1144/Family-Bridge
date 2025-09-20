@@ -7,7 +7,12 @@ import '../providers/elder_provider.dart';
 import '../models/medication_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+
+import '../widgets/medication_photo_widget.dart';
+import '../../../services/storage/media_storage_service.dart';
+
 import '../../../core/services/storage_service.dart';
+
 
 class MedicationReminderScreen extends StatefulWidget {
   const MedicationReminderScreen({super.key});
@@ -20,6 +25,7 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
   late VoiceService _voiceService;
   final ImagePicker _imagePicker = ImagePicker();
   File? _capturedImage;
+  String? _capturedImageUrl;
 
   @override
   void initState() {
@@ -69,6 +75,14 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
         setState(() {
           _capturedImage = File(photo.path);
         });
+        try {
+          final url = await MediaStorageService().uploadFile(
+            file: File(photo.path),
+            bucket: MediaStorageService.bucketMedicationPhotos,
+            contentType: 'image/jpeg',
+          );
+          setState(() => _capturedImageUrl = url);
+        } catch (_) {}
         await _voiceService.confirmAction('Photo taken');
       }
     } catch (e) {
@@ -91,7 +105,11 @@ class _MedicationReminderScreenState extends State<MedicationReminderScreen> {
     
     await elderProvider.markMedicationTaken(
       medication.id,
+
+      photoUrl: _capturedImageUrl ?? _capturedImage?.path,
+
       photoUrl: photoUrl,
+
     );
     
     await _voiceService.confirmAction('Medication marked as taken');

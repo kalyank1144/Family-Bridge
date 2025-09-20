@@ -6,8 +6,14 @@ import '../providers/elder_provider.dart';
 import '../models/daily_checkin_model.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_theme.dart';
+
+import '../widgets/elder_image_picker.dart';
+import '../widgets/voice_checkin_widget.dart';
+import '../../../services/storage/media_storage_service.dart';
+
 import '../../../core/services/storage_service.dart';
 import 'dart:io';
+
 
 class DailyCheckinScreen extends StatefulWidget {
   const DailyCheckinScreen({super.key});
@@ -24,6 +30,7 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
   // Check-in data - simplified
   String _selectedMood = '';
   String _notes = '';
+  String? _environmentPhotoUrl;
   String? _voiceNoteUrl;
   
   bool _isRecording = false;
@@ -271,6 +278,47 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
               Container(\n                height: 80,\n                decoration: BoxDecoration(\n                  border: Border.all(color: Colors.grey.shade300, width: 2),\n                  borderRadius: BorderRadius.circular(16),\n                ),\n                child: Row(\n                  children: [\n                    Expanded(\n                      child: TextField(\n                        controller: _notesController,\n                        onChanged: (value) => _notes = value,\n                        decoration: const InputDecoration(\n                          hintText: 'Add a note...',\n                          hintStyle: TextStyle(\n                            fontSize: 20,\n                            color: Colors.grey,\n                          ),\n                          border: InputBorder.none,\n                          contentPadding: EdgeInsets.all(24),\n                        ),\n                        style: const TextStyle(\n                          fontSize: 20,\n                          color: AppTheme.darkText,\n                        ),\n                      ),\n                    ),\n                    // Microphone button\n                    Container(\n                      width: 60,\n                      height: 60,\n                      margin: const EdgeInsets.only(right: 10),\n                      decoration: BoxDecoration(\n                        color: _isRecording ? AppTheme.emergencyRed : AppTheme.darkText,\n                        borderRadius: BorderRadius.circular(30),\n                      ),\n                      child: IconButton(\n                        onPressed: _toggleRecording,\n                        icon: Icon(\n                          _isRecording ? Icons.stop : Icons.mic,\n                          color: Colors.white,\n                          size: 28,\n                        ),\n                      ),\n                    ),\n                  ],\n                ),\n              ),
               const SizedBox(height: 40),
               
+
+              // Environment Photo (optional)
+              Text(
+                'Add a photo (optional)',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 12),
+              // Simplified camera for elders
+              // ignore: prefer_const_constructors
+              ElderImagePicker(
+                bucket: MediaStorageService.bucketMedicationPhotos,
+                buttonText: 'Take Photo',
+                onUploaded: (url) {
+                  _environmentPhotoUrl = url;
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // Voice Note (record, playback, upload)
+              VoiceCheckinWidget(
+                onUploaded: (url) {
+                  setState(() {
+                    _voiceNoteUrl = url;
+                  });
+                },
+              ),
+              const SizedBox(height: 40),
+
+              // Submit Button
+              ElevatedButton(
+                onPressed: _submitCheckin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                ),
+                child: const Text(
+                  'Send to Family',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+
               const Spacer(),
               
               // Send to Family button - matching sample
@@ -294,6 +342,7 @@ class _DailyCheckinScreenState extends State<DailyCheckinScreen> {
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                     ),
+
                   ),
                 ),
               ),
