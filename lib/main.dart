@@ -77,6 +77,20 @@ Future<void> _registerHiveAdapters() async {
   Hive.registerAdapter(MessageStatusAdapter());
   Hive.registerAdapter(MessagePriorityAdapter());
   Hive.registerAdapter(MessageReactionAdapter());
+
+  // Initialize Supabase if configured
+  if (Env.supabaseUrl.isNotEmpty && Env.supabaseAnonKey.isNotEmpty) {
+    await Supabase.initialize(
+      url: Env.supabaseUrl,
+      anonKey: Env.supabaseAnonKey,
+    );
+  }
+
+  // Initialize auth service
+  await AuthService.instance.initialize();
+
+  // Initialize notification service
+  await NotificationService.instance.initialize(userType: 'elder');
 }
 
 /// Main application widget with providers and routing

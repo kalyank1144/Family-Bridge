@@ -10,12 +10,10 @@ final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService();
 });
 
-// Media service provider
 final mediaServiceProvider = Provider<MediaService>((ref) {
   return MediaService();
 });
 
-// Emergency service provider
 final emergencyServiceProvider = Provider<EmergencyService>((ref) {
   final emergencyService = EmergencyService();
   final chatService = ref.read(chatServiceProvider);
