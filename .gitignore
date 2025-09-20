@@ -1,3 +1,4 @@
+
 # Miscellaneous
 *.class
 *.log
@@ -21,10 +22,15 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
+
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/flutter_assets/
 **/ios/Flutter/flutter_export_environment.sh
+
+**/ios/Runner/GeneratedPluginRegistrant.*
+
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -32,6 +38,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+
 
 # Symbolication related
 app.*.symbols
@@ -45,6 +52,18 @@ app.*.map.json
 /android/app/release
 
 # iOS specific
+
+# Android related
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+
+# iOS/XCode related
+
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside
@@ -70,6 +89,7 @@ app.*.map.json
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
 **/ios/Flutter/flutter_export_environment.sh
+
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
@@ -148,9 +168,38 @@ firebase_options.dart
 Thumbs.db
 ehthumbs.db
 
+
+# Web related
+
+# Windows related
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+
+# Linux related
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+
+# macOS related
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Logs
+*.log
+
+
 # Temporary files
 *.tmp
 *.temp
+
 
 # Database files
 *.db
@@ -288,3 +337,18 @@ AuthKey_*.p8
 
 # Generated files
 /lib/generated/
+
+# Coverage
+coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+

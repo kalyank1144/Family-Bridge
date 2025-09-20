@@ -7,6 +7,12 @@ class AppTheme {
   static const Color secondaryColor = Color(0xFF9333EA);
   static const Color accentColor = Color(0xFFF59E0B);
   static const Color backgroundColor = Color(0xFFF9FAFB);
+  
+  // Onboarding minimalist palette
+  static const Color onboardingPrimary = Color(0xFF333333);
+  static const Color onboardingSecondary = Color(0xFF666666);
+  static const Color onboardingBackground = Color(0xFFF5F5F5);
+  static const Color onboardingBorder = Color(0xFFE0E0E0);
   static const Color surfaceColor = Colors.white;
   static const Color errorColor = Color(0xFFEF4444);
   static const Color successColor = Color(0xFF10B981);
@@ -32,6 +38,77 @@ class AppTheme {
   static const double spacingLg = 24.0;
   static const double spacingXl = 32.0;
 
+  // Onboarding minimalist theme
+  static ThemeData get onboardingTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: onboardingBackground,
+      colorScheme: const ColorScheme.light(
+        primary: onboardingPrimary,
+        secondary: onboardingSecondary,
+        background: onboardingBackground,
+        surface: Colors.white,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onBackground: Colors.black,
+        onSurface: Colors.black,
+      ),
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(
+          fontSize: 36,
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+          letterSpacing: -0.5,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+          letterSpacing: 0.5,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+          height: 1.2,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w400,
+          color: onboardingSecondary,
+          height: 1.4,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: onboardingSecondary,
+          height: 1.3,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: onboardingPrimary,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFFCCCCCC),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+          textStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+  
   // Default light theme (existing)
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -132,7 +209,7 @@ class AppTheme {
         ),
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: surfaceColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -178,22 +255,22 @@ class AppTheme {
     ),
   );
 
-  // Elder-focused theme with WCAG AAA sizing/contrast
+  // Elder-focused theme with WCAG AAA sizing/contrast - matching sample designs
   static ThemeData get elderTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: const ColorScheme.light(
-        primary: Color(0xFF1E3A8A),
+        primary: primaryBlue,
         onPrimary: Colors.white,
-        secondary: Color(0xFF059669),
+        secondary: successGreen,
         onSecondary: Colors.white,
-        error: Color(0xFFDC2626),
+        error: emergencyRed,
         onError: Colors.white,
-        background: Color(0xFFF9FAFB),
-        onBackground: Color(0xFF111827),
+        background: lightBackground,
+        onBackground: darkText,
         surface: Colors.white,
-        onSurface: Color(0xFF111827),
+        onSurface: darkText,
       ),
       textTheme: TextTheme(
         displayLarge: GoogleFonts.openSans(
@@ -279,7 +356,7 @@ class AppTheme {
           ),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -339,12 +416,13 @@ class AppTheme {
     );
   }
 
-  // Elder-accessible color shortcuts
-  static const Color primaryBlue = Color(0xFF1E3A8A);
-  static const Color successGreen = Color(0xFF059669);
-  static const Color emergencyRed = Color(0xFFDC2626);
-  static const Color warningYellow = Color(0xFFF59E0B);
-  static const Color neutralGray = Color(0xFF6B7280);
-  static const Color lightBackground = Color(0xFFF9FAFB);
-  static const Color darkText = Color(0xFF111827);
+  // Elder-accessible color shortcuts - matching sample designs exactly
+  static const Color primaryBlue = Color(0xFF2196F3);      // Blue for medications
+  static const Color successGreen = Color(0xFF4CAF50);     // Green for positive actions
+  static const Color emergencyRed = Color(0xFFF44336);     // Red for emergency/help
+  static const Color familyPurple = Color(0xFF9C27B0);     // Purple for family communication
+  static const Color warningYellow = Color(0xFFF59E0B);    // Yellow for warnings
+  static const Color neutralGray = Color(0xFF6B7280);      // Gray for secondary text
+  static const Color lightBackground = Color(0xFFF9FAFB);  // Light background
+  static const Color darkText = Color(0xFF111827);         // High contrast dark text
 }

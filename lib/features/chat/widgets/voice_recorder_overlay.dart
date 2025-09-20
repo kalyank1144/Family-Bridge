@@ -65,7 +65,7 @@ class _VoiceRecorderOverlayState extends State<VoiceRecorderOverlay> {
         HapticFeedback.mediumImpact();
       }
     } catch (e) {
-      print('Error starting recording: $e');
+      debugPrint('Error starting recording: $e');
       widget.onCancel();
     }
   }
