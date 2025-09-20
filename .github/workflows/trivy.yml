@@ -1,0 +1,37 @@
+name: Trivy
+
+on:
+  push:
+    branches: [ main, capy/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  fs-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy FS scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          ignore-unfixed: true
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+  image-scan:
+    if: ${{ hashFiles('**/Dockerfile') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          docker build -t family-bridge:ci .
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: family-bridge:ci
+          ignore-unfixed: true
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '0'
