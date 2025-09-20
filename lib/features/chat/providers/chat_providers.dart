@@ -10,12 +10,10 @@ final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService();
 });
 
-// Media service provider
 final mediaServiceProvider = Provider<MediaService>((ref) {
   return MediaService();
 });
 
-// Emergency service provider
 final emergencyServiceProvider = Provider<EmergencyService>((ref) {
   final emergencyService = EmergencyService();
   final chatService = ref.read(chatServiceProvider);
@@ -23,9 +21,8 @@ final emergencyServiceProvider = Provider<EmergencyService>((ref) {
   return emergencyService;
 });
 
-// Notification service provider
-final notificationServiceProvider = Provider<NotificationService>((ref) {
-  return NotificationService();
+final notificationServiceProvider = Provider<ChatNotificationService>((ref) {
+  return ChatNotificationService();
 });
 
 final messagesStreamProvider = StreamProvider.family<List<Message>, String>(

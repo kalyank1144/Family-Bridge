@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 import '../models/alert.dart';
 
 class NotificationService {
@@ -29,7 +30,6 @@ class NotificationService {
   }
 
   void _onNotificationTapped(NotificationResponse response) {
-    // Handle notification tap
     if (response.payload != null) {
       // Navigate to relevant screen based on payload
     }
@@ -145,7 +145,7 @@ class NotificationService {
       id.hashCode,
       title,
       body,
-      scheduledTime as TZDateTime,
+      tz.TZDateTime.from(scheduledTime, tz.local),
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
