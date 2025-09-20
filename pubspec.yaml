@@ -93,6 +93,32 @@ dependencies:
   
   # Health & Fitness
   percent_indicator: ^4.2.3
+  fl_chart: ^0.66.2
+  
+  # Professional reporting
+  pdf: ^3.10.7
+  printing: ^5.12.0
+  
+  # HIPAA Compliance & Security
+  encrypt: ^5.0.1
+  crypto: ^3.0.3
+  flutter_secure_storage: ^9.0.0
+  device_info_plus: ^9.1.1
+  
+  # Icons
+  flutter_feather_icons: ^2.0.0+1
+  
+  # Media
+  audioplayers: ^5.2.1
+  image_picker: ^1.0.5
+  camera: ^0.10.5
+  record: ^5.0.4
+  
+  # Permissions & Device
+  permission_handler: ^11.1.0
+  path_provider: ^2.1.1
+  url_launcher: ^6.2.2
+
   table_calendar: ^3.0.9
   fl_chart: ^1.1.1
   

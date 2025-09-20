@@ -4,6 +4,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/mixins/hipaa_compliance_mixin.dart';
+import '../../../core/services/access_control_service.dart';
 import '../providers/family_data_provider.dart';
 import '../providers/health_monitoring_provider.dart';
 import '../models/family_member.dart';
@@ -25,7 +27,7 @@ class HealthMonitoringScreen extends StatefulWidget {
 }
 
 class _HealthMonitoringScreenState extends State<HealthMonitoringScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, HipaaComplianceMixin {
   late TabController _tabController;
   
   @override
@@ -36,6 +38,13 @@ class _HealthMonitoringScreenState extends State<HealthMonitoringScreen>
   }
 
   Future<void> _loadHealthData() async {
+    // Log PHI access for health monitoring
+    await logPhiAccess(
+      widget.memberId,
+      'health_monitoring_access',
+      metadata: {'screen': 'HealthMonitoringScreen'},
+    );
+
     final healthProvider = context.read<HealthMonitoringProvider>();
     await healthProvider.loadHealthData(widget.memberId);
     healthProvider.subscribeToHealthUpdates(widget.memberId);
@@ -75,9 +84,16 @@ class _HealthMonitoringScreenState extends State<HealthMonitoringScreen>
         ),
         title: Column(
           children: [
-            Text(
-              'Health Monitoring',
-              style: Theme.of(context).textTheme.titleLarge,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Health Monitoring',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(width: 8),
+                buildComplianceStatusIndicator(),
+              ],
             ),
             Text(
               member.name,
@@ -629,7 +645,19 @@ class _HealthMonitoringScreenState extends State<HealthMonitoringScreen>
   }
 
   void _exportHealthReport() {
-    // Export health report functionality
+    // Check export permissions
+    if (!hasPermission(Permission.exportPhi)) {
+      _showSecurityError('You do not have permission to export health reports');
+      return;
+    }
+
+    // Log PHI export
+    logPhiAccess(
+      widget.memberId,
+      'export',
+      metadata: {'exportType': 'health_report'},
+    );
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Health report exported successfully'),

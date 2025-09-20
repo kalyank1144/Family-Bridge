@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+
 import 'package:flutter/services.dart';
+
 
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,7 +17,7 @@ import 'core/utils/env.dart';
 import 'core/services/auth_service.dart';
 import 'core/models/user_model.dart';
 
-// Auth
+
 import 'features/auth/providers/auth_provider.dart';
 
 // Caregiver providers
@@ -31,6 +33,9 @@ import 'features/chat/screens/family_chat_screen.dart';
 // Chat
 import 'features/chat/providers/chat_providers.dart';
 import 'features/chat/services/notification_service.dart' as chat_notifications;
+
+// HIPAA Compliance
+import 'features/admin/providers/hipaa_compliance_provider.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -48,7 +53,9 @@ void main() async {
   // Load environment variables
   await dotenv.load(fileName: ".env", isOptional: true);
 
+
   // Initialize Supabase
+
 
 
   await Supabase.initialize(
@@ -57,10 +64,12 @@ void main() async {
   );
 
 
+
   // Initialize auth service
   await AuthService.instance.initialize();
 
   // Initialize notifications
+
 
 
   await NotificationService.instance.initialize();
@@ -106,6 +115,25 @@ class FamilyBridgeApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
         ChangeNotifierProvider(create: (_) => AlertProvider()),
         ChangeNotifierProvider(create: (_) => ElderProvider()),
+
+        ChangeNotifierProvider(create: (_) => HipaaComplianceProvider()),
+        Provider.value(value: voiceService),
+      ],
+      child: const FamilyBridgeApp(),
+    ),
+  );
+}
+
+class FamilyBridgeApp extends StatelessWidget {
+  const FamilyBridgeApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'FamilyBridge',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      routerConfig: AppRouter.router,
         
         // Chat providers (using Riverpod pattern)
         Provider(create: (_) => chatServiceProvider),
@@ -132,6 +160,7 @@ class FamilyBridgeApp extends StatelessWidget {
           );
         },
       ),
+
     );
   }
 

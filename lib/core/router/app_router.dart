@@ -21,6 +21,13 @@ import '../../features/caregiver/screens/family_member_detail_screen.dart';
 import '../../features/caregiver/screens/add_appointment_screen.dart';
 import '../../features/caregiver/screens/alert_settings_screen.dart';
 import '../../features/caregiver/screens/reports_screen.dart';
+import '../../features/caregiver/screens/advanced_health_monitoring_screen.dart';
+import '../../features/caregiver/screens/care_plan_screen.dart';
+import '../../features/caregiver/screens/professional_reports_screen.dart';
+
+// Admin screens
+import '../../features/admin/screens/compliance_dashboard_screen.dart';
+import '../../features/admin/screens/audit_logs_screen.dart';
 
 // Elder screens
 import '../../features/elder/screens/elder_home_screen.dart';
@@ -149,6 +156,21 @@ class AppRouter {
             name: 'reports',
             builder: (context, state) => const ReportsScreen(),
           ),
+          GoRoute(
+            path: 'advanced-monitoring',
+            name: 'advanced_monitoring',
+            builder: (context, state) => const AdvancedHealthMonitoringScreen(),
+          ),
+          GoRoute(
+            path: 'care-plan',
+            name: 'care_plan',
+            builder: (context, state) => const CarePlanScreen(),
+          ),
+          GoRoute(
+            path: 'professional-reports',
+            name: 'professional_reports',
+            builder: (context, state) => const ProfessionalReportsScreen(),
+          ),
         ],
       ),
 
@@ -179,8 +201,26 @@ class AppRouter {
             builder: (context, state) => const FamilyChatScreen(),
           ),
         ],
+      ),
+
+      // Admin routes (HIPAA Compliance)
+      GoRoute(
+        path: '/admin',
+        name: 'admin_dashboard',
+        builder: (context, state) => const ComplianceDashboardScreen(),
+        routes: [
+          GoRoute(
+            path: 'audit-logs',
+            name: 'audit_logs',
+            builder: (context, state) => const AuditLogsScreen(),
+          ),
+        ],
+      ),
+    ],
+  );
         ),
       ],
     );
   }
+
 }
