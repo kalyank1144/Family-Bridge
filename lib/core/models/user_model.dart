@@ -1,6 +1,47 @@
 import 'package:flutter/material.dart';
 
-enum UserRole { elder, caregiver, youth }
+/// Unified user role enum for the entire app
+/// Replaces multiple conflicting UserType/UserRole definitions
+enum UserRole {
+  elder,
+  caregiver,
+  youth,
+  // Additional roles for access control
+  professional,  // Healthcare professionals
+  admin,         // System administrators
+  superAdmin,    // Super administrators
+}
+
+/// User type constants for backward compatibility
+class UserType {
+  static const String elder = 'elder';
+  static const String caregiver = 'caregiver';
+  static const String youth = 'youth';
+  static const String professional = 'professional';
+  static const String admin = 'admin';
+  static const String superAdmin = 'superAdmin';
+  
+  /// Convert UserRole enum to string
+  static String fromRole(UserRole role) => role.name;
+  
+  /// Convert string to UserRole enum
+  static UserRole toRole(String type) {
+    return UserRole.values.firstWhere(
+      (role) => role.name == type,
+      orElse: () => UserRole.elder,
+    );
+  }
+  
+  /// Check if user type is a family member (elder, caregiver, youth)
+  static bool isFamilyMember(UserRole role) {
+    return [UserRole.elder, UserRole.caregiver, UserRole.youth].contains(role);
+  }
+  
+  /// Check if user type is a healthcare professional
+  static bool isProfessional(UserRole role) {
+    return [UserRole.professional, UserRole.admin, UserRole.superAdmin].contains(role);
+  }
+}
 
 class AccessibilityPrefs {
   final bool largeText;
@@ -135,10 +176,7 @@ class UserProfile {
       email: json['email'] as String? ?? '',
       name: json['name'] as String? ?? '',
       phone: json['phone'] as String?,
-      role: UserRole.values.firstWhere(
-        (e) => e.name == roleStr,
-        orElse: () => UserRole.elder,
-      ),
+      role: UserType.toRole(roleStr),
       dateOfBirth: json['date_of_birth'] != null
           ? DateTime.tryParse(json['date_of_birth'] as String)
           : null,

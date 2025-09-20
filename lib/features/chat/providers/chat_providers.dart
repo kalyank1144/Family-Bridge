@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 import '../models/presence_model.dart';
 import '../services/chat_service.dart';
 import '../services/media_service.dart';
 import '../services/emergency_service.dart';
-import '../services/notification_service.dart';
+import '../../../core/services/notification_service.dart';
 
 final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService();
@@ -21,8 +21,9 @@ final emergencyServiceProvider = Provider<EmergencyService>((ref) {
   return emergencyService;
 });
 
-final notificationServiceProvider = Provider<ChatNotificationService>((ref) {
-  return ChatNotificationService();
+// Notification service provider
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService.instance;
 });
 
 final messagesStreamProvider = StreamProvider.family<List<Message>, String>(

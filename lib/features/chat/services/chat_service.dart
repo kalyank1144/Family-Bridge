@@ -10,8 +10,7 @@ import '../../../services/network/network_manager.dart';
 import '../../../services/offline/offline_manager.dart';
 import '../../../services/sync/data_sync_service.dart';
 import '../../../services/sync/sync_queue.dart';
-import '../../../models/hive/message_model.dart' as hive;
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 import '../models/presence_model.dart';
 
 class ChatService {
@@ -196,7 +195,7 @@ class ChatService {
       if (payload.eventType == PostgresChangeEvent.insert ||
           payload.eventType == PostgresChangeEvent.update) {
         final json = Map<String, dynamic>.from(payload.newRecord!);
-        final model = hive.HiveChatMessage.fromMap(json);
+        final model = Message.fromMap(json);
         await _repo.upsertLocal(model);
       } else if (payload.eventType == PostgresChangeEvent.delete) {
         final id = payload.oldRecord?['id'] as String?;
@@ -532,7 +531,7 @@ class ChatService {
   }
 
   // Mapping helpers
-  hive.HiveChatMessage _toHive(Message m) => hive.HiveChatMessage(
+  Message _toHive(Message m) => Message(
         id: m.id,
         familyId: m.familyId,
         senderId: m.senderId,
@@ -553,7 +552,7 @@ class ChatService {
         pendingSync: false,
       );
 
-  Message _fromHive(hive.HiveChatMessage m) => Message(
+  Message _fromHive(Message m) => Message(
         id: m.id,
         familyId: m.familyId,
         senderId: m.senderId,
