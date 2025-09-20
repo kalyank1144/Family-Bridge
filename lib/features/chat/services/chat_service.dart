@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -11,6 +11,7 @@ import '../../../services/offline/offline_manager.dart';
 import '../../../services/sync/data_sync_service.dart';
 import '../../../services/sync/sync_queue.dart';
 import '../../../core/models/message_model.dart';
+import '../../../core/services/notification_service.dart';
 import '../models/presence_model.dart';
 
 class ChatService {
@@ -32,6 +33,7 @@ class ChatService {
   StreamSubscription<NetworkStatus>? _netSub;
 
   static final ChatService _instance = ChatService._internal();
+  static ChatService get instance => _instance;
   factory ChatService() => _instance;
   ChatService._internal();
 
@@ -64,6 +66,9 @@ class ChatService {
       await DataSyncService.instance.initialize();
     }
     _repo = ChatRepository(box: DataSyncService.instance.messagesBox);
+
+    // Configure notifications for current user type
+    NotificationService.instance.setUserType(userType);
 
     // Stream local messages always
     _repoSub?.cancel();
@@ -197,6 +202,44 @@ class ChatService {
         final json = Map<String, dynamic>.from(payload.newRecord!);
         final model = Message.fromMap(json);
         await _repo.upsertLocal(model);
+
+        if (payload.eventType == PostgresChangeEvent.insert && model.senderId != _currentUserId) {
+          String preview;
+          switch (model.type) {
+            case MessageType.text:
+              preview = model.content ?? '';
+              break;
+            case MessageType.voice:
+              final secs = model.voiceDuration ?? 0;
+              preview = 'Voice message (${secs}s)';
+              break;
+            case MessageType.image:
+              preview = 'Photo';
+              break;
+            case MessageType.video:
+              preview = 'Video';
+              break;
+            case MessageType.location:
+              preview = model.locationName ?? 'Location shared';
+              break;
+            case MessageType.careNote:
+              preview = 'Care note';
+              break;
+            case MessageType.announcement:
+              preview = 'Announcement';
+              break;
+            case MessageType.achievement:
+              preview = 'Achievement';
+              break;
+          }
+          await NotificationService.instance.showMessageNotification(
+            model.senderName,
+            preview,
+            model.priority,
+            familyId: model.familyId,
+            messageId: model.id,
+          );
+        }
       } else if (payload.eventType == PostgresChangeEvent.delete) {
         final id = payload.oldRecord?['id'] as String?;
         if (id != null) await _repo.deleteLocal(id);
@@ -240,6 +283,11 @@ class ChatService {
     String? replyToId,
     List<String>? mentions,
     Map<String, dynamic>? metadata,
+    String? mediaUrl,
+    String? mediaThumbnail,
+    double? latitude,
+    double? longitude,
+    String? locationName,
   }) async {
     final messageId = _uuid.v4();
     final timestamp = DateTime.now();
@@ -257,15 +305,22 @@ class ChatService {
       replyToId: replyToId,
       mentions: mentions,
       metadata: metadata,
-      status: NetworkManager.instance.current.isOnline
-          ? MessageStatus.sending
+      mediaUrl: mediaUrl,
+      mediaThumbnail: mediaThumbnail,
+      latitude: latitude,
+      longitude: longitude,
+      locationName: locationName,
+      status: OfflineManager.instance.isOffline || !NetworkManager.instance.current.isOnline
+          ? MessageStatus.queued
           : MessageStatus.sending,
     );
 
     // Persist locally immediately for instant UI feedback
-    await _repo.upsertLocal(_toHive(message).copyWith(status: 'queued', pendingSync: !NetworkManager.instance.current.isOnline));
+    final isOnline = NetworkManager.instance.current.isOnline && !OfflineManager.instance.isOffline;
+    final localStatus = isOnline ? MessageStatus.sending : MessageStatus.queued;
+    await _repo.upsertLocal(message.copyWith(status: localStatus, pendingSync: !isOnline));
 
-    if (OfflineManager.instance.isOffline) {
+    if (!isOnline) {
       await SyncQueue.instance.enqueue(SyncOperation(
         id: messageId,
         box: 'messages',
@@ -278,7 +333,7 @@ class ChatService {
 
     try {
       await _supabase.from('messages').insert(message.toJson());
-      await _repo.upsertLocal(_toHive(message).copyWith(status: 'sent', pendingSync: false));
+      await _repo.upsertLocal(message.copyWith(status: MessageStatus.sent, pendingSync: false));
       return message.copyWith(status: MessageStatus.sent);
     } catch (e) {
       debugPrint('Error sending message: $e');
@@ -289,7 +344,7 @@ class ChatService {
         type: SyncOpType.create,
         payload: message.toJson(),
       ));
-      await _repo.upsertLocal(_toHive(message).copyWith(status: 'queued', pendingSync: true));
+      await _repo.upsertLocal(message.copyWith(status: MessageStatus.queued, pendingSync: true));
       return message.copyWith(status: MessageStatus.failed);
     }
   }
@@ -475,7 +530,7 @@ class ChatService {
 
   Future<String> _uploadAudio(String audioPath) async {
     final fileName = '${_uuid.v4()}.m4a';
-    final file = await _supabase.storage
+    await _supabase.storage
         .from('voice_messages')
         .upload(fileName, File(audioPath));
 
@@ -530,59 +585,7 @@ class ChatService {
     await _presenceChannel?.unsubscribe();
   }
 
-  // Mapping helpers
-  Message _toHive(Message m) => Message(
-        id: m.id,
-        familyId: m.familyId,
-        senderId: m.senderId,
-        senderName: m.senderName,
-        senderType: m.senderType,
-        content: m.content,
-        type: m.type.name,
-        status: m.status.name,
-        priority: m.priority.name,
-        timestamp: m.timestamp,
-        isEdited: m.isEdited,
-        editedAt: m.editedAt,
-        readBy: m.readBy,
-        metadata: m.metadata,
-        replyToId: m.replyToId,
-        isDeleted: m.isDeleted,
-        mentions: m.mentions,
-        pendingSync: false,
-      );
-
-  Message _fromHive(Message m) => Message(
-        id: m.id,
-        familyId: m.familyId,
-        senderId: m.senderId,
-        senderName: m.senderName,
-        senderType: m.senderType,
-        content: m.content,
-        type: MessageType.values.firstWhere(
-          (e) => e.name == m.type,
-          orElse: () => MessageType.text,
-        ),
-        status: MessageStatus.values.firstWhere(
-          (e) => e.name == m.status,
-          orElse: () => MessageStatus.sent,
-        ),
-        priority: MessagePriority.values.firstWhere(
-          (e) => e.name == m.priority,
-          orElse: () => MessagePriority.normal,
-        ),
-        timestamp: m.timestamp,
-        isEdited: m.isEdited,
-        editedAt: m.editedAt,
-        readBy: m.readBy,
-        metadata: m.metadata,
-        replyToId: m.replyToId,
-        isDeleted: m.isDeleted,
-        mentions: m.mentions,
-      );
-}
-
-class File {
-  final String path;
-  File(this.path);
+  // Mapping helpers (using unified Message model)
+  Message _toHive(Message m) => m;
+  Message _fromHive(Message m) => m;
 }

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/presence_model.dart';
 
-class TypingIndicator extends StatelessWidget {
+class TypingIndicatorWidget extends StatelessWidget {
   final List<TypingIndicator> typingUsers;
   final String userType;
 
-  const TypingIndicator({
+  const TypingIndicatorWidget({
     super.key,
     required this.typingUsers,
     required this.userType,
