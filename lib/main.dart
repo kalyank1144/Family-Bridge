@@ -13,6 +13,7 @@ import 'core/config/env_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/services/voice_service.dart';
 import 'core/models/user_model.dart';
 import 'core/models/message_model.dart';
@@ -78,6 +79,7 @@ Future<void> _initializeApp() async {
   // Initialize core services
   await AuthService.instance.initialize();
   await NotificationService.instance.initialize();
+  await PushNotificationService.instance.initialize();
 
   // Initialize additional services
   final voiceService = VoiceService();

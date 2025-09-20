@@ -1,12 +1,17 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tzdata;
 import '../models/message_model.dart';
-import '../../features/emergency/models/help_request.dart';
+import 'package:family_bridge/features/chat/services/emergency_service.dart';
+import 'package:family_bridge/features/caregiver/models/alert.dart';
+import 'package:family_bridge/shared/services/notification_analytics_service.dart';
 
 /// Unified notification service for the entire app
 /// Handles chat messages, alerts, appointments, and emergencies
@@ -57,6 +62,7 @@ class NotificationService {
     await _createNotificationChannels();
     await _setupTTS();
     await _requestPermissions();
+    try { tzdata.initializeTimeZones(); } catch (_) {}
     _setupSchoolHoursCheck();
   }
 
@@ -231,8 +237,13 @@ class NotificationService {
       details,
       payload: 'message:$familyId:$messageId',
     );
-    
-    // TTS announcement for elder users
+    await NotificationAnalyticsService.instance.logDelivered(
+      type: 'message',
+      priority: priority.name,
+      title: title,
+      body: body,
+      payload: {'family_id': familyId, 'message_id': messageId},
+    );
     await _announceMessage(senderName, content, priority);
   }
 
@@ -258,7 +269,7 @@ class NotificationService {
       importance: Importance.high,
       playSound: true,
       enableVibration: true,
-      ledColor: Color.fromARGB(255, 255, 165, 0), // Orange
+      ledColor: Color.fromARGB(255, 255, 165, 0),
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -279,6 +290,40 @@ class NotificationService {
       message,
       details,
       payload: 'alert:$alertType:$familyMemberId',
+    );
+    await NotificationAnalyticsService.instance.logDelivered(
+      type: 'alert',
+      priority: 'high',
+      title: title,
+      body: message,
+      payload: {'alert_type': alertType, 'member_id': familyMemberId},
+    );
+  }
+
+  Future<void> showCriticalAlert(Alert alert) async {
+    await sendCareAlert(
+      title: alert.title,
+      message: alert.description,
+      alertType: alert.type.toString().split('.').last,
+      familyMemberId: alert.familyMemberId,
+    );
+  }
+
+  Future<void> showHighPriorityAlert(Alert alert) async {
+    await sendCareAlert(
+      title: alert.title,
+      message: alert.description,
+      alertType: alert.type.toString().split('.').last,
+      familyMemberId: alert.familyMemberId,
+    );
+  }
+
+  Future<void> showNotification(Alert alert) async {
+    await sendCareAlert(
+      title: alert.title,
+      message: alert.description,
+      alertType: alert.type.toString().split('.').last,
+      familyMemberId: alert.familyMemberId,
     );
   }
 
@@ -323,6 +368,48 @@ class NotificationService {
       details,
       payload: 'appointment:$appointmentId',
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+    );
+    await NotificationAnalyticsService.instance.logDelivered(
+      type: 'appointment',
+      priority: 'time_sensitive',
+      title: title,
+      body: message,
+      payload: {'appointment_id': appointmentId},
+    );
+  }
+
+  Future<void> scheduleDailyCheckinReminder({
+    required String title,
+    required String message,
+    required TimeOfDay time,
+  }) async {
+    final now = DateTime.now();
+    final first = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final when = first.isAfter(now) ? first : first.add(const Duration(days: 1));
+    const androidDetails = AndroidNotificationDetails(
+      'alerts_channel',
+      'Care Alerts',
+      channelDescription: 'Family care and health alerts',
+      priority: Priority.high,
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      interruptionLevel: InterruptionLevel.timeSensitive,
+    );
+    const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
+    await _notifications.zonedSchedule(
+      _alertNotificationId++,
+      title,
+      message,
+      tz.TZDateTime.from(when, tz.local),
+      details,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
     );
   }
 
@@ -371,8 +458,13 @@ class NotificationService {
       details,
       payload: 'emergency:${helpType.name}:$location',
     );
-    
-    // TTS announcement for elder users
+    await NotificationAnalyticsService.instance.logDelivered(
+      type: 'emergency',
+      priority: 'emergency',
+      title: title,
+      body: message,
+      payload: {'help_type': helpType.name, 'location': location},
+    );
     if (_currentUserType == 'elder') {
       await _tts.speak('Emergency alert: $title. $message');
     }
@@ -496,43 +588,36 @@ class NotificationService {
   }
 
   /// Handle notification tap
-  void _onNotificationTapped(NotificationResponse response) {
+  void _onNotificationTapped(NotificationResponse response) async {
     if (kDebugMode) {
       print('Notification tapped: ${response.payload}');
     }
     
     final payload = response.payload;
     if (payload != null) {
+      await NotificationAnalyticsService.instance.logOpened(payload: {'payload': payload});
       final parts = payload.split(':');
       if (parts.isNotEmpty) {
         final type = parts[0];
         switch (type) {
           case 'message':
-            // Navigate to chat screen
             if (parts.length >= 2) {
               final familyId = parts[1];
-              // TODO: Navigate to chat with familyId
             }
             break;
           case 'alert':
-            // Navigate to appropriate alert screen
             if (parts.length >= 2) {
               final alertType = parts[1];
-              // TODO: Navigate based on alert type
             }
             break;
           case 'appointment':
-            // Navigate to appointment details
             if (parts.length >= 2) {
               final appointmentId = parts[1];
-              // TODO: Navigate to appointment details
             }
             break;
           case 'emergency':
-            // Navigate to emergency screen
             if (parts.length >= 2) {
               final helpType = parts[1];
-              // TODO: Navigate to emergency response
             }
             break;
         }
