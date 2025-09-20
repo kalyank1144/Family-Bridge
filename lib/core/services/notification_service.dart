@@ -4,8 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../models/message_model.dart';
+import 'package:timezone/timezone.dart' as tz;
 
+/// Unified notification service for the entire app
+/// Handles chat messages, alerts, appointments, and emergencies
+/// with user-type specific behaviors and accessibility features
 class NotificationService {
   final FlutterLocalNotificationsPlugin _notifications = 
       FlutterLocalNotificationsPlugin();
@@ -15,17 +18,21 @@ class NotificationService {
   bool _isAppInForeground = true;
   bool _isSchoolHours = false;
   
-  // Priority notification counters
+  // Notification ID counters for different priorities
   int _emergencyNotificationId = 1000;
   int _urgentNotificationId = 2000;
   int _importantNotificationId = 3000;
   int _normalNotificationId = 4000;
+  int _alertNotificationId = 5000;
+  int _appointmentNotificationId = 6000;
   
   static final NotificationService _instance = NotificationService._internal();
-  factory NotificationService() => _instance;
+  static NotificationService get instance => _instance;
   NotificationService._internal();
 
-  Future<void> initialize({required String userType}) async {
+  /// Initialize the notification service
+  /// [userType] should be 'elder', 'caregiver', or 'youth'
+  Future<void> initialize({String? userType}) async {
     _currentUserType = userType;
     
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -51,7 +58,7 @@ class NotificationService {
     _setupSchoolHoursCheck();
   }
 
-  /// Create notification channels for different priorities
+  /// Create notification channels for different priorities and types
   Future<void> _createNotificationChannels() async {
     if (Platform.isAndroid) {
       final channels = [
@@ -89,6 +96,20 @@ class NotificationService {
           importance: Importance.low,
           priority: Priority.low,
         ),
+        const AndroidNotificationChannel(
+          'alerts_channel',
+          'Care Alerts',
+          description: 'Family care and health alerts',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        const AndroidNotificationChannel(
+          'appointment_reminders_channel',
+          'Appointment Reminders',
+          description: 'Appointment and medication reminders',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
       ];
 
       for (final channel in channels) {
@@ -98,6 +119,7 @@ class NotificationService {
     }
   }
 
+  /// Setup text-to-speech for elder users
   Future<void> _setupTTS() async {
     if (_currentUserType == 'elder') {
       await _tts.setLanguage('en-US');
@@ -107,11 +129,11 @@ class NotificationService {
     }
   }
 
+  /// Request necessary permissions
   Future<void> _requestPermissions() async {
     if (Platform.isAndroid) {
       await Permission.notification.request();
       
-      // Request special permissions for emergency notifications
       final androidImplementation = _notifications.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       
@@ -125,11 +147,12 @@ class NotificationService {
         alert: true,
         badge: true,
         sound: true,
-        critical: true, // For emergency alerts
+        critical: true,
       );
     }
   }
 
+  /// Setup school hours filtering for youth users
   void _setupSchoolHoursCheck() {
     if (_currentUserType == 'youth') {
       final now = DateTime.now();
@@ -140,44 +163,51 @@ class NotificationService {
     }
   }
 
-  /// Show notification for regular messages
-  Future<void> showMessageNotification(Message message) async {
-    if (_isAppInForeground && message.priority != MessagePriority.emergency) return;
+  // MARK: - Chat Message Notifications
+
+  /// Show notification for chat messages
+  Future<void> showMessageNotification({
+    required String id,
+    required String senderName,
+    required String content,
+    required MessagePriority priority,
+    required MessageType type,
+  }) async {
+    if (_isAppInForeground && priority != MessagePriority.emergency) return;
     
     // School hours filtering (except emergencies)
     if (_currentUserType == 'youth' && _isSchoolHours) {
-      if (message.priority != MessagePriority.emergency) {
+      if (priority != MessagePriority.emergency) {
         return;
       }
     }
     
-    final notificationId = _getNotificationId(message.priority);
-    final channelId = _getChannelId(message.priority);
-    final title = _getNotificationTitle(message);
-    final body = _getNotificationBody(message);
+    final notificationId = _getNotificationId(priority);
+    final channelId = _getChannelId(priority);
+    final title = _getMessageNotificationTitle(senderName, priority);
+    final body = _getMessageNotificationBody(content, type);
     
     final androidDetails = AndroidNotificationDetails(
       channelId,
-      _getChannelName(message.priority),
+      _getChannelName(priority),
       channelDescription: 'Family chat messages',
-      importance: _getImportance(message.priority),
-      priority: _getPriority(message.priority),
+      importance: _getImportance(priority),
+      priority: _getPriority(priority),
       playSound: true,
-      sound: message.priority == MessagePriority.emergency 
+      sound: priority == MessagePriority.emergency 
           ? const RawResourceAndroidNotificationSound('emergency_alert') 
           : null,
       enableVibration: true,
-      vibrationPattern: _getVibrationPattern(message.priority),
-      enableLights: message.priority == MessagePriority.emergency,
-      ledColor: message.priority == MessagePriority.emergency 
+      vibrationPattern: _getVibrationPattern(priority),
+      enableLights: priority == MessagePriority.emergency,
+      ledColor: priority == MessagePriority.emergency 
           ? const Color.fromARGB(255, 255, 0, 0) 
           : null,
-      fullScreenIntent: message.priority == MessagePriority.emergency,
+      fullScreenIntent: priority == MessagePriority.emergency,
       category: AndroidNotificationCategory.message,
       groupKey: 'family_chat',
-      setAsGroupSummary: false,
-      autoCancel: message.priority != MessagePriority.emergency,
-      ongoing: message.priority == MessagePriority.emergency,
+      autoCancel: priority != MessagePriority.emergency,
+      ongoing: priority == MessagePriority.emergency,
     );
     
     const iosDetails = DarwinNotificationDetails(
@@ -197,24 +227,128 @@ class NotificationService {
       title,
       body,
       notificationDetails,
-      payload: message.id,
+      payload: id,
     );
     
     // Voice announcement for elders on urgent/emergency messages
     if (_currentUserType == 'elder' && 
-        (message.priority == MessagePriority.emergency || 
-         message.priority == MessagePriority.urgent)) {
-      await _announceMessage(message);
+        (priority == MessagePriority.emergency || 
+         priority == MessagePriority.urgent)) {
+      await _announceMessage(senderName, content, priority);
     }
     
     // Haptic feedback for emergency
-    if (message.priority == MessagePriority.emergency) {
-      HapticFeedback.heavyImpact();
-      // Repeat vibration for emergency
-      Future.delayed(const Duration(seconds: 2), () => HapticFeedback.heavyImpact());
-      Future.delayed(const Duration(seconds: 4), () => HapticFeedback.heavyImpact());
+    if (priority == MessagePriority.emergency) {
+      _triggerEmergencyHaptics();
     }
   }
+
+  // MARK: - Alert Notifications (for Caregiver)
+
+  /// Show care alert notification
+  Future<void> showAlert({
+    required String id,
+    required String title,
+    required String description,
+    required AlertPriority priority,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'alerts_channel',
+      'Care Alerts',
+      channelDescription: 'Family care alerts',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    
+    const iosDetails = DarwinNotificationDetails();
+    
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+    
+    await _notifications.show(
+      _alertNotificationId++,
+      title,
+      description,
+      details,
+      payload: id,
+    );
+  }
+
+  /// Show critical alert (for Caregiver)
+  Future<void> showCriticalAlert({
+    required String id,
+    required String title,
+    required String description,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'emergency_channel',
+      'Critical Alerts',
+      channelDescription: 'Critical family care alerts',
+      importance: Importance.max,
+      priority: Priority.max,
+      enableVibration: true,
+      playSound: true,
+      ongoing: true,
+      autoCancel: false,
+    );
+    
+    const iosDetails = DarwinNotificationDetails(
+      interruptionLevel: InterruptionLevel.critical,
+    );
+    
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+    
+    await _notifications.show(
+      _alertNotificationId++,
+      '🚨 CRITICAL: $title',
+      description,
+      details,
+      payload: id,
+    );
+  }
+
+  // MARK: - Appointment Notifications
+
+  /// Schedule appointment reminder
+  Future<void> scheduleAppointmentReminder({
+    required String id,
+    required String title,
+    required String body,
+    required DateTime scheduledTime,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'appointment_reminders_channel',
+      'Appointment Reminders',
+      channelDescription: 'Appointment reminder notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    
+    const iosDetails = DarwinNotificationDetails();
+    
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+    
+    await _notifications.zonedSchedule(
+      _appointmentNotificationId++,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledTime, tz.local),
+      details,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      payload: id,
+    );
+  }
+
+  // MARK: - Emergency Notifications
 
   /// Send emergency notification to all family members
   Future<void> sendEmergencyNotification({
@@ -222,8 +356,6 @@ class NotificationService {
     required String senderName,
     required String message,
   }) async {
-    final notificationId = _emergencyNotificationId++;
-    
     const androidDetails = AndroidNotificationDetails(
       'emergency_channel',
       'Emergency Alerts',
@@ -240,8 +372,6 @@ class NotificationService {
       category: AndroidNotificationCategory.alarm,
       autoCancel: false,
       ongoing: true,
-      showWhen: true,
-      largeIcon: DrawableResourceAndroidBitmap('@mipmap/emergency_icon'),
     );
     
     const iosDetails = DarwinNotificationDetails(
@@ -254,7 +384,7 @@ class NotificationService {
     );
     
     await _notifications.show(
-      notificationId,
+      _emergencyNotificationId++,
       '🆘 EMERGENCY ALERT',
       '$senderName needs immediate assistance - Check family chat now!',
       const NotificationDetails(
@@ -263,104 +393,41 @@ class NotificationService {
       ),
     );
     
-    // Voice announcement
+    // Voice announcement for elders
     if (_currentUserType == 'elder') {
       await _tts.speak('Emergency alert from $senderName. Please check your family chat immediately.');
     }
     
-    // Continuous haptic feedback
     _triggerEmergencyHaptics();
-  }
-
-  /// Send help request notification
-  Future<void> sendHelpRequestNotification({
-    required String familyId,
-    required String senderName,
-    required HelpRequestType helpType,
-    required String message,
-  }) async {
-    final typeText = _getHelpTypeText(helpType);
-    final emoji = _getHelpTypeEmoji(helpType);
-    
-    await _notifications.show(
-      _urgentNotificationId++,
-      '$emoji Help Request: $typeText',
-      '$senderName needs assistance - $message',
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'urgent_channel',
-          'Urgent Messages',
-          importance: Importance.high,
-          priority: Priority.high,
-          playSound: true,
-          enableVibration: true,
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
-      ),
-    );
-  }
-
-  /// Send emergency cancelled notification
-  Future<void> sendEmergencyCancelledNotification({
-    required String familyId,
-    required String senderName,
-    String? reason,
-  }) async {
-    // Cancel all emergency notifications first
-    await cancelEmergencyNotifications();
-    
-    await _notifications.show(
-      _importantNotificationId++,
-      '✅ Emergency Cancelled',
-      '$senderName has cancelled the emergency alert. ${reason ?? "Everything is okay now."}',
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'important_channel',
-          'Important Messages',
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          playSound: true,
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-    );
   }
 
   /// Cancel all emergency notifications
   Future<void> cancelEmergencyNotifications() async {
-    // Cancel specific emergency notification IDs
     for (int i = 1000; i < _emergencyNotificationId; i++) {
       await _notifications.cancel(i);
     }
   }
 
+  // MARK: - Utility Methods
+
   /// Voice announcement for elders
-  Future<void> _announceMessage(Message message) async {
+  Future<void> _announceMessage(String senderName, String content, MessagePriority priority) async {
     if (_currentUserType != 'elder') return;
     
     String announcement = '';
     
-    switch (message.priority) {
+    switch (priority) {
       case MessagePriority.emergency:
-        announcement = 'Emergency message from ${message.senderName}. ${message.content}';
+        announcement = 'Emergency message from $senderName. $content';
         break;
       case MessagePriority.urgent:
-        announcement = 'Urgent message from ${message.senderName}.';
+        announcement = 'Urgent message from $senderName.';
         break;
       case MessagePriority.important:
-        announcement = 'Important message from ${message.senderName}.';
+        announcement = 'Important message from $senderName.';
         break;
       default:
-        announcement = 'New message from ${message.senderName}.';
+        announcement = 'New message from $senderName.';
     }
     
     await _tts.speak(announcement);
@@ -370,7 +437,6 @@ class NotificationService {
   void _triggerEmergencyHaptics() {
     HapticFeedback.heavyImpact();
     
-    // Create emergency vibration pattern
     Future.delayed(const Duration(milliseconds: 500), () => HapticFeedback.heavyImpact());
     Future.delayed(const Duration(milliseconds: 1000), () => HapticFeedback.heavyImpact());
     Future.delayed(const Duration(milliseconds: 1500), () => HapticFeedback.heavyImpact());
@@ -462,49 +528,40 @@ class NotificationService {
     }
   }
 
-  /// Get notification title
-  String _getNotificationTitle(Message message) {
-    switch (message.priority) {
+  /// Get notification title for messages
+  String _getMessageNotificationTitle(String senderName, MessagePriority priority) {
+    switch (priority) {
       case MessagePriority.emergency:
-        return '🆘 EMERGENCY - ${message.senderName}';
+        return '🆘 EMERGENCY - $senderName';
       case MessagePriority.urgent:
-        return '🔴 Urgent - ${message.senderName}';
+        return '🔴 Urgent - $senderName';
       case MessagePriority.important:
-        return '🟡 Important - ${message.senderName}';
+        return '🟡 Important - $senderName';
       case MessagePriority.normal:
-        return message.senderName;
+        return senderName;
     }
   }
 
-  /// Get notification body
-  String _getNotificationBody(Message message) {
-    if (message.type == MessageType.voice) {
-      return '🎵 Voice message';
-    } else if (message.type == MessageType.image) {
-      return '📷 Photo';
-    } else if (message.type == MessageType.video) {
-      return '🎥 Video';
-    } else if (message.type == MessageType.location) {
-      return '📍 Location';
-    } else {
-      return message.content ?? 'New message';
+  /// Get notification body for messages
+  String _getMessageNotificationBody(String content, MessageType type) {
+    switch (type) {
+      case MessageType.voice:
+        return '🎵 Voice message';
+      case MessageType.image:
+        return '📷 Photo';
+      case MessageType.video:
+        return '🎥 Video';
+      case MessageType.location:
+        return '📍 Location';
+      default:
+        return content;
     }
-  }
-
-  /// Get help type emoji
-  String _getHelpTypeEmoji(dynamic helpType) {
-    return '🆘'; // Simplified for now
-  }
-
-  /// Get help type text
-  String _getHelpTypeText(dynamic helpType) {
-    return 'Assistance'; // Simplified for now
   }
 
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
-    // Handle navigation based on notification payload
     debugPrint('Notification tapped: ${response.payload}');
+    // TODO: Implement navigation based on notification payload
   }
 
   /// Set app foreground state
@@ -524,6 +581,11 @@ class NotificationService {
     await _notifications.cancelAll();
   }
 
+  /// Cancel specific notification
+  Future<void> cancelNotification(int id) async {
+    await _notifications.cancel(id);
+  }
+
   /// Get notification count
   Future<int> getNotificationCount() async {
     final pendingNotifications = await _notifications.pendingNotificationRequests();
@@ -531,4 +593,28 @@ class NotificationService {
   }
 }
 
-// Notification service provider is defined in chat_providers.dart
+// Enums for type safety
+enum MessagePriority {
+  normal,
+  important,
+  urgent,
+  emergency,
+}
+
+enum MessageType {
+  text,
+  voice,
+  image,
+  video,
+  location,
+  careNote,
+  announcement,
+  achievement,
+}
+
+enum AlertPriority {
+  low,
+  medium,
+  high,
+  critical,
+}

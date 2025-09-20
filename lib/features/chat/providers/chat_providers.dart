@@ -4,7 +4,7 @@ import '../models/presence_model.dart';
 import '../services/chat_service.dart';
 import '../services/media_service.dart';
 import '../services/emergency_service.dart';
-import '../services/notification_service.dart';
+import '../../../core/services/notification_service.dart';
 
 final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService();
@@ -25,7 +25,7 @@ final emergencyServiceProvider = Provider<EmergencyService>((ref) {
 
 // Notification service provider
 final notificationServiceProvider = Provider<NotificationService>((ref) {
-  return NotificationService();
+  return NotificationService.instance;
 });
 
 final messagesStreamProvider = StreamProvider.family<List<Message>, String>(
