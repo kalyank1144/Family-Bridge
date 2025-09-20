@@ -312,7 +312,7 @@ class _FamilyChatScreenState extends ConsumerState<FamilyChatScreen> {
           return const SizedBox.shrink();
         }
         
-        return TypingIndicator(
+        return TypingIndicatorWidget(
           typingUsers: othersTyping,
           userType: widget.userType,
         );
@@ -655,53 +655,6 @@ class MessageSearchDialog extends StatelessWidget {
           child: const Text('Close'),
         ),
       ],
-    );
-  }
-}
-
-class ChatSettingsScreen extends StatelessWidget {
-  final String familyId;
-  final String userType;
-
-  const ChatSettingsScreen({
-    super.key,
-    required this.familyId,
-    required this.userType,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chat Settings'),
-      ),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.notifications),
-            title: const Text('Notifications'),
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.volume_up),
-            title: const Text('Message Sounds'),
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-          if (userType == 'elder')
-            ListTile(
-              leading: const Icon(Icons.text_fields),
-              title: const Text('Text Size'),
-              subtitle: const Text('Large'),
-              onTap: () {},
-            ),
-        ],
-      ),
     );
   }
 }
