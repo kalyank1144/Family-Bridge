@@ -9,11 +9,9 @@ import 'analytics_service.dart';
 /// Service for monitoring app performance and health
 class PerformanceService {
   static PerformanceService? _instance;
+  static PerformanceService get instance => _instance ??= PerformanceService._internal();
   
-  factory PerformanceService() {
-    _instance ??= PerformanceService._internal();
-    return _instance!;
-  }
+  factory PerformanceService() => instance;
   
   PerformanceService._internal();
   
