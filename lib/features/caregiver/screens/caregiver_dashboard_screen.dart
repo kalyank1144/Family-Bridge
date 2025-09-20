@@ -3,10 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/mixins/hipaa_compliance_mixin.dart';
+import '../../../core/services/access_control_service.dart';
 import '../providers/family_data_provider.dart';
 import '../providers/alert_provider.dart';
+import '../models/alert.dart';
 import '../providers/appointments_provider.dart';
-import '../widgets/family_member_card.dart';
+import '../widgets/family_member_overview_card.dart';
 import '../widgets/alert_panel.dart';
 import '../widgets/quick_action_button.dart';
 import '../widgets/activity_timeline.dart';
@@ -18,7 +21,7 @@ class CaregiverDashboardScreen extends StatefulWidget {
   State<CaregiverDashboardScreen> createState() => _CaregiverDashboardScreenState();
 }
 
-class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
+class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> with HipaaComplianceMixin {
   @override
   void initState() {
     super.initState();
@@ -84,9 +87,15 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
         icon: const Icon(FeatherIcons.menu, color: AppTheme.textPrimary),
         onPressed: () => Scaffold.of(context).openDrawer(),
       ),
-      title: Text(
-        'Family Care Dashboard',
-        style: Theme.of(context).textTheme.headlineSmall,
+      title: Row(
+        children: [
+          Text(
+            'Family Care Dashboard',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(width: 12),
+          buildComplianceStatusIndicator(),
+        ],
       ),
       actions: [
         Stack(
@@ -122,6 +131,13 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
               ),
           ],
         ),
+        if (hasPermission(Permission.manageCompliance)) ...[
+          IconButton(
+            icon: const Icon(FeatherIcons.shield, color: AppTheme.textPrimary),
+            onPressed: () => context.push('/admin'),
+            tooltip: 'HIPAA Compliance',
+          ),
+        ],
         const SizedBox(width: 8),
       ],
     );
@@ -129,13 +145,23 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
 
   Widget _buildAlertSection(BuildContext context) {
     final alertProvider = context.watch<AlertProvider>();
-    final criticalAlerts = alertProvider.criticalAlerts;
-    final highAlerts = alertProvider.highPriorityAlerts;
-    
-    if (criticalAlerts.isEmpty && highAlerts.isEmpty) {
+    final alerts = alertProvider.alerts;
+
+    if (alerts.isEmpty) {
       return const SizedBox.shrink();
     }
-    
+
+    final critical = alerts.where((a) => a.priority == AlertPriority.critical).length;
+    final high = alerts.where((a) => a.priority == AlertPriority.high).length;
+    final medium = alerts.where((a) => a.priority == AlertPriority.medium).length;
+    final low = alerts.where((a) => a.priority == AlertPriority.low).length;
+
+    final ordered = [
+      ...alerts.where((a) => a.priority == AlertPriority.critical),
+      ...alerts.where((a) => a.priority == AlertPriority.high),
+      ...alerts.where((a) => a.priority == AlertPriority.medium),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -143,7 +169,7 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Active Alerts',
+              'Priority Alerts',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             TextButton(
@@ -153,19 +179,30 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
           ],
         ),
         const SizedBox(height: AppTheme.spacingSm),
-        AlertPanel(alerts: [...criticalAlerts, ...highAlerts].take(3).toList()),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _alertChip(context, 'Critical', critical, AppTheme.healthRed),
+            _alertChip(context, 'High', high, const Color(0xFFFC8C03)),
+            _alertChip(context, 'Medium', medium, AppTheme.warningColor),
+            _alertChip(context, 'Low', low, AppTheme.infoColor),
+          ],
+        ),
+        const SizedBox(height: AppTheme.spacingSm),
+        AlertPanel(alerts: ordered.take(3).toList()),
       ],
     );
   }
 
   Widget _buildFamilyMembersSection(BuildContext context) {
     final familyProvider = context.watch<FamilyDataProvider>();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Family Member Status',
+          'Family Members',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: AppTheme.spacingMd),
@@ -180,22 +217,16 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
               ),
             ),
           )
-        else
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: familyProvider.familyMembers.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final member = familyProvider.familyMembers[index];
-                return FamilyMemberCard(
+        else ...[
+          ...familyProvider.familyMembers.map((member) => Padding(
+                padding: const EdgeInsets.only(bottom: AppTheme.spacingMd),
+                child: FamilyMemberOverviewCard(
                   member: member,
-                  onTap: () => context.push('/caregiver/member/${member.id}'),
-                );
-              },
-            ),
-          ),
+                  onViewDetails: () => context.push('/caregiver/member/${member.id}'),
+                  onMonitor: () => context.push('/caregiver/health-monitoring/${member.id}'),
+                ),
+              )),
+        ],
       ],
     );
   }
@@ -213,15 +244,28 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
           children: [
             Expanded(
               child: QuickActionButton(
-                icon: FeatherIcons.heart,
-                label: 'Health\nMonitoring',
+                icon: FeatherIcons.activity,
+                label: 'Advanced\nMonitoring',
                 color: AppTheme.healthGreen,
-                onTap: () {
-                  final familyProvider = context.read<FamilyDataProvider>();
-                  if (familyProvider.familyMembers.isNotEmpty) {
-                    context.push('/caregiver/health-monitoring/${familyProvider.familyMembers.first.id}');
-                  }
-                },
+                onTap: () => context.push('/caregiver/advanced-monitoring'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: QuickActionButton(
+                icon: FeatherIcons.clipboard,
+                label: 'Care\nPlans',
+                color: AppTheme.warningColor,
+                onTap: () => context.push('/caregiver/care-plan'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: QuickActionButton(
+                icon: FeatherIcons.fileText,
+                label: 'Reports',
+                color: AppTheme.infoColor,
+                onTap: () => context.push('/caregiver/professional-reports'),
               ),
             ),
             const SizedBox(width: 12),
@@ -229,35 +273,37 @@ class _CaregiverDashboardScreenState extends State<CaregiverDashboardScreen> {
               child: QuickActionButton(
                 icon: FeatherIcons.calendar,
                 label: 'Appointments',
-                color: AppTheme.infoColor,
-                onTap: () => context.push('/caregiver/appointments'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: QuickActionButton(
-                icon: FeatherIcons.checkSquare,
-                label: 'Tasks',
-                color: AppTheme.warningColor,
-                onTap: () {
-                  // Navigate to tasks screen
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: QuickActionButton(
-                icon: FeatherIcons.messageSquare,
-                label: 'Messages',
                 color: AppTheme.primaryColor,
-                onTap: () {
-                  // Navigate to messages screen
-                },
+                onTap: () => context.push('/caregiver/appointments'),
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _alertChip(BuildContext context, String label, int count, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Text('$label: ', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700)),
+          Text('$count', style: Theme.of(context).textTheme.labelSmall),
+        ],
+      ),
     );
   }
 

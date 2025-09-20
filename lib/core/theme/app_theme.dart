@@ -209,7 +209,7 @@ class AppTheme {
         ),
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: surfaceColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -255,22 +255,22 @@ class AppTheme {
     ),
   );
 
-  // Elder-focused theme with WCAG AAA sizing/contrast
+  // Elder-focused theme with WCAG AAA sizing/contrast - matching sample designs
   static ThemeData get elderTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: const ColorScheme.light(
-        primary: Color(0xFF1E3A8A),
+        primary: primaryBlue,
         onPrimary: Colors.white,
-        secondary: Color(0xFF059669),
+        secondary: successGreen,
         onSecondary: Colors.white,
-        error: Color(0xFFDC2626),
+        error: emergencyRed,
         onError: Colors.white,
-        background: Color(0xFFF9FAFB),
-        onBackground: Color(0xFF111827),
+        background: lightBackground,
+        onBackground: darkText,
         surface: Colors.white,
-        onSurface: Color(0xFF111827),
+        onSurface: darkText,
       ),
       textTheme: TextTheme(
         displayLarge: GoogleFonts.openSans(
@@ -356,7 +356,7 @@ class AppTheme {
           ),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -416,12 +416,13 @@ class AppTheme {
     );
   }
 
-  // Elder-accessible color shortcuts
-  static const Color primaryBlue = Color(0xFF1E3A8A);
-  static const Color successGreen = Color(0xFF059669);
-  static const Color emergencyRed = Color(0xFFDC2626);
-  static const Color warningYellow = Color(0xFFF59E0B);
-  static const Color neutralGray = Color(0xFF6B7280);
-  static const Color lightBackground = Color(0xFFF9FAFB);
-  static const Color darkText = Color(0xFF111827);
+  // Elder-accessible color shortcuts - matching sample designs exactly
+  static const Color primaryBlue = Color(0xFF2196F3);      // Blue for medications
+  static const Color successGreen = Color(0xFF4CAF50);     // Green for positive actions
+  static const Color emergencyRed = Color(0xFFF44336);     // Red for emergency/help
+  static const Color familyPurple = Color(0xFF9C27B0);     // Purple for family communication
+  static const Color warningYellow = Color(0xFFF59E0B);    // Yellow for warnings
+  static const Color neutralGray = Color(0xFF6B7280);      // Gray for secondary text
+  static const Color lightBackground = Color(0xFFF9FAFB);  // Light background
+  static const Color darkText = Color(0xFF111827);         // High contrast dark text
 }

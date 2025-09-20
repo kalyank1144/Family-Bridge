@@ -10,6 +10,11 @@ import '../widgets/chat_input_bar.dart';
 import '../widgets/online_status_bar.dart';
 import '../widgets/voice_recorder_overlay.dart';
 
+import '../widgets/sync_status_banner.dart';
+
+import 'chat_settings_screen.dart';
+
+
 class FamilyChatScreen extends ConsumerStatefulWidget {
   final String familyId;
   final String userId;
@@ -67,40 +72,133 @@ class _FamilyChatScreenState extends ConsumerState<FamilyChatScreen> {
   Widget _buildAppBar() {
     final presenceAsync = ref.watch(presenceStreamProvider(widget.familyId));
     
-    return AppBar(
-      elevation: 0,
-      backgroundColor: _getAppBarColor(),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Family Chat',
-            style: TextStyle(
-              fontSize: widget.userType == 'elder' ? 24 : 20,
-              fontWeight: FontWeight.bold,
-            ),
+    return PreferredSize(
+      preferredSize: Size.fromHeight(widget.userType == 'elder' ? 80 : 65),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              _getAppBarColor(),
+              _getAppBarColor().withOpacity(0.9),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          if (presenceAsync.hasValue)
-            Text(
-              '${presenceAsync.value!.values.where((p) => p.isOnline).length} online',
-              style: TextStyle(
-                fontSize: widget.userType == 'elder' ? 16 : 14,
-                color: Colors.white70,
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: _getAppBarColor().withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-        ],
-      ),
-      actions: [
-        if (widget.userType == 'caregiver')
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _showSearchDialog,
-          ),
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: _showChatSettings,
+          ],
         ),
-      ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: Colors.white,
+                    size: widget.userType == 'elder' ? 28 : 24,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Family Circle',
+                        style: TextStyle(
+                          fontSize: widget.userType == 'elder' ? 26 : 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      if (presenceAsync.hasValue)
+                        Container(
+                          margin: const EdgeInsets.only(top: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8, 
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.greenAccent,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.greenAccent.withOpacity(0.5),
+                                      blurRadius: 4,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${presenceAsync.value!.values.where((p) => p.isOnline).length} family members active',
+                                style: TextStyle(
+                                  fontSize: widget.userType == 'elder' ? 14 : 12,
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (widget.userType == 'caregiver')
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.search_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    onPressed: _showSearchDialog,
+                  ),
+                IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.more_vert_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  onPressed: _showChatSettings,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -386,20 +484,82 @@ class _FamilyChatScreenState extends ConsumerState<FamilyChatScreen> {
     );
   }
 
-  void _shareLocation() {
-    // Implement location sharing
+  Future<void> _shareLocation() async {
+    try {
+      // For now, send a mock location - in real app would use GPS
+      ref.read(chatServiceProvider).sendMessage(
+        content: 'My current location',
+        type: MessageType.location,
+        latitude: 37.7749,
+        longitude: -122.4194,
+        locationName: 'San Francisco, CA',
+      );
+      
+      HapticFeedback.lightImpact();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location shared with family')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to share location: $e')),
+      );
+    }
   }
 
-  void _pickImage() {
-    // Implement image picker
+  Future<void> _pickImage() async {
+    try {
+      final mediaService = ref.read(mediaServiceProvider);
+      final imageFile = await mediaService.pickImage();
+      if (imageFile != null) {
+        final imageUrl = await mediaService.uploadImage(imageFile);
+        ref.read(chatServiceProvider).sendMessage(
+          content: '',
+          type: MessageType.image,
+          mediaUrl: imageUrl,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send image: $e')),
+      );
+    }
   }
 
-  void _pickVideo() {
-    // Implement video picker
+  Future<void> _pickVideo() async {
+    try {
+      final mediaService = ref.read(mediaServiceProvider);
+      final videoFile = await mediaService.pickVideo();
+      if (videoFile != null) {
+        final videoUrl = await mediaService.uploadVideo(videoFile);
+        ref.read(chatServiceProvider).sendMessage(
+          content: '',
+          type: MessageType.video,
+          mediaUrl: videoUrl,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send video: $e')),
+      );
+    }
   }
 
   void _pickGif() {
-    // Implement GIF picker
+    // Implement GIF picker - placeholder
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        height: 400,
+        padding: const EdgeInsets.all(16),
+        child: const Center(
+          child: Text(
+            'GIF Picker\nComing Soon!',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ),
+    );
   }
 
   void _setReplyTo(Message message) {
@@ -442,14 +602,12 @@ class _FamilyChatScreenState extends ConsumerState<FamilyChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(widget.userType == 'elder' ? 80 : 60),
-        child: _buildAppBar(),
-      ),
+      appBar: _buildAppBar(),
       body: Stack(
         children: [
           Column(
             children: [
+              SyncStatusBanner(),
               OnlineStatusBar(
                 familyId: widget.familyId,
                 userType: widget.userType,

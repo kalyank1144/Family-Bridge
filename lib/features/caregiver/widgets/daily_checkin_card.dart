@@ -5,12 +5,14 @@ import '../../../core/theme/app_theme.dart';
 class DailyCheckInCard extends StatelessWidget {
   final bool hasCompletedCheckIn;
   final DateTime lastCheckIn;
+  final String? voiceNoteUrl;
   final VoidCallback? onRemind;
 
   const DailyCheckInCard({
     super.key,
     required this.hasCompletedCheckIn,
     required this.lastCheckIn,
+    this.voiceNoteUrl,
     this.onRemind,
   });
 
@@ -150,7 +152,7 @@ class DailyCheckInCard extends StatelessWidget {
                       _buildCheckInDetail(
                         context,
                         'Voice Note',
-                        'Available',
+                        voiceNoteUrl != null ? 'Available' : 'None',
                         FeatherIcons.mic,
                       ),
                     ],
@@ -178,8 +180,8 @@ class DailyCheckInCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          // Play voice note
+                        onPressed: voiceNoteUrl == null ? null : () {
+                          // navigate or open player elsewhere
                         },
                         icon: const Icon(FeatherIcons.play, size: 16),
                         label: const Text('Play Voice Note'),
