@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/services/hipaa_audit_service.dart';
-import '../../core/services/access_control_service.dart';
-import '../../core/services/encryption_service.dart';
-import '../../core/services/breach_detection_service.dart';
+import '../../../core/services/hipaa_audit_service.dart';
+import '../../../core/services/access_control_service.dart';
+import '../../../core/services/encryption_service.dart';
+import '../../../core/services/breach_detection_service.dart';
 
 class HipaaComplianceProvider extends ChangeNotifier {
   final HipaaAuditService _auditService = HipaaAuditService.instance;
@@ -481,12 +481,6 @@ class HipaaComplianceProvider extends ChangeNotifier {
   }
 
   /// Private helper methods
-  void _subscribeToBreachAlerts() {
-    _breachService.incidentStream.listen((incident) {
-      _activeIncidents.add(incident);
-      notifyListeners();
-    });
-  }
 
   void _showCriticalIncidentNotification(BreachIncident incident) {
     // In production: show system notification, alert security team

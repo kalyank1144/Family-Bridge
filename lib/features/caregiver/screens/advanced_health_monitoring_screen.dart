@@ -4,15 +4,40 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/health_analytics_service.dart';
+import '../../../core/mixins/hipaa_compliance_mixin.dart';
+import '../../../core/services/access_control_service.dart';
 import '../providers/family_data_provider.dart';
 
-class AdvancedHealthMonitoringScreen extends StatelessWidget {
+class AdvancedHealthMonitoringScreen extends StatefulWidget {
   const AdvancedHealthMonitoringScreen({super.key});
 
   @override
+  State<AdvancedHealthMonitoringScreen> createState() => _AdvancedHealthMonitoringScreenState();
+}
+
+class _AdvancedHealthMonitoringScreenState extends State<AdvancedHealthMonitoringScreen> 
+    with HipaaComplianceMixin<AdvancedHealthMonitoringScreen> {
+
+  @override
   Widget build(BuildContext context) {
+    return buildPermissionGate(
+      requiredPermission: Permission.readPhi,
+      child: _buildMonitoringContent(context),
+    );
+  }
+
+  Widget _buildMonitoringContent(BuildContext context) {
     final familyProvider = context.watch<FamilyDataProvider>();
     final members = familyProvider.familyMembers;
+    
+    // Log PHI access when viewing health monitoring data
+    for (final member in members) {
+      logPhiAccess(member.id, 'health_monitoring', metadata: {
+        'screen': 'AdvancedHealthMonitoring',
+        'memberName': member.name,
+      });
+    }
+    
     final analytics = HealthAnalyticsService();
     final summary = analytics.summarizeCurrent(members);
     final anomalies = analytics.detectAnomalies(members);

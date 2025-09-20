@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/services/hipaa_audit_service.dart';
-import '../../core/services/access_control_service.dart';
-import '../admin/providers/hipaa_compliance_provider.dart';
+import '../services/hipaa_audit_service.dart';
+import '../services/access_control_service.dart';
+import '../services/encryption_service.dart';
+import '../../features/admin/providers/hipaa_compliance_provider.dart';
 
 /// Mixin to add HIPAA compliance features to any screen
 mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {
@@ -217,7 +218,7 @@ mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {
       final result = await dataAccessor();
       
       // Log successful access
-      await _complianceProvider?._auditService.logEvent(
+      await HipaaAuditService.instance.logEvent(
         eventType: AuditEventType.phiView,
         description: 'PHI data accessed successfully',
         phiIdentifier: phiId,
@@ -227,7 +228,7 @@ mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {
       return result;
     } catch (e) {
       // Log failed access
-      await _complianceProvider?._auditService.logEvent(
+      await HipaaAuditService.instance.logEvent(
         eventType: AuditEventType.phiAccess,
         description: 'PHI data access failed',
         success: false,
@@ -253,7 +254,7 @@ mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {
     }
 
     // Log PHI modification attempt
-    await _complianceProvider?._auditService.logEvent(
+    await HipaaAuditService.instance.logEvent(
       eventType: AuditEventType.phiModification,
       description: 'PHI modification initiated: $modificationType',
       phiIdentifier: phiId,
@@ -264,7 +265,7 @@ mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {
       final result = await dataModifier();
       
       // Log successful modification
-      await _complianceProvider?._auditService.logEvent(
+      await HipaaAuditService.instance.logEvent(
         eventType: AuditEventType.phiModification,
         description: 'PHI modification completed successfully',
         phiIdentifier: phiId,
@@ -274,7 +275,7 @@ mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {
       return result;
     } catch (e) {
       // Log failed modification
-      await _complianceProvider?._auditService.logEvent(
+      await HipaaAuditService.instance.logEvent(
         eventType: AuditEventType.phiModification,
         description: 'PHI modification failed',
         success: false,
