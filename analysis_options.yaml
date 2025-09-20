@@ -4,6 +4,105 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+
+    - "**/*.gr.dart"
+    - "**/generated/**"
+    - "build/**"
+    - ".dart_tool/**"
+  
+  plugins:
+    - dart_code_metrics
+  
+  errors:
+    # Treat missing required parameters as errors
+    missing_required_param: error
+    # Treat missing returns as errors
+    missing_return: error
+    # Treat unused imports as errors
+    unused_import: error
+    # Treat unused local variables as warnings
+    unused_local_variable: warning
+    
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+
+linter:
+  rules:
+    # Style rules
+    - prefer_const_constructors
+    - prefer_const_literals_to_create_immutables
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - sort_child_properties_last
+    - use_key_in_widget_constructors
+    - use_full_hex_values_for_flutter_colors
+    - use_raw_strings
+    - use_string_buffers
+    
+    # Error prevention rules
+    - avoid_unnecessary_containers
+    - avoid_empty_else
+    - avoid_print
+    - avoid_slow_async_io
+    - avoid_types_as_parameter_names
+    - avoid_web_libraries_in_flutter
+    - no_duplicate_case_values
+    - no_logic_in_create_state
+    - prefer_void_to_null
+    - unnecessary_string_interpolations
+    - unnecessary_string_escapes
+    - valid_regexps
+    
+    # Performance rules
+    - avoid_function_literals_in_foreach_calls
+    - prefer_spread_collections
+    - prefer_for_elements_to_map_fromIterable
+    - prefer_if_elements_to_conditional_expressions
+    - prefer_collection_literals
+    
+    # Documentation rules
+    - public_member_api_docs
+    - comment_references
+    
+    # Design rules
+    - avoid_classes_with_only_static_members
+    - avoid_catching_errors
+    - prefer_mixin
+    - one_member_abstracts
+    - prefer_expression_function_bodies
+    - prefer_single_quotes
+    - require_trailing_commas
+    - sized_box_for_whitespace
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - unnecessary_lambdas
+    - unnecessary_parenthesis
+    - use_colored_box
+    - use_decorated_box
+    - use_super_parameters
+
+dart_code_metrics:
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+    source-lines-of-code: 50
+    
+  rules:
+    - newline-before-return
+    - no-boolean-literal-compare
+    - no-empty-block
+    - prefer-trailing-comma
+    - prefer-conditional-expressions
+    - no-equal-then-else
+    - avoid-unnecessary-type-casts
+    - avoid-unnecessary-type-assertions
+    - prefer-first
+    - prefer-last
+
     - "**/generated_plugin_registrant.dart"
     - "lib/generated_plugin_registrant.dart"
 
@@ -29,3 +128,4 @@ linter:
     
     # Accessibility
     use_build_context_synchronously: false # Can be tricky with async operations
+

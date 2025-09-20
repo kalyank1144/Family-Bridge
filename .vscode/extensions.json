@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "dart-code.dart-code",
+    "dart-code.flutter",
+    "alexisvt.flutter-snippets",
+    "nash.awesome-flutter-snippets",
+    "github.copilot",
+    "ms-vscode.vscode-json",
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "usernamehw.errorlens",
+    "gruntfuggly.todo-tree",
+    "github.vscode-github-actions"
+  ]
+}
