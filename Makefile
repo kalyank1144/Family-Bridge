@@ -210,3 +210,8 @@ pr: check test ## Prepare for pull request
 .PHONY: release
 release: clean get check test build-appbundle build-ipa ## Prepare release build
 	@echo "Release builds complete!"
+
+.PHONY: build-web
+build-web: ## Build Web app
+	chmod +x scripts/build_web.sh
+	./scripts/build_web.sh release
