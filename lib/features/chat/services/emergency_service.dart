@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 import '../services/chat_service.dart';
 
 class EmergencyService {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 import 'voice_message_player.dart';
 import 'message_reactions.dart';
 

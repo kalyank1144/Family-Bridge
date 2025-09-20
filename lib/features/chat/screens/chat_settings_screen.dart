@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/presence_model.dart';
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 import '../providers/chat_providers.dart';
 import '../services/chat_service.dart';
 

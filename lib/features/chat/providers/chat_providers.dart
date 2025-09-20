@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/message_model.dart';
+import '../../../core/models/message_model.dart';
 import '../models/presence_model.dart';
 import '../services/chat_service.dart';
 import '../services/media_service.dart';
