@@ -13,6 +13,14 @@ import '../../features/auth/screens/family_setup_screen.dart';
 import '../../features/auth/screens/family_members_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 
+
+// Onboarding
+import '../../features/onboarding/screens/welcome_screen.dart';
+import '../../features/onboarding/screens/user_type_selection_screen.dart';
+import '../../features/onboarding/providers/user_type_provider.dart';
+
+// Caregiver screens
+
 import '../../features/caregiver/screens/caregiver_dashboard_screen.dart';
 import '../../features/caregiver/screens/health_monitoring_screen.dart';
 import '../../features/caregiver/screens/appointments_calendar_screen.dart';
@@ -32,7 +40,10 @@ import '../../features/elder/screens/elder_home_screen.dart';
 import '../../features/elder/screens/emergency_contacts_screen.dart';
 import '../../features/elder/screens/medication_reminder_screen.dart';
 import '../../features/elder/screens/daily_checkin_screen.dart';
-import '../../features/elder/screens/family_chat_screen.dart';
+import '../../features/elder/screens/family_chat_screen.dart' as elder_chat;
+
+// Youth
+import '../../features/youth/screens/youth_home_screen.dart';
 
 import '../../features/youth/screens/youth_home_dashboard.dart';
 import '../../features/youth/screens/story_recording_screen.dart';
@@ -40,6 +51,28 @@ import '../../features/youth/screens/youth_games_screen.dart';
 import '../../features/youth/screens/photo_sharing_screen.dart';
 
 class AppRouter {
+
+  final UserTypeProvider userTypeProvider;
+  AppRouter(this.userTypeProvider);
+
+  late final GoRouter router = GoRouter(
+    initialLocation: '/welcome',
+    debugLogDiagnostics: false,
+    refreshListenable: userTypeProvider,
+    routes: [
+      // Onboarding
+      GoRoute(
+        path: '/welcome',
+        name: 'welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/user-type',
+        name: 'user_type',
+        builder: (context, state) => const UserTypeSelectionScreen(),
+      ),
+
+
 
   static final GoRouter router = GoRouter(
     initialLocation: '/caregiver',
@@ -120,6 +153,7 @@ class AppRouter {
           name: 'family_members',
           builder: (context, state) => const FamilyMembersScreen(),
         ),
+
       // Caregiver routes
       GoRoute(
         path: '/caregiver',
@@ -204,10 +238,17 @@ class AppRouter {
           GoRoute(
             path: 'family',
             name: 'elder_family',
-            builder: (context, state) => const FamilyChatScreen(),
+            builder: (context, state) => const elder_chat.FamilyChatScreen(),
           ),
         ],
       ),
+
+
+      // Youth
+      GoRoute(
+        path: '/youth',
+        name: 'youth_home',
+        builder: (context, state) => const YouthHomeScreen(),
 
       GoRoute(
         path: '/youth',
@@ -243,8 +284,34 @@ class AppRouter {
 
           ),
         ],
+
       ),
     ],
+    redirect: (context, state) {
+      final path = state.uri.path;
+      final selected = userTypeProvider.userType;
+
+      final isOnboarding = path == '/welcome' || path == '/user-type';
+      final isRolePath =
+          path.startsWith('/elder') || path.startsWith('/caregiver') || path.startsWith('/youth');
+
+      // If userType selected and trying to visit onboarding, send to home
+      if (selected != null && isOnboarding) {
+        return switch (selected) {
+          UserType.elder => '/elder',
+          UserType.caregiver => '/caregiver',
+          UserType.youth => '/youth',
+        };
+      }
+
+      // If no user type yet and not onboarding or role deep link, go to welcome
+      if (selected == null && !(isOnboarding || isRolePath)) {
+        return '/welcome';
+      }
+
+      // Allow deep links to role paths even if not selected
+      return null;
+    },
   );
         ),
       ],
