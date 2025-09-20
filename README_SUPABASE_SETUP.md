@@ -20,13 +20,17 @@ flutter run --dart-define-from-file=.env
 ```
 
 ## 3) Create Database Schema
-Open Supabase → SQL Editor and paste the contents of `supabase/schema.sql`. Execute. This will create:
+Apply the SQL files in this order via Supabase → SQL Editor:
+1. `supabase/schema.sql`
+2. `supabase/migrations/20250919_auth_system.sql`
+3. `supabase/migrations/20250914_family_chat.sql`
+4. `supabase/migrations/20250919_multimedia.sql`
+
+This will create:
 - users (profile) – linked to auth.users
-- emergency_contacts
-- medications
-- medication_logs
-- daily_checkins
-- messages
+- emergency_contacts, medications, medication_logs, daily_checkins
+- auth system: user_profiles, family_groups, family_members, family_invites, family_members_view
+- chat: messages table, RPCs, triggers, storage buckets for chat media
 - storage buckets for `medication-photos` and `voice-notes` with safe policies
 
 Row Level Security is enabled with sensible policies: users can only access their own rows; messages are readable by sender or recipient.
@@ -44,6 +48,7 @@ on conflict (id) do nothing;
 ## 5) App Wiring
 - The app loads environment from `.env` (and supports `--dart-define`) via `flutter_dotenv`.
 - Supabase initialization occurs in `lib/main.dart` using values from `lib/core/utils/env.dart`.
+- Environment validation runs via `EnvConfig` during startup to ensure required keys are set.
 - All Elder data operations use Supabase in `lib/features/elder/providers/elder_provider.dart`.
 - Realtime updates are subscribed via `SupabaseRealtime` channels for messages and medications.
 
@@ -54,10 +59,25 @@ Use buckets:
 
 Upload with Supabase Storage API and save file URLs in respective tables.
 
+## 6) Auth Providers
+- Enable Email/Password in Project Settings → Authentication
+- (Optional) Enable Google and Apple providers
+  - Set Redirect URLs:
+    - Web: https://your-domain/auth/v1/callback
+    - Android: com.your.bundle.id://login-callback
+    - iOS: com.your.bundle.id://login-callback
+
 ## 7) Running the app
 ```
 flutter pub get
 flutter run --dart-define-from-file=.env
+```
+
+## 8) Seed Development Data
+If you already have test users in `auth.users`, run:
+```
+-- Replace placeholders first
+supabase/schema editor → paste supabase/seeds/dev_seed.sql
 ```
 
 ## 8) Troubleshooting

@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 // Core imports
 import 'core/theme/app_theme.dart';
 import 'core/utils/env.dart';
+import 'core/config/env_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/notification_service.dart';
@@ -53,8 +54,8 @@ Future<void> main() async {
 
 /// Initialize all app dependencies and services
 Future<void> _initializeApp() async {
-  // Load environment variables
-  await dotenv.load(fileName: '.env', isOptional: true);
+  // Load and validate environment configuration
+  await EnvConfig.initialize();
 
   // Set device orientation
   await SystemChrome.setPreferredOrientations([
