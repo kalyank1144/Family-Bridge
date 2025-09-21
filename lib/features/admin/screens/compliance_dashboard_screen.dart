@@ -454,6 +454,27 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> w
           child: Padding(
             padding: const EdgeInsets.all(AppTheme.spacingMd),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('A/B Testing Status', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                Chip(label: const Text('Prompt timing'), avatar: const Icon(FeatherIcons.clock, size: 16)),
+                Chip(label: const Text('Messaging variants'), avatar: const Icon(FeatherIcons.messageCircle, size: 16)),
+                Chip(label: const Text('Trial lengths'), avatar: const Icon(FeatherIcons.calendar, size: 16)),
+              ]),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(child: _buildMetricItem(context, 'Prompt timing', 'A/B/C', AppTheme.primaryColor)),
+                Expanded(child: _buildMetricItem(context, 'Messaging', 'family/benefit/value', AppTheme.infoColor)),
+                Expanded(child: _buildMetricItem(context, 'Trial length', '30/14/7', AppTheme.warningColor)),
+              ]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: AppTheme.spacingLg),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingMd),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Recent Conversion Alerts', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               _buildEventTile('User converted to premium', '2 hours ago', AppTheme.successColor),
