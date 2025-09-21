@@ -55,6 +55,11 @@ import '../../features/chat/screens/chat_settings_screen.dart';
 
 // Additional admin imports
 import '../../features/admin/screens/secure_authentication_screen.dart';
+import '../../features/admin/subscription_dashboard/screens/subscription_metrics_screen.dart';
+import '../../features/admin/subscription_dashboard/screens/trial_performance_screen.dart';
+import '../../features/admin/subscription_management/screens/admin_actions_screen.dart';
+import '../../features/admin/reports/screens/weekly_report_screen.dart';
+import '../../features/admin/revenue_forecast/screens/revenue_forecast_screen.dart';
 
 /// Centralized application router with authentication and role-based routing
 class AppRouter {
@@ -274,6 +279,33 @@ class AppRouter {
               path: 'secure-auth',
               name: 'secure_auth',
               builder: (context, state) => const SecureAuthenticationScreen(),
+            ),
+            GoRoute(
+              path: 'subscriptions',
+              name: 'subscription_metrics',
+              builder: (context, state) => const SubscriptionMetricsScreen(),
+              routes: [
+                GoRoute(
+                  path: 'trial-performance',
+                  name: 'trial_performance',
+                  builder: (context, state) => const TrialPerformanceScreen(),
+                ),
+                GoRoute(
+                  path: 'actions',
+                  name: 'admin_actions',
+                  builder: (context, state) => const AdminActionsScreen(),
+                ),
+                GoRoute(
+                  path: 'revenue-forecast',
+                  name: 'revenue_forecast',
+                  builder: (context, state) => const RevenueForecastScreen(),
+                ),
+                GoRoute(
+                  path: 'weekly-report',
+                  name: 'weekly_report',
+                  builder: (context, state) => const WeeklyReportScreen(),
+                ),
+              ],
             ),
           ],
         ),
