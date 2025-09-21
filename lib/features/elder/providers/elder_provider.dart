@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/medication_model.dart';
 import '../models/emergency_contact_model.dart';
 import '../models/daily_checkin_model.dart';
@@ -7,6 +8,7 @@ import '../services/emergency_contact_service.dart';
 import '../services/daily_checkin_service.dart';
 
 class ElderProvider extends ChangeNotifier {
+  final _supabase = Supabase.instance.client;
   final ElderMedicationService _medicationService = ElderMedicationService();
   final EmergencyContactService _contactService = EmergencyContactService();
   final DailyCheckinService _checkinService = DailyCheckinService();
@@ -80,10 +82,10 @@ class ElderProvider extends ChangeNotifier {
           .single();
       
       _userName = response['name'] ?? 'User';
+      notifyListeners();
     } catch (e) {
       debugPrint('Error loading user profile: $e');
     }
-
   }
 
   // Emergency Contacts Methods
@@ -180,33 +182,6 @@ class ElderProvider extends ChangeNotifier {
     if (_medications.isEmpty) {
       _nextMedication = null;
       return;
-
-  
-  // Mark Medication as Taken
-  Future<void> markMedicationTaken(String medicationId, {String? photoUrl}) async {
-    try {
-      await _supabase.from('medication_logs').insert({
-        'medication_id': medicationId,
-        'elder_id': _userId,
-        'taken_at': DateTime.now().toIso8601String(),
-        'photo_url': photoUrl,
-        'confirmation_photo_url': photoUrl,
-        'confirmed': true,
-      });
-      
-      // Update next dose time
-      final medication = _medications.firstWhere((med) => med.id == medicationId);
-      final nextDose = medication.calculateNextDose();
-      
-      await _supabase
-          .from('medications')
-          .update({'next_dose_time': nextDose.toIso8601String()})
-          .eq('id', medicationId);
-      
-      await loadMedications();
-    } catch (e) {
-      debugPrint('Error marking medication taken: $e');
-
     }
 
     final now = DateTime.now();
@@ -216,7 +191,7 @@ class ElderProvider extends ChangeNotifier {
     _nextMedication = dueMedications.isNotEmpty ? dueMedications.first : null;
   }
 
-  Future<void> markMedicationTaken(String medicationId) async {
+  Future<void> markMedicationTaken(String medicationId, {String? photoUrl}) async {
     try {
       await _medicationService.initialize();
       await _medicationService.markMedicationTaken(medicationId, _userId);
@@ -224,14 +199,10 @@ class ElderProvider extends ChangeNotifier {
       // Reload medications to get updated state
       await loadMedications();
     } catch (e) {
-
       debugPrint('Medication taken update queued for sync: $e');
       // Still update local state optimistically
       _updateNextMedication();
       notifyListeners();
-
-      debugPrint('Error skipping medication: $e');
-
     }
   }
 
@@ -244,14 +215,10 @@ class ElderProvider extends ChangeNotifier {
       _updateNextMedication();
       notifyListeners();
     } catch (e) {
-
       debugPrint('Medication creation queued for sync: $e');
       _medications.add(medication);
       _updateNextMedication();
       notifyListeners();
-
-      debugPrint('Error checking today\'s check-in: $e');
-
     }
   }
 
@@ -267,11 +234,7 @@ class ElderProvider extends ChangeNotifier {
       _todayCheckin = await _checkinService.getTodayCheckin(_userId);
       _hasCheckedInToday = _todayCheckin != null;
     } catch (e) {
-
       debugPrint('Error loading today check-in: $e');
-
-      debugPrint('Error submitting daily check-in: $e');
-
     }
     notifyListeners();
   }
@@ -281,12 +244,8 @@ class ElderProvider extends ChangeNotifier {
       await _checkinService.initialize();
       _checkinStats = await _checkinService.getCheckinStats(_userId, days: days);
     } catch (e) {
-
       debugPrint('Error loading check-in stats: $e');
       _checkinStats = {};
-
-      debugPrint('Error loading weather: $e');
-
     }
     notifyListeners();
   }
@@ -303,15 +262,11 @@ class ElderProvider extends ChangeNotifier {
       // Refresh stats
       await loadCheckinStats();
     } catch (e) {
-
       debugPrint('Daily check-in queued for sync: $e');
       // Still update local state optimistically
       _todayCheckin = checkin;
       _hasCheckedInToday = true;
       notifyListeners();
-
-      debugPrint('Error loading unread messages: $e');
-
     }
   }
 
