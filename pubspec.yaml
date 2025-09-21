@@ -24,8 +24,9 @@ dependencies:
   fl_chart: ^0.66.2
   table_calendar: ^3.0.9
 
-  # State Management (Using Provider for consistency)
+  # State Management 
   provider: ^6.1.1
+  flutter_riverpod: ^2.4.10
 
   # Navigation
   go_router: ^13.2.0
@@ -111,6 +112,15 @@ dependencies:
 
   # Weather (Optional feature)
   weather: ^3.1.1
+  
+  # Payment Processing & Subscriptions
+  stripe_flutter: ^9.4.0
+  in_app_purchase: ^3.1.12
+  purchases_flutter: ^6.9.0
+  
+  # Additional Animations
+  confetti: ^0.7.0
+  lottie: ^3.1.0
 
 dev_dependencies:
   flutter_test:
