@@ -7,6 +7,10 @@ import 'features/caregiver/services/alert_service.dart';
 import 'features/caregiver/services/family_data_service.dart';
 import 'features/elder/services/medication_service.dart';
 import 'features/chat/services/media_service.dart';
+import 'features/caregiver/providers/alert_provider.dart';
+import 'features/caregiver/providers/family_data_provider.dart';
+import 'features/elder/providers/elder_provider.dart';
+import 'features/youth/providers/photo_sharing_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,12 +50,19 @@ class FamilyBridgeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Core services
         Provider<LoggingService>(create: (_) => LoggingService()),
         Provider<NotificationService>(create: (_) => NotificationService()),
         Provider<AlertService>(create: (_) => AlertService()),
         Provider<FamilyDataService>(create: (_) => FamilyDataService()),
         Provider<ElderMedicationService>(create: (_) => ElderMedicationService()),
         Provider<MediaService>(create: (_) => MediaService()),
+        
+        // UI providers for state management
+        ChangeNotifierProvider<AlertProvider>(create: (_) => AlertProvider()),
+        ChangeNotifierProvider<FamilyDataProvider>(create: (_) => FamilyDataProvider()),
+        ChangeNotifierProvider<ElderProvider>(create: (_) => ElderProvider()),
+        ChangeNotifierProvider<PhotoSharingProvider>(create: (_) => PhotoSharingProvider()),
       ],
       child: MaterialApp(
         title: 'FamilyBridge',
@@ -123,9 +134,40 @@ class WelcomeScreen extends StatelessWidget {
                 description: 'Elder medication reminders and tracking',
                 isImplemented: true,
               ),
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              const Text(
+                'UI Integration (Provider Classes):',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _ServiceStatusCard(
+                title: 'AlertProvider',
+                description: 'UI integration for caregiver alerts and notifications',
+                isImplemented: true,
+              ),
+              _ServiceStatusCard(
+                title: 'FamilyDataProvider',
+                description: 'UI integration for family member coordination',
+                isImplemented: true,
+              ),
+              _ServiceStatusCard(
+                title: 'ElderProvider',
+                description: 'UI integration for elder medication and check-ins',
+                isImplemented: true,
+              ),
+              _ServiceStatusCard(
+                title: 'PhotoSharingProvider',
+                description: 'UI integration for youth photo sharing features',
+                isImplemented: true,
+              ),
               const SizedBox(height: 32),
               const Text(
-                'All core services have been implemented!',
+                '✅ All services and providers implemented!\nUI components can now be built.',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
