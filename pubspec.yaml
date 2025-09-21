@@ -99,6 +99,9 @@ dependencies:
   # Security & Encryption (HIPAA)
   encrypt: ^5.0.1
   crypto: ^3.0.3
+  
+  # Payment Processing (Stripe)
+  stripe_flutter: ^9.4.0
 
   # Professional Reporting
   pdf: ^3.10.7

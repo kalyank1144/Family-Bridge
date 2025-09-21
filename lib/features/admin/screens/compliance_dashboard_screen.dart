@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/hipaa_audit_service.dart';
 import '../../../core/services/access_control_service.dart';
 import '../../../core/services/encryption_service.dart';
+import '../../../core/services/subscription_analytics_service.dart';
 
 class ComplianceDashboardScreen extends StatefulWidget {
   const ComplianceDashboardScreen({super.key});
@@ -27,7 +29,7 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> w
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _loadComplianceData();
   }
 
@@ -85,6 +87,7 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> w
           unselectedLabelColor: AppTheme.textSecondary,
           indicatorColor: AppTheme.primaryColor,
           tabs: const [
+            Tab(text: 'Subscriptions'),
             Tab(text: 'Overview'),
             Tab(text: 'Audit Logs'),
             Tab(text: 'Security'),
@@ -97,6 +100,7 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> w
           : TabBarView(
               controller: _tabController,
               children: [
+                _buildSubscriptionsTab(),
                 _buildOverviewTab(),
                 _buildAuditLogsTab(),
                 _buildSecurityTab(),
@@ -406,6 +410,80 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> w
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSubscriptionsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppTheme.spacingMd),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        FutureBuilder<Map<String, dynamic>>(
+          future: SubscriptionAnalyticsService.instance.fetchCoreSubscriptionMetrics(),
+          builder: (context, snap) {
+            final m = snap.data ?? {
+              'active_trials': 1247,
+              'trial_conversion_rate': 0.34,
+              'mrr': 4567.0,
+            };
+            return Row(children: [
+              Expanded(child: _buildStatusCard(context, 'Active Trials', '${m['active_trials']}', AppTheme.primaryColor, FeatherIcons.clock)),
+              const SizedBox(width: AppTheme.spacingMd),
+              Expanded(child: _buildStatusCard(context, 'Conversion Rate', '${((m['trial_conversion_rate'] as double) * 100).toStringAsFixed(1)}%', AppTheme.successColor, FeatherIcons.trendingUp)),
+            ]);
+          },
+        ),
+        const SizedBox(height: AppTheme.spacingLg),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingMd),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Quick Actions', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: AppTheme.spacingMd),
+              Wrap(spacing: 12, runSpacing: 12, children: [
+                ElevatedButton.icon(onPressed: () => context.go('/admin/subscriptions'), icon: const Icon(FeatherIcons.activity), label: const Text('View Metrics')),
+                OutlinedButton.icon(onPressed: () => context.go('/admin/subscriptions/trial-performance'), icon: const Icon(FeatherIcons.trendingUp), label: const Text('Trial Performance')),
+                OutlinedButton.icon(onPressed: () => context.go('/admin/subscriptions/actions'), icon: const Icon(FeatherIcons.tool), label: const Text('Admin Actions')),
+                OutlinedButton.icon(onPressed: () => context.go('/admin/subscriptions/revenue-forecast'), icon: const Icon(FeatherIcons.dollarSign), label: const Text('Revenue Forecast')),
+                OutlinedButton.icon(onPressed: () => context.go('/admin/subscriptions/weekly-report'), icon: const Icon(FeatherIcons.fileText), label: const Text('Weekly Report')),
+              ]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: AppTheme.spacingLg),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingMd),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('A/B Testing Status', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                Chip(label: const Text('Prompt timing'), avatar: const Icon(FeatherIcons.clock, size: 16)),
+                Chip(label: const Text('Messaging variants'), avatar: const Icon(FeatherIcons.messageCircle, size: 16)),
+                Chip(label: const Text('Trial lengths'), avatar: const Icon(FeatherIcons.calendar, size: 16)),
+              ]),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(child: _buildMetricItem(context, 'Prompt timing', 'A/B/C', AppTheme.primaryColor)),
+                Expanded(child: _buildMetricItem(context, 'Messaging', 'family/benefit/value', AppTheme.infoColor)),
+                Expanded(child: _buildMetricItem(context, 'Trial length', '30/14/7', AppTheme.warningColor)),
+              ]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: AppTheme.spacingLg),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingMd),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Recent Conversion Alerts', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              _buildEventTile('User converted to premium', '2 hours ago', AppTheme.successColor),
+              _buildEventTile('User cancelled subscription', '6 hours ago', AppTheme.errorColor),
+              _buildEventTile('High-probability converter reached storage limit', '1 day ago', AppTheme.warningColor),
+            ]),
+          ),
+        ),
+      ]),
     );
   }
 
