@@ -7,6 +7,10 @@ import 'features/caregiver/services/alert_service.dart';
 import 'features/caregiver/services/family_data_service.dart';
 import 'features/elder/services/medication_service.dart';
 import 'features/chat/services/media_service.dart';
+import 'features/caregiver/providers/alert_provider.dart';
+import 'features/caregiver/providers/family_data_provider.dart';
+import 'features/elder/providers/elder_provider.dart';
+import 'features/youth/providers/photo_sharing_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,12 +50,19 @@ class FamilyBridgeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Core Services
         Provider<LoggingService>(create: (_) => LoggingService()),
         Provider<NotificationService>(create: (_) => NotificationService()),
         Provider<AlertService>(create: (_) => AlertService()),
         Provider<FamilyDataService>(create: (_) => FamilyDataService()),
         Provider<ElderMedicationService>(create: (_) => ElderMedicationService()),
         Provider<MediaService>(create: (_) => MediaService()),
+        
+        // UI Providers
+        ChangeNotifierProvider<AlertProvider>(create: (_) => AlertProvider()),
+        ChangeNotifierProvider<FamilyDataProvider>(create: (_) => FamilyDataProvider()),
+        ChangeNotifierProvider<ElderProvider>(create: (_) => ElderProvider()),
+        ChangeNotifierProvider<PhotoSharingProvider>(create: (_) => PhotoSharingProvider()),
       ],
       child: MaterialApp(
         title: 'FamilyBridge',
