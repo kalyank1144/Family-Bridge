@@ -30,8 +30,10 @@ class PhotoSharingProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final url = await _media.pickImage(source: ImageSource.camera);
-      if (url != null) {
+      final file = await _media.pickImage(source: ImageSource.camera);
+      if (file != null) {
+        // Upload image and get URL
+        final url = await _media.uploadImage(file);
         _photos.insert(0, url);
       }
     } catch (e) {
@@ -49,8 +51,10 @@ class PhotoSharingProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final url = await _media.pickImage(source: ImageSource.gallery);
-      if (url != null) {
+      final file = await _media.pickImage(source: ImageSource.gallery);
+      if (file != null) {
+        // Upload image and get URL
+        final url = await _media.uploadImage(file);
         _photos.insert(0, url);
       }
     } catch (e) {
