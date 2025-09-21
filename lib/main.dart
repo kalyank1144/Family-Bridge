@@ -161,7 +161,7 @@ class FamilyBridgeApp extends StatelessWidget {
       ],
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
-          final router = AppRouter(userTypeProvider).router;
+          final router = AppRouter.createRouter(context);
           
           return MaterialApp.router(
             title: 'FamilyBridge',
