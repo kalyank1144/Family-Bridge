@@ -65,6 +65,30 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 ])
 void main() {}
 
+/// Simple Mock Voice Service for basic tests
+class MockVoiceService extends Mock implements VoiceService {
+  @override
+  bool get isInitialized => true;
+  
+  @override
+  Future<void> initialize() async {}
+  
+  @override
+  bool get isListening => false;
+  
+  @override
+  Stream<String> get speechStream => const Stream.empty();
+  
+  @override
+  Future<void> startListening() async {}
+  
+  @override
+  Future<void> stopListening() async {}
+  
+  @override
+  Future<void> speak(String text) async {}
+}
+
 /// Mock Auth Service with configurable behavior
 class ConfigurableMockAuthService extends Mock implements AuthService {
   User? _currentUser;

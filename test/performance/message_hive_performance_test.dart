@@ -14,6 +14,10 @@ void main() {
     if (!dir.existsSync()) dir.createSync(recursive: true);
     Hive.init(dir.path);
     Hive.registerAdapter(MessageAdapter());
+    Hive.registerAdapter(MessageTypeAdapter());
+    Hive.registerAdapter(MessageStatusAdapter());
+    Hive.registerAdapter(MessagePriorityAdapter());
+    Hive.registerAdapter(MessageReactionAdapter());
     box = await Hive.openBox<Message>('messages');
   });
 
@@ -28,9 +32,9 @@ void main() {
         senderName: 'User',
         senderType: 'elder',
         content: 'Msg $i',
-        type: 'text',
-        status: 'sent',
-        priority: 'normal',
+        type: MessageType.text,
+        status: MessageStatus.sent,
+        priority: MessagePriority.normal,
         timestamp: DateTime.now(),
       );
       await box.put(m.id, m);
