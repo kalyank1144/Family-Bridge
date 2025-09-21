@@ -30,6 +30,8 @@ import 'features/youth/providers/youth_provider.dart';
 import 'features/youth/providers/games_provider.dart';
 import 'features/youth/providers/photo_sharing_provider.dart';
 import 'features/youth/providers/story_recording_provider.dart';
+import 'features/youth/providers/achievements_provider.dart';
+import 'features/youth/providers/tech_help_provider.dart';
 import 'features/chat/providers/chat_provider.dart';
 import 'features/admin/providers/hipaa_compliance_provider.dart';
 
@@ -147,6 +149,8 @@ class FamilyBridgeApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GamesProvider()),
         ChangeNotifierProvider(create: (_) => PhotoSharingProvider()),
         ChangeNotifierProvider(create: (_) => StoryRecordingProvider()),
+        ChangeNotifierProvider(create: (_) => AchievementsProvider()),
+        ChangeNotifierProvider(create: (_) => TechHelpProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => HipaaComplianceProvider()),
         
@@ -157,7 +161,7 @@ class FamilyBridgeApp extends StatelessWidget {
       ],
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
-          final router = AppRouter(userTypeProvider).router;
+          final router = AppRouter.createRouter(context);
           
           return MaterialApp.router(
             title: 'FamilyBridge',

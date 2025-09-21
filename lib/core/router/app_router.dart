@@ -301,7 +301,7 @@ class AppRouter {
     
     // Check authentication status
     final isAuthenticated = authProvider.isAuthenticated;
-    final isLoading = authProvider.status == AuthStatus.loading;
+    final isLoading = authProvider.status == AuthStatus.unknown;
 
     // Don't redirect while authentication is loading
     if (isLoading) return null;

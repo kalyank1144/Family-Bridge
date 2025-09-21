@@ -114,5 +114,24 @@ void main() {
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(materialApp.title, equals('FamilyBridge'));
     });
+
+    // Additional test from main branch - simplified version
+    testWidgets('App renders welcome screen', (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final voiceService = VoiceService();
+      final userTypeProvider = UserTypeProvider();
+
+      await tester.pumpWidget(FamilyBridgeApp(
+        prefs: prefs,
+        voiceService: voiceService,
+        userTypeProvider: userTypeProvider,
+      ));
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.text('FamilyBridge'), findsOneWidget);
+    });
   });
 }

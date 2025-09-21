@@ -26,6 +26,7 @@ class AuthProvider extends ChangeNotifier with WidgetsBindingObserver {
   Session? get session => _session;
   UserProfile? get profile => _profile;
   UserRole? get selectedRole => _selectedRole;
+  bool get isAuthenticated => _status == AuthStatus.authenticated;
 
   AuthProvider() {
     WidgetsBinding.instance.addObserver(this);
