@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../core/models/user_model.dart';
 import '../../features/subscription/models/payment_method.dart';
 import '../../features/subscription/models/subscription_status.dart';
 import 'subscription_backend_service.dart';
+import 'auth_service.dart';
 
 class PaymentService {
   final stripe.Stripe _stripe = stripe.Stripe.instance;
@@ -81,12 +83,14 @@ class PaymentService {
       );
 
       if (confirmedSetupIntent.paymentMethodId != null) {
-        // Get payment method details
-        final paymentMethod = await stripe.Stripe.instance.retrievePaymentMethod(
-          confirmedSetupIntent.paymentMethodId!,
+        // Webhooks will persist details; return a minimal success marker
+        return PaymentMethodInfo(
+          stripePaymentMethodId: confirmedSetupIntent.paymentMethodId!,
+          type: PaymentMethodType.card,
+          card: null,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         );
-
-        return PaymentMethodInfo.fromStripe(paymentMethod);
       }
 
       return null;
@@ -120,9 +124,9 @@ class PaymentService {
       }
 
       // Update payment method if provided
-      if (paymentMethod != null && user.stripeCustomerId != null) {
+      if (paymentMethod != null) {
         bool paymentMethodUpdated = await _backend.updatePaymentMethod(
-          user.stripeCustomerId!,
+          '',
           paymentMethod.stripePaymentMethodId,
         );
         
@@ -135,7 +139,7 @@ class PaymentService {
       }
 
       // Create subscription
-      final subscriptionId = await _backend.createSubscription(user.stripeCustomerId!, priceId);
+      final subscriptionId = await _backend.createSubscription('', priceId);
       if (subscriptionId == null) {
         return const SubscriptionOperationResult(
           result: SubscriptionResult.paymentFailed,
@@ -144,7 +148,7 @@ class PaymentService {
       }
 
       // Get updated subscription info
-      final subscriptionInfo = await _backend.getSubscriptionStatus(user.stripeCustomerId!);
+      final subscriptionInfo = await _backend.getSubscriptionStatus('');
       
       return SubscriptionOperationResult(
         result: SubscriptionResult.success,
@@ -217,16 +221,7 @@ class PaymentService {
         );
       }
 
-      // Create payment intent
-      final user = getCurrentUser(); // You'll need to implement this
-      if (user?.stripeCustomerId == null) {
-        return const PaymentOperationResult(
-          result: PaymentResult.failed,
-          message: 'User not properly configured for payments',
-        );
-      }
-
-      final paymentIntent = await _backend.createPaymentIntent(amount, user!.stripeCustomerId!);
+      final paymentIntent = await _backend.createPaymentIntent(amount, '');
       if (paymentIntent == null) {
         return const PaymentOperationResult(
           result: PaymentResult.failed,
@@ -234,7 +229,6 @@ class PaymentService {
         );
       }
 
-      // Present Apple Pay
       await stripe.Stripe.instance.presentApplePay(
         params: stripe.ApplePayPresentParams(
           cartItems: [
@@ -248,7 +242,6 @@ class PaymentService {
         ),
       );
 
-      // Confirm payment
       final confirmedPaymentIntent = await stripe.Stripe.instance.confirmApplePayPayment(
         paymentIntent.clientSecret,
       );
@@ -295,16 +288,7 @@ class PaymentService {
         );
       }
 
-      // Create payment intent
-      final user = getCurrentUser(); // You'll need to implement this
-      if (user?.stripeCustomerId == null) {
-        return const PaymentOperationResult(
-          result: PaymentResult.failed,
-          message: 'User not properly configured for payments',
-        );
-      }
-
-      final paymentIntent = await _backend.createPaymentIntent(amount, user!.stripeCustomerId!);
+      final paymentIntent = await _backend.createPaymentIntent(amount, '');
       if (paymentIntent == null) {
         return const PaymentOperationResult(
           result: PaymentResult.failed,
@@ -312,7 +296,6 @@ class PaymentService {
         );
       }
 
-      // Present Google Pay
       await stripe.Stripe.instance.initGooglePay(
         stripe.GooglePayInitParams(
           testEnvironment: kDebugMode,
@@ -357,16 +340,16 @@ class PaymentService {
 
   Future<SetupIntentResult?> _createSetupIntent() async {
     try {
-      final user = getCurrentUser(); // You'll need to implement this
-      if (user?.stripeCustomerId == null) {
-        throw Exception('User not properly configured for payments');
-      }
-
-      // This should be done through your backend for security
-      // For now, we'll use a placeholder
-      // In production, you would call your backend API to create the setup intent
-      
-      throw UnimplementedError('Setup intent creation should be done via backend');
+      final res = await SubscriptionBackendService()._supabase.functions.invoke(
+        'stripe-create-setup-intent',
+      );
+      final data = (res.data is String)
+          ? (jsonDecode(res.data as String) as Map<String, dynamic>)
+          : res.data as Map<String, dynamic>;
+      final clientSecret = data['client_secret'] as String?;
+      final id = data['setup_intent_id'] as String?;
+      if (clientSecret == null || id == null) return null;
+      return SetupIntentResult(clientSecret: clientSecret, id: id);
     } catch (e) {
       print('Error creating setup intent: $e');
       return null;
@@ -397,11 +380,12 @@ class PaymentService {
     );
   }
 
-  /// Get current user - this should be implemented based on your auth system
+  /// Get current user from auth service
   UserProfile? getCurrentUser() {
-    // This should return the current user from your auth service
-    // You'll need to implement this based on your existing auth system
-    throw UnimplementedError('getCurrentUser should be implemented with your auth system');
+    // Lightweight access via AuthService singleton
+    // Returns basic profile (without Stripe fields)
+    // Consumers should rely on backend for Stripe customer mapping
+    return AuthService.instance.currentUser;
   }
 
   /// Cleanup resources

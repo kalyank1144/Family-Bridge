@@ -55,6 +55,11 @@ import '../../features/chat/screens/chat_settings_screen.dart';
 
 // Additional admin imports
 import '../../features/admin/screens/secure_authentication_screen.dart';
+
+// Subscription & Trial imports
+import '../../features/subscription/screens/trial_upgrade_screen.dart';
+import '../../features/subscription/screens/payment_methods_screen.dart';
+import '../../features/subscription/screens/subscription_settings_screen.dart';
 import '../../features/admin/subscription_dashboard/screens/subscription_metrics_screen.dart';
 import '../../features/admin/subscription_dashboard/screens/trial_performance_screen.dart';
 import '../../features/admin/subscription_management/screens/admin_actions_screen.dart';
@@ -262,6 +267,23 @@ class AppRouter {
               },
             ),
           ],
+        ),
+
+        // === SUBSCRIPTION ROUTES ===
+        GoRoute(
+          path: '/subscription/upgrade',
+          name: 'subscription_upgrade',
+          builder: (context, state) => const TrialUpgradeScreen(),
+        ),
+        GoRoute(
+          path: '/subscription/payment-methods',
+          name: 'subscription_payment_methods',
+          builder: (context, state) => const PaymentMethodsScreen(),
+        ),
+        GoRoute(
+          path: '/subscription/settings',
+          name: 'subscription_settings',
+          builder: (context, state) => const SubscriptionSettingsScreen(),
         ),
 
         // === ADMIN ROUTES ===

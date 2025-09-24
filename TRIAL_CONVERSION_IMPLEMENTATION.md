@@ -313,10 +313,11 @@ class ConversionAnalytics {
 ### Environment Variables:
 ```env
 STRIPE_PUBLISHABLE_KEY=pk_live_xxx
-STRIPE_SECRET_KEY=sk_live_xxx
 APPLE_PAY_MERCHANT_ID=merchant.familybridge
 GOOGLE_PAY_MERCHANT_ID=familybridge
-REVENUE_CAT_API_KEY=xxx
+# Server-side only (Supabase Function secrets):
+# STRIPE_SECRET_KEY=sk_live_xxx
+# STRIPE_WEBHOOK_SECRET=whsec_live_xxx
 ```
 
 ### Database Migrations:
