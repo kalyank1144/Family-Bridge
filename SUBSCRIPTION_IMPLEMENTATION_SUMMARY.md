@@ -12,10 +12,10 @@ Successfully implemented a complete backend payment processing and subscription 
   - Configured with existing `dio: ^5.4.0` for HTTP requests
 
 - **✅ Environment Variables** (`.env`)
-  - `STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY` for API access
-  - `STRIPE_WEBHOOK_SECRET` for webhook validation
+  - `STRIPE_PUBLISHABLE_KEY` for client SDK
   - `STRIPE_PRICE_ID_PREMIUM` for subscription pricing
   - `TRIAL_PERIOD_DAYS` configuration
+  - Server-side only: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` set as Supabase Function secrets (not in mobile env)
 
 ### 2. Database Schema (Supabase Migration)
 - **✅ Enhanced User Profiles Table**

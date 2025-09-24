@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/models/user_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/services/offline_payment_service.dart';
@@ -223,7 +224,7 @@ class SubscriptionProvider extends ChangeNotifier {
       // Process payment
       final result = await _paymentService.processSubscriptionPayment(
         user: user,
-        priceId: 'price_premium_monthly', // This should come from config
+        priceId: (dotenv.env['STRIPE_PRICE_ID_PREMIUM'] ?? ''),
         paymentMethod: paymentMethod,
       );
 

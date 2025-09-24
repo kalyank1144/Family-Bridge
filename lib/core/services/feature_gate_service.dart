@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/user_profile_model.dart';
 import 'trial_service.dart';
 
@@ -56,7 +57,10 @@ class FeatureGateService {
           child: const Text('Not now'),
         ),
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop('upgrade'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.push('/subscription/upgrade');
+          },
           child: const Text('Upgrade'),
         ),
       ],

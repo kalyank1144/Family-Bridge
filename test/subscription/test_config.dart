@@ -22,8 +22,7 @@ class SubscriptionTestConfig {
   /// Test environment variables for Stripe testing
   static const Map<String, String> testEnvVars = {
     'STRIPE_PUBLISHABLE_KEY': 'pk_test_...',
-    'STRIPE_SECRET_KEY': 'sk_test_...',
-    'STRIPE_WEBHOOK_SECRET': 'whsec_test...',
+        'STRIPE_WEBHOOK_SECRET': 'whsec_test...',
     'STRIPE_PRICE_ID_PREMIUM': 'price_test_premium',
     'TRIAL_PERIOD_DAYS': '30',
   };
