@@ -352,3 +352,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+
+# Allow tracking workspace settings for analyzer scoping
+!.vscode/settings.json
