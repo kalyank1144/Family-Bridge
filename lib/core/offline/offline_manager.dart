@@ -1,10 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
-import '../network/network_manager.dart';
-import 'storage/local_storage_manager.dart';
-import 'queue/operation_queue.dart';
+
 import 'models/offline_operation.dart';
 import 'models/sync_status.dart';
+import 'package:family_bridge/core/network/network_manager.dart';
+import 'queue/operation_queue.dart';
+import 'storage/local_storage_manager.dart';
 
 class OfflineManager {
   final LocalStorageManager storageManager;

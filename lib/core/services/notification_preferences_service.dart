@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/notification_preferences.dart';
+
+import 'package:family_bridge/core/models/notification_preferences.dart';
 
 class NotificationPreferencesService {
   NotificationPreferencesService._internal();

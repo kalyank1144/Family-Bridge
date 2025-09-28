@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:collection/collection.dart';
+
 import 'package:flutter/foundation.dart';
+
+import 'package:collection/collection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/user_model.dart';
+
+import 'package:family_bridge/core/models/user_model.dart';
 
 class SubscriptionAnalyticsService {
   static final SubscriptionAnalyticsService instance = SubscriptionAnalyticsService._internal();

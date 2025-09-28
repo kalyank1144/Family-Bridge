@@ -1,6 +1,7 @@
 import 'dart:async';
-import '../models/message_model.dart';
-import '../models/notification_preferences.dart';
+
+import 'package:family_bridge/core/models/message_model.dart';
+import 'package:family_bridge/core/models/notification_preferences.dart';
 
 class NotificationRouteDecision {
   final bool deliverNow;

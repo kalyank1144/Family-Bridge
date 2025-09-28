@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/subscription_model.dart';
-import '../widgets/upgrade_prompt_widget.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
+import 'package:family_bridge/features/trial_management/widgets/upgrade_prompt_widget.dart';
 
 class StorageUpgradeTrigger {
   static const double FREE_STORAGE_LIMIT_GB = 0.5; // 500MB for trial users

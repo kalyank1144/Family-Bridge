@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/family_member.dart';
-import '../services/family_data_service.dart';
+
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
+import 'package:family_bridge/features/caregiver/services/family_data_service.dart';
 
 class FamilyDataProvider extends ChangeNotifier {
   final FamilyDataService _service = FamilyDataService();

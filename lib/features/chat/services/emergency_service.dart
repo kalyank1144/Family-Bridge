@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../../core/models/message_model.dart';
-import '../services/chat_service.dart';
+
+import 'package:family_bridge/core/models/message_model.dart';
+import 'package:family_bridge/features/chat/services/chat_service.dart';
 
 class EmergencyService {
   ChatService? _chatService;

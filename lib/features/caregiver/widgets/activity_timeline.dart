@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
-import '../models/family_member.dart';
-import '../models/appointment.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/appointment.dart';
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
 
 class ActivityTimeline extends StatelessWidget {
   final List<FamilyMember> familyMembers;

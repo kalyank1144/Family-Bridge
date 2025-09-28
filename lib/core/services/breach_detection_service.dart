@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
-import 'hipaa_audit_service.dart';
+
 import 'access_control_service.dart';
+import 'hipaa_audit_service.dart';
 
 enum BreachType {
   unauthorizedAccess,

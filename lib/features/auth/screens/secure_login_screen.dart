@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/models/user_model.dart';
-import '../../../core/services/enhanced_auth_service.dart';
-import '../../../core/services/voice_service.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/enhanced_ui_components.dart';
-import '../../../core/widgets/loading_states.dart';
-import '../../../core/widgets/success_animations.dart';
-import '../providers/auth_provider.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/core/services/enhanced_auth_service.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/core/widgets/enhanced_ui_components.dart';
+import 'package:family_bridge/core/widgets/loading_states.dart';
+import 'package:family_bridge/core/widgets/success_animations.dart';
+import 'package:family_bridge/features/auth/providers/auth_provider.dart';
 
 class SecureLoginScreen extends StatefulWidget {
   const SecureLoginScreen({super.key});

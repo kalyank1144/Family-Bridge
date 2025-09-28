@@ -1,10 +1,13 @@
 import 'dart:async';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/services/subscription_analytics_service.dart';
-import '../widgets/metric_card_widget.dart';
-import '../widgets/conversion_funnel_widget.dart';
+
+import 'package:fl_chart/fl_chart.dart';
+
+import 'package:family_bridge/core/services/subscription_analytics_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/admin/subscription_dashboard/widgets/conversion_funnel_widget.dart';
+import 'package:family_bridge/features/admin/subscription_dashboard/widgets/metric_card_widget.dart';
 
 class SubscriptionMetricsScreen extends StatefulWidget {
   const SubscriptionMetricsScreen({super.key});

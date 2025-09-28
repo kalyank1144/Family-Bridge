@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:intl/intl.dart';
-import '../providers/elder_provider.dart';
-import '../models/medication_model.dart';
-import '../widgets/large_action_button.dart';
-import '../widgets/medication_photo_card.dart';
-import '../widgets/voice_navigation_widget.dart';
-import '../widgets/weather_widget.dart';
-import '../widgets/voice_checkin_widget.dart';
-import 'medication_reminder_screen.dart';
+import 'package:provider/provider.dart';
+
 import 'daily_checkin_screen.dart';
 import 'emergency_contacts_screen.dart';
-import '../../chat/screens/family_chat_screen.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/voice_service.dart';
+import 'medication_reminder_screen.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/elder/models/medication_model.dart';
+import 'package:family_bridge/features/elder/providers/elder_provider.dart';
+import 'package:family_bridge/features/elder/widgets/large_action_button.dart';
+import 'package:family_bridge/features/elder/widgets/medication_photo_card.dart';
+import 'package:family_bridge/features/elder/widgets/voice_checkin_widget.dart';
+import 'package:family_bridge/features/elder/widgets/voice_navigation_widget.dart';
+import 'package:family_bridge/features/elder/widgets/weather_widget.dart';
 
 /// Enhanced Elder Dashboard that showcases comprehensive ElderProvider integration
 /// Features: medication management, daily check-ins, family communication, health tracking

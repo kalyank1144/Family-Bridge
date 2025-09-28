@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:go_router/go_router.dart';
-import '../../features/auth/providers/auth_provider.dart';
-import '../../features/caregiver/providers/family_data_provider.dart';
-import '../../features/elder/providers/elder_provider.dart';
-import '../../features/youth/providers/photo_sharing_provider.dart';
-import '../../features/caregiver/providers/alert_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/features/auth/providers/auth_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/alert_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
+import 'package:family_bridge/features/elder/providers/elder_provider.dart';
+import 'package:family_bridge/features/youth/providers/photo_sharing_provider.dart';
 
 // Enhanced Screens
-import '../../features/elder/screens/enhanced_elder_dashboard.dart';
-import '../../features/auth/screens/enhanced_family_setup_screen.dart';
-import '../../features/caregiver/screens/enhanced_alert_management_screen.dart';
-import '../../features/youth/screens/enhanced_youth_dashboard.dart';
+import 'package:family_bridge/features/elder/screens/enhanced_elder_dashboard.dart';
+import 'package:family_bridge/features/auth/screens/enhanced_family_setup_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/enhanced_alert_management_screen.dart';
+import 'package:family_bridge/features/youth/screens/enhanced_youth_dashboard.dart';
 
 // Existing Screens
-import '../../features/caregiver/screens/caregiver_dashboard_screen.dart';
-import '../../features/onboarding/screens/welcome_screen.dart';
-import '../../features/onboarding/screens/user_type_selection_screen.dart';
-import '../../features/auth/screens/login_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/caregiver_dashboard_screen.dart';
+import 'package:family_bridge/features/onboarding/screens/welcome_screen.dart';
+import 'package:family_bridge/features/onboarding/screens/user_type_selection_screen.dart';
+import 'package:family_bridge/features/auth/screens/login_screen.dart';
 
 /// Enhanced Navigation Controller that showcases comprehensive provider integration
 /// Manages routing between enhanced screens with proper provider initialization

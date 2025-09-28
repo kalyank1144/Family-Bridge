@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import '../../chat/screens/family_chat_screen.dart' as chat;
+
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart' as chat;
 
 class YouthHomeScreen extends StatefulWidget {
   const YouthHomeScreen({super.key});

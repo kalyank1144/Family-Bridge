@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/models/message_model.dart';
-import '../models/presence_model.dart';
-import '../providers/chat_providers.dart';
-import '../widgets/message_bubble.dart';
-import '../widgets/typing_indicator.dart';
-import '../widgets/chat_input_bar.dart';
-import '../widgets/online_status_bar.dart';
-import '../widgets/voice_recorder_overlay.dart';
 
-import '../widgets/sync_status_banner.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_settings_screen.dart';
-
+import 'package:family_bridge/core/models/message_model.dart';
+import 'package:family_bridge/features/chat/models/presence_model.dart';
+import 'package:family_bridge/features/chat/providers/chat_providers.dart';
+import 'package:family_bridge/features/chat/widgets/chat_input_bar.dart';
+import 'package:family_bridge/features/chat/widgets/message_bubble.dart';
+import 'package:family_bridge/features/chat/widgets/online_status_bar.dart';
+import 'package:family_bridge/features/chat/widgets/sync_status_banner.dart';
+import 'package:family_bridge/features/chat/widgets/typing_indicator.dart';
+import 'package:family_bridge/features/chat/widgets/voice_recorder_overlay.dart';
 
 class FamilyChatScreen extends ConsumerStatefulWidget {
   final String familyId;

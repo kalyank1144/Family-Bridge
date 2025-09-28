@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import '../providers/photo_sharing_provider.dart';
-import '../../chat/screens/family_chat_screen.dart';
+
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/youth/providers/photo_sharing_provider.dart';
 
 class PhotoSharingScreen extends StatelessWidget {
   const PhotoSharingScreen({super.key});

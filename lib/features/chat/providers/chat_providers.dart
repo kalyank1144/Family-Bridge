@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/models/message_model.dart';
-import '../models/presence_model.dart';
-import '../services/chat_service.dart';
-import '../services/media_service.dart';
+import 'package:family_bridge/core/models/message_model.dart';
+import 'package:family_bridge/features/chat/models/presence_model.dart';
+import 'package:family_bridge/features/chat/services/chat_service.dart';
+import 'package:family_bridge/features/chat/services/media_service.dart';
 
 final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService.instance;

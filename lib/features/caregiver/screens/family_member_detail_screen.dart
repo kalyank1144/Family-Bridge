@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../providers/family_data_provider.dart';
-import '../providers/health_monitoring_provider.dart';
-import '../providers/appointments_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/providers/appointments_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/health_monitoring_provider.dart';
 
 class FamilyMemberDetailScreen extends StatelessWidget {
   final String memberId;

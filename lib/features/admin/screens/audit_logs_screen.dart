@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/hipaa_audit_service.dart';
+
+import 'package:family_bridge/core/services/hipaa_audit_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
 
 class AuditLogsScreen extends StatefulWidget {
   const AuditLogsScreen({super.key});

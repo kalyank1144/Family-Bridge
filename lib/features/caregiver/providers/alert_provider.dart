@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/alert.dart';
-import '../services/alert_service.dart';
-import '../../../core/services/notification_service.dart';
+
+import 'package:family_bridge/core/services/notification_service.dart';
+import 'package:family_bridge/features/caregiver/models/alert.dart';
+import 'package:family_bridge/features/caregiver/services/alert_service.dart';
 
 class AlertProvider extends ChangeNotifier {
   final AlertService _service = AlertService();

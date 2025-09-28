@@ -4,9 +4,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../network/network_manager.dart';
-import '../sync/data_sync_service.dart';
-import '../sync/sync_queue.dart';
+import 'package:family_bridge/services/network/network_manager.dart';
+import 'package:family_bridge/services/sync/data_sync_service.dart';
+import 'package:family_bridge/services/sync/sync_queue.dart';
 
 enum SyncState { idle, syncing, error }
 

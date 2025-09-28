@@ -1,19 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../models/hive/user_model.dart';
-import '../../core/models/message_model.dart';
-import '../../models/hive/health_data_model.dart';
-import '../../models/hive/appointment_model.dart';
-import '../../models/hive/medication_model.dart';
-import '../../models/hive/emergency_contact_model.dart';
-import '../../models/hive/daily_checkin_model.dart';
-import '../network/network_manager.dart';
 import 'conflict_resolver.dart';
+import 'package:family_bridge/core/models/message_model.dart';
+import 'package:family_bridge/models/hive/appointment_model.dart';
+import 'package:family_bridge/models/hive/daily_checkin_model.dart';
+import 'package:family_bridge/models/hive/emergency_contact_model.dart';
+import 'package:family_bridge/models/hive/health_data_model.dart';
+import 'package:family_bridge/models/hive/medication_model.dart';
+import 'package:family_bridge/models/hive/user_model.dart';
+import 'package:family_bridge/services/network/network_manager.dart';
 import 'sync_queue.dart';
 
 typedef Json = Map<String, dynamic>;

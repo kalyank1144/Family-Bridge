@@ -1,9 +1,12 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import '../providers/story_recording_provider.dart';
-import '../widgets/audio_recording_widget.dart';
-import '../../chat/screens/family_chat_screen.dart';
+
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/youth/providers/story_recording_provider.dart';
+import 'package:family_bridge/features/youth/widgets/audio_recording_widget.dart';
 
 class StoryRecordingScreen extends StatelessWidget {
   const StoryRecordingScreen({super.key});

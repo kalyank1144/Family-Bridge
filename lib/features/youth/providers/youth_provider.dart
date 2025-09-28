@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/gamification_service.dart';
-import '../../caregiver/models/family_member.dart';
+
+import 'package:family_bridge/core/services/gamification_service.dart';
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
 
 class YouthProvider extends ChangeNotifier {
   final GamificationService _gamification = GamificationService();

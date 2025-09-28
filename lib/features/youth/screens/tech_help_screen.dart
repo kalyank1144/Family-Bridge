@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import '../providers/tech_help_provider.dart';
-import '../../chat/screens/family_chat_screen.dart';
+
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/youth/providers/tech_help_provider.dart';
 
 class TechHelpScreen extends StatelessWidget {
   const TechHelpScreen({super.key});

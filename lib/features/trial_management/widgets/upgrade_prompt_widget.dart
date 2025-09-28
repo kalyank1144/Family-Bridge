@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 <<<<<<< HEAD
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/subscription_model.dart';
-import '../providers/subscription_provider.dart';
-import '../screens/upgrade_options_screen.dart';
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
+import 'package:family_bridge/features/trial_management/providers/subscription_provider.dart';
+import 'package:family_bridge/features/trial_management/screens/upgrade_options_screen.dart';
 
 class UpgradePromptWidget extends ConsumerWidget {
   final String title;
@@ -222,7 +223,7 @@ class UpgradePromptWidget extends ConsumerWidget {
     );
 =======
 import 'package:provider/provider.dart';
-import '../providers/trial_status_provider.dart';
+import 'package:family_bridge/features/trial_management/providers/trial_status_provider.dart';
 
 class UpgradePromptWidget extends StatelessWidget {
   final String featureKey;

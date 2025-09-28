@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/health_analytics_service.dart';
-import '../../../core/mixins/hipaa_compliance_mixin.dart';
-import '../../../core/services/access_control_service.dart';
-import '../providers/family_data_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/mixins/hipaa_compliance_mixin.dart';
+import 'package:family_bridge/core/services/access_control_service.dart';
+import 'package:family_bridge/core/services/health_analytics_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
 
 class AdvancedHealthMonitoringScreen extends StatefulWidget {
   const AdvancedHealthMonitoringScreen({super.key});

@@ -3,12 +3,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/user_model.dart';
-import '../models/family_model.dart';
+import 'package:family_bridge/core/models/family_model.dart';
+import 'package:family_bridge/core/models/user_model.dart';
 
 class AuthService {
   AuthService._();

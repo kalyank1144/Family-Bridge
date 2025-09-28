@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_animate/flutter_animate.dart';
-import '../models/presence_model.dart';
+
+import 'package:family_bridge/features/chat/models/presence_model.dart';
 
 class TypingIndicatorWidget extends StatelessWidget {
   final List<TypingIndicator> typingUsers;

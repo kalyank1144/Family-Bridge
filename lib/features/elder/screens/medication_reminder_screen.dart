@@ -1,19 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import '../providers/elder_provider.dart';
-import '../models/medication_model.dart';
-import '../../../core/services/voice_service.dart';
-import '../../../core/theme/app_theme.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-import '../widgets/medication_photo_widget.dart';
-import '../../../services/storage/media_storage_service.dart';
-
-import '../../../core/services/storage_service.dart';
-
+import 'package:family_bridge/core/services/storage_service.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/elder/models/medication_model.dart';
+import 'package:family_bridge/features/elder/providers/elder_provider.dart';
+import 'package:family_bridge/features/elder/widgets/medication_photo_widget.dart';
+import 'package:family_bridge/services/storage/media_storage_service.dart';
 
 class MedicationReminderScreen extends StatefulWidget {
   const MedicationReminderScreen({super.key});

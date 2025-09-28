@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/mixins/hipaa_compliance_mixin.dart';
-import '../../../core/services/access_control_service.dart';
-import '../providers/family_data_provider.dart';
-import '../providers/alert_provider.dart';
-import '../models/alert.dart';
-import '../providers/appointments_provider.dart';
-import '../widgets/family_member_overview_card.dart';
-import '../widgets/alert_panel.dart';
-import '../widgets/quick_action_button.dart';
-import '../widgets/activity_timeline.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/mixins/hipaa_compliance_mixin.dart';
+import 'package:family_bridge/core/services/access_control_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/alert.dart';
+import 'package:family_bridge/features/caregiver/providers/alert_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/appointments_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
+import 'package:family_bridge/features/caregiver/widgets/activity_timeline.dart';
+import 'package:family_bridge/features/caregiver/widgets/alert_panel.dart';
+import 'package:family_bridge/features/caregiver/widgets/family_member_overview_card.dart';
+import 'package:family_bridge/features/caregiver/widgets/quick_action_button.dart';
 
 class CaregiverDashboardScreen extends StatefulWidget {
   const CaregiverDashboardScreen({super.key});

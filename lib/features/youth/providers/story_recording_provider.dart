@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '../../../core/services/audio_service.dart';
+
+import 'package:family_bridge/core/services/audio_service.dart';
 
 class StoryRecordingProvider extends ChangeNotifier {
   final AudioService _audio = AudioService();

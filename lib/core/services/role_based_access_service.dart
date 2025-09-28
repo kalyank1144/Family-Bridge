@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/user_model.dart';
 import 'hipaa_audit_service.dart';
+import 'package:family_bridge/core/models/user_model.dart';
 
 /// Permission types for the application
 enum Permission {

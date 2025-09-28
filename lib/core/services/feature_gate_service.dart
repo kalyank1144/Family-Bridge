@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
-import '../models/user_profile_model.dart';
+
+import 'package:family_bridge/core/models/user_profile_model.dart';
 import 'trial_service.dart';
 
 class FeatureGateService {

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/models/family_model.dart';
-import '../../../core/services/auth_service.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../../../core/services/voice_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/models/family_model.dart';
+import 'package:family_bridge/core/services/auth_service.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/auth/providers/auth_provider.dart';
 
 class FamilySetupScreen extends StatefulWidget {
   const FamilySetupScreen({super.key});

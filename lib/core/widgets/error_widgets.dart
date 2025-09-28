@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/error_service.dart';
+
+import 'package:family_bridge/core/services/error_service.dart';
 
 /// Standard error display widget with consistent styling
 class ErrorWidget extends StatelessWidget {

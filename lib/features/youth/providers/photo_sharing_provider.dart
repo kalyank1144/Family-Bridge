@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:image_picker/image_picker.dart';
-import '../../chat/services/media_service.dart';
+
+import 'package:family_bridge/features/chat/services/media_service.dart';
 
 class PhotoSharingProvider extends ChangeNotifier {
   final MediaService _media = MediaService();

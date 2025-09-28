@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_constants.dart';
+
+import 'package:family_bridge/shared/core/constants/app_constants.dart';
 
 /// A customizable button widget with consistent styling across the app
 class CustomButton extends StatelessWidget {

@@ -1,6 +1,6 @@
-import '../models/user_profile_model.dart';
-import 'trial_service.dart';
+import 'package:family_bridge/core/models/user_profile_model.dart';
 import 'trial_analytics_service.dart';
+import 'trial_service.dart';
 
 class ConversionOptimizationService {
   final TrialService trialService;

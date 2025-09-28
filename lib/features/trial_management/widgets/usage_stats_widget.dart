@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import '../providers/trial_status_provider.dart';
+
+import 'package:family_bridge/features/trial_management/providers/trial_status_provider.dart';
 
 class UsageStatsWidget extends StatelessWidget {
   const UsageStatsWidget({super.key});

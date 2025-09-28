@@ -1,13 +1,16 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../config/env_config.dart';
-import '../models/message_model.dart';
+
 import 'notification_service.dart';
+import 'package:family_bridge/core/config/env_config.dart';
+import 'package:family_bridge/core/models/message_model.dart';
 import 'package:family_bridge/features/chat/services/emergency_service.dart';
 
 @pragma('vm:entry-point')

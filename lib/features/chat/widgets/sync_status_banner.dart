@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../services/offline/offline_manager.dart';
-import '../../../services/network/network_manager.dart';
+import 'package:family_bridge/services/network/network_manager.dart';
+import 'package:family_bridge/services/offline/offline_manager.dart';
 
 final syncStatusProvider = StreamProvider<SyncStatus>((ref) {
   return OfflineManager.instance.statusStream;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../caregiver/models/family_member.dart';
+
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
 
 class FamilyAvatarRow extends StatelessWidget {
   final List<FamilyMember> family;

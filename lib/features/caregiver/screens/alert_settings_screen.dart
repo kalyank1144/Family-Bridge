@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../providers/alert_provider.dart';
-import '../models/alert.dart';
-import '../../../core/services/notification_preferences_service.dart';
-import '../../../core/models/notification_preferences.dart';
-import '../../auth/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/models/notification_preferences.dart';
+import 'package:family_bridge/core/services/notification_preferences_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/auth/providers/auth_provider.dart';
+import 'package:family_bridge/features/caregiver/models/alert.dart';
+import 'package:family_bridge/features/caregiver/providers/alert_provider.dart';
 
 class AlertSettingsScreen extends StatelessWidget {
   const AlertSettingsScreen({super.key});

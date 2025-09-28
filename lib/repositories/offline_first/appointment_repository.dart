@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '../../models/hive/appointment_model.dart';
 import 'base_offline_repository.dart';
+import 'package:family_bridge/models/hive/appointment_model.dart';
 
 class AppointmentRepository extends BaseOfflineRepository<HiveAppointment> {
   AppointmentRepository({required Box<HiveAppointment> box})

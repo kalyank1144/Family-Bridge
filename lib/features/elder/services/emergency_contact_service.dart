@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
+
 import 'package:uuid/uuid.dart';
 
-import '../../../repositories/offline_first/emergency_contact_repository.dart';
-import '../../../services/sync/data_sync_service.dart';
-import '../../../models/hive/emergency_contact_model.dart';
-import '../models/emergency_contact_model.dart';
+import 'package:family_bridge/features/elder/models/emergency_contact_model.dart';
+import 'package:family_bridge/models/hive/emergency_contact_model.dart';
+import 'package:family_bridge/repositories/offline_first/emergency_contact_repository.dart';
+import 'package:family_bridge/services/sync/data_sync_service.dart';
 
 class EmergencyContactService {
   final _uuid = const Uuid();

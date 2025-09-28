@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../providers/subscription_provider.dart';
-import '../models/payment_method.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/subscription/models/payment_method.dart';
+import 'package:family_bridge/features/subscription/providers/subscription_provider.dart';
 
 /// Screen for upgrading from trial to premium subscription
 class TrialUpgradeScreen extends StatefulWidget {

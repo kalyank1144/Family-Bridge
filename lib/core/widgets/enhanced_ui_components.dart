@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../utils/accessibility_helper.dart';
+
+import 'package:family_bridge/core/utils/accessibility_helper.dart';
 
 // Enhanced button with multiple styles and states
 class EnhancedButton extends StatefulWidget {

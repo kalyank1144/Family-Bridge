@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import '../providers/achievements_provider.dart';
-import '../../../core/services/gamification_service.dart';
+
+import 'package:family_bridge/core/services/gamification_service.dart';
+import 'package:family_bridge/features/youth/providers/achievements_provider.dart';
 
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});

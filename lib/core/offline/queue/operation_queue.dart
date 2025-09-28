@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
-import '../storage/local_storage_manager.dart';
-import '../models/offline_operation.dart';
+
+import 'package:family_bridge/core/offline/models/offline_operation.dart';
+import 'package:family_bridge/core/offline/storage/local_storage_manager.dart';
 
 class OperationQueue {
   final LocalStorageManager storageManager;

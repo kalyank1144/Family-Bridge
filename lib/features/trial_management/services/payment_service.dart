@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
-import '../models/subscription_model.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
 
 class PaymentService {
   // Stripe configuration

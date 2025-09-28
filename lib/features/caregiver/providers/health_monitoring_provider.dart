@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/health_data.dart';
-import '../services/health_data_service.dart';
+
+import 'package:family_bridge/features/caregiver/models/health_data.dart';
+import 'package:family_bridge/features/caregiver/services/health_data_service.dart';
 
 class HealthMonitoringProvider extends ChangeNotifier {
   final HealthDataService _service = HealthDataService();

@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
-import '../../../core/models/user_profile_model.dart';
-import '../../../core/services/trial_service.dart';
-import '../../../core/services/feature_gate_service.dart';
-import '../../../core/services/conversion_optimization_service.dart';
-import '../../../core/services/trial_analytics_service.dart';
+
+import 'package:family_bridge/core/models/user_profile_model.dart';
+import 'package:family_bridge/core/services/conversion_optimization_service.dart';
+import 'package:family_bridge/core/services/feature_gate_service.dart';
+import 'package:family_bridge/core/services/trial_analytics_service.dart';
+import 'package:family_bridge/core/services/trial_service.dart';
 
 class TrialStatusProvider extends ChangeNotifier {
   final TrialService trialService;

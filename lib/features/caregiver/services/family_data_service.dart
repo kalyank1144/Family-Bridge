@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/family_member.dart';
+
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
 
 class FamilyDataService {
   final SupabaseClient _supabase = Supabase.instance.client;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../services/admin_subscription_service.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/admin/subscription_management/services/admin_subscription_service.dart';
 
 class AdminActionsScreen extends StatefulWidget {
   const AdminActionsScreen({super.key});

@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import '../models/message_model.dart';
-import '../models/presence_model.dart';
-import '../services/chat_service.dart';
+
+import 'package:family_bridge/features/chat/models/message_model.dart';
+import 'package:family_bridge/features/chat/models/presence_model.dart';
+import 'package:family_bridge/features/chat/services/chat_service.dart';
 
 class ChatProvider extends ChangeNotifier {
   final ChatService _chatService = ChatService.instance;

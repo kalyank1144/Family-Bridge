@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:intl/intl.dart';
-import '../providers/alert_provider.dart';
-import '../models/alert.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/notification_service.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/services/notification_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/alert.dart';
+import 'package:family_bridge/features/caregiver/providers/alert_provider.dart';
 
 /// Enhanced Alert Management Screen showcasing comprehensive AlertProvider integration
 /// Features: alert creation, management, filtering, real-time updates, and escalation

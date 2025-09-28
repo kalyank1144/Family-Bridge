@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:confetti/confetti.dart';
-import '../models/subscription_model.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
 
 class SubscriptionSuccessScreen extends StatefulWidget {
   final SubscriptionModel subscription;

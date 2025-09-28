@@ -1,19 +1,21 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/models/user_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../../../core/services/auth_service.dart';
-import '../../../core/services/notification_service.dart';
-import '../../../core/services/offline_payment_service.dart';
-import '../../../core/services/payment_service.dart';
-import '../../../core/services/subscription_backend_service.dart';
-import '../../../core/services/subscription_error_handler.dart';
-import '../../../core/services/subscription_lifecycle_service.dart';
-import '../models/payment_method.dart';
-import '../models/subscription_status.dart';
+
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/core/services/auth_service.dart';
+import 'package:family_bridge/core/services/notification_service.dart';
+import 'package:family_bridge/core/services/offline_payment_service.dart';
+import 'package:family_bridge/core/services/payment_service.dart';
+import 'package:family_bridge/core/services/subscription_backend_service.dart';
+import 'package:family_bridge/core/services/subscription_error_handler.dart';
+import 'package:family_bridge/core/services/subscription_lifecycle_service.dart';
+import 'package:family_bridge/features/subscription/models/payment_method.dart';
+import 'package:family_bridge/features/subscription/models/subscription_status.dart';
 
 /// Provider for managing subscription state and operations
 class SubscriptionProvider extends ChangeNotifier {

@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'package:flutter/material.dart';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../features/subscription/models/payment_method.dart';
 import 'notification_service.dart';
+import 'package:family_bridge/features/subscription/models/payment_method.dart';
 import 'subscription_backend_service.dart';
 import 'subscription_error_handler.dart';
 

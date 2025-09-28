@@ -1,70 +1,71 @@
 import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
 
 // Core imports
-import '../models/user_model.dart';
+import 'package:family_bridge/core/models/user_model.dart';
 
 // Auth imports
-import '../../features/auth/providers/auth_provider.dart';
-import '../../features/auth/screens/login_screen.dart';
-import '../../features/auth/screens/signup_screen.dart';
-import '../../features/auth/screens/forgot_password_screen.dart';
-import '../../features/auth/screens/profile_setup_screen.dart';
-import '../../features/auth/screens/profile_screen.dart';
-import '../../features/auth/screens/family_setup_screen.dart';
-import '../../features/auth/screens/family_members_screen.dart';
-import '../../features/auth/screens/onboarding_screen.dart';
+import 'package:family_bridge/features/auth/providers/auth_provider.dart';
+import 'package:family_bridge/features/auth/screens/login_screen.dart';
+import 'package:family_bridge/features/auth/screens/signup_screen.dart';
+import 'package:family_bridge/features/auth/screens/forgot_password_screen.dart';
+import 'package:family_bridge/features/auth/screens/profile_setup_screen.dart';
+import 'package:family_bridge/features/auth/screens/profile_screen.dart';
+import 'package:family_bridge/features/auth/screens/family_setup_screen.dart';
+import 'package:family_bridge/features/auth/screens/family_members_screen.dart';
+import 'package:family_bridge/features/auth/screens/onboarding_screen.dart';
 
 // Onboarding imports
-import '../../features/onboarding/screens/welcome_screen.dart';
-import '../../features/onboarding/screens/user_type_selection_screen.dart';
-import '../../features/onboarding/providers/user_type_provider.dart';
+import 'package:family_bridge/features/onboarding/screens/welcome_screen.dart';
+import 'package:family_bridge/features/onboarding/screens/user_type_selection_screen.dart';
+import 'package:family_bridge/features/onboarding/providers/user_type_provider.dart';
 
 // Caregiver imports
-import '../../features/caregiver/screens/caregiver_dashboard_screen.dart';
-import '../../features/caregiver/screens/health_monitoring_screen.dart';
-import '../../features/caregiver/screens/appointments_calendar_screen.dart';
-import '../../features/caregiver/screens/family_member_detail_screen.dart';
-import '../../features/caregiver/screens/add_appointment_screen.dart';
-import '../../features/caregiver/screens/alert_settings_screen.dart';
-import '../../features/caregiver/screens/reports_screen.dart';
-import '../../features/caregiver/screens/advanced_health_monitoring_screen.dart';
-import '../../features/caregiver/screens/care_plan_screen.dart';
-import '../../features/caregiver/screens/professional_reports_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/caregiver_dashboard_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/health_monitoring_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/appointments_calendar_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/family_member_detail_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/add_appointment_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/alert_settings_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/reports_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/advanced_health_monitoring_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/care_plan_screen.dart';
+import 'package:family_bridge/features/caregiver/screens/professional_reports_screen.dart';
 
 // Admin imports
-import '../../features/admin/screens/compliance_dashboard_screen.dart';
-import '../../features/admin/screens/audit_logs_screen.dart';
+import 'package:family_bridge/features/admin/screens/compliance_dashboard_screen.dart';
+import 'package:family_bridge/features/admin/screens/audit_logs_screen.dart';
 
 // Elder imports
-import '../../features/elder/screens/elder_home_screen.dart';
-import '../../features/elder/screens/emergency_contacts_screen.dart';
-import '../../features/elder/screens/medication_reminder_screen.dart';
-import '../../features/elder/screens/daily_checkin_screen.dart';
-import '../../features/elder/screens/family_chat_screen.dart' as elder_chat;
+import 'package:family_bridge/features/elder/screens/elder_home_screen.dart';
+import 'package:family_bridge/features/elder/screens/emergency_contacts_screen.dart';
+import 'package:family_bridge/features/elder/screens/medication_reminder_screen.dart';
+import 'package:family_bridge/features/elder/screens/daily_checkin_screen.dart';
+import 'package:family_bridge/features/elder/screens/family_chat_screen.dart' as elder_chat;
 
 // Youth imports
-import '../../features/youth/screens/youth_home_dashboard.dart';
-import '../../features/youth/screens/story_recording_screen.dart';
-import '../../features/youth/screens/youth_games_screen.dart';
-import '../../features/youth/screens/photo_sharing_screen.dart';
+import 'package:family_bridge/features/youth/screens/youth_home_dashboard.dart';
+import 'package:family_bridge/features/youth/screens/story_recording_screen.dart';
+import 'package:family_bridge/features/youth/screens/youth_games_screen.dart';
+import 'package:family_bridge/features/youth/screens/photo_sharing_screen.dart';
 
 // Chat imports
-import '../../features/chat/screens/family_chat_screen.dart';
-import '../../features/chat/screens/chat_settings_screen.dart';
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/chat/screens/chat_settings_screen.dart';
 
 // Additional admin imports
-import '../../features/admin/screens/secure_authentication_screen.dart';
+import 'package:family_bridge/features/admin/screens/secure_authentication_screen.dart';
 
 // Subscription & Trial imports
-import '../../features/subscription/screens/trial_upgrade_screen.dart';
-import '../../features/subscription/screens/payment_methods_screen.dart';
-import '../../features/subscription/screens/subscription_settings_screen.dart';
-import '../../features/admin/subscription_dashboard/screens/subscription_metrics_screen.dart';
-import '../../features/admin/subscription_dashboard/screens/trial_performance_screen.dart';
-import '../../features/admin/subscription_management/screens/admin_actions_screen.dart';
-import '../../features/admin/reports/screens/weekly_report_screen.dart';
-import '../../features/admin/revenue_forecast/screens/revenue_forecast_screen.dart';
+import 'package:family_bridge/features/subscription/screens/trial_upgrade_screen.dart';
+import 'package:family_bridge/features/subscription/screens/payment_methods_screen.dart';
+import 'package:family_bridge/features/subscription/screens/subscription_settings_screen.dart';
+import 'package:family_bridge/features/admin/subscription_dashboard/screens/subscription_metrics_screen.dart';
+import 'package:family_bridge/features/admin/subscription_dashboard/screens/trial_performance_screen.dart';
+import 'package:family_bridge/features/admin/subscription_management/screens/admin_actions_screen.dart';
+import 'package:family_bridge/features/admin/reports/screens/weekly_report_screen.dart';
+import 'package:family_bridge/features/admin/revenue_forecast/screens/revenue_forecast_screen.dart';
 
 /// Centralized application router with authentication and role-based routing
 class AppRouter {

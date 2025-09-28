@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:io';
-import '../../../services/offline/offline_manager.dart';
-import '../../../services/network/network_manager.dart';
-import '../../../repositories/offline_first/daily_checkin_repository.dart';
-import '../../../repositories/offline_first/medication_repository.dart';
-import '../../../repositories/offline_first/emergency_contact_repository.dart';
-import '../../../core/services/voice_service.dart';
-import '../models/daily_checkin_model.dart';
-import '../models/medication_model.dart';
-import '../models/emergency_contact_model.dart';
+
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/features/elder/models/daily_checkin_model.dart';
+import 'package:family_bridge/features/elder/models/emergency_contact_model.dart';
+import 'package:family_bridge/features/elder/models/medication_model.dart';
+import 'package:family_bridge/repositories/offline_first/daily_checkin_repository.dart';
+import 'package:family_bridge/repositories/offline_first/emergency_contact_repository.dart';
+import 'package:family_bridge/repositories/offline_first/medication_repository.dart';
+import 'package:family_bridge/services/network/network_manager.dart';
+import 'package:family_bridge/services/offline/offline_manager.dart';
 
 /// Service to test offline functionality for elder interface
 class OfflineTestService {

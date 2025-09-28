@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+
 import 'package:intl/intl.dart';
-import '../providers/elder_provider.dart';
-import '../widgets/action_card.dart';
-import '../widgets/weather_widget.dart';
-import '../widgets/voice_navigation_widget.dart';
-import 'emergency_contacts_screen.dart';
-import 'medication_reminder_screen.dart';
+import 'package:provider/provider.dart';
+
 import 'daily_checkin_screen.dart';
+import 'emergency_contacts_screen.dart';
 import 'family_chat_screen.dart';
-import '../../../core/services/voice_service.dart';
-import '../../../core/theme/app_theme.dart';
+import 'medication_reminder_screen.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/elder/providers/elder_provider.dart';
+import 'package:family_bridge/features/elder/widgets/action_card.dart';
+import 'package:family_bridge/features/elder/widgets/voice_navigation_widget.dart';
+import 'package:family_bridge/features/elder/widgets/weather_widget.dart';
 
 class ElderHomeScreen extends StatefulWidget {
   const ElderHomeScreen({super.key});

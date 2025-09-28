@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:provider/provider.dart';
-import '../providers/story_recording_provider.dart';
+
+import 'package:family_bridge/features/youth/providers/story_recording_provider.dart';
 import 'waveform_visualizer.dart';
 
 class AudioRecordingWidget extends StatefulWidget {
