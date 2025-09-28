@@ -11,5 +11,6 @@
     "types": ["node"],
     "baseUrl": "."
   },
-  "include": ["security/src", "scripts"]
+  "include": ["security/src", "scripts"],
+  "exclude": ["supabase/**", "caregiver-dashboard/**", "lib/**", "android/**", "ios/**"]
 }
