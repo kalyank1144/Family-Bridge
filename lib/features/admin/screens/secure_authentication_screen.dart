@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/access_control_service.dart';
-import '../providers/hipaa_compliance_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/services/access_control_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/admin/providers/hipaa_compliance_provider.dart';
 
 class SecureAuthenticationScreen extends StatefulWidget {
   const SecureAuthenticationScreen({super.key});

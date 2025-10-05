@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../services/hipaa_audit_service.dart';
-import '../services/access_control_service.dart';
-import '../services/encryption_service.dart';
-import '../../features/admin/providers/hipaa_compliance_provider.dart';
+
+import 'package:family_bridge/core/services/access_control_service.dart';
+import 'package:family_bridge/core/services/encryption_service.dart';
+import 'package:family_bridge/core/services/hipaa_audit_service.dart';
+import 'package:family_bridge/features/admin/providers/hipaa_compliance_provider.dart';
 
 /// Mixin to add HIPAA compliance features to any screen
 mixin HipaaComplianceMixin<T extends StatefulWidget> on State<T> {

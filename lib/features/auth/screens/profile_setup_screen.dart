@@ -1,18 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
-import '../../../core/models/user_model.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/loading_states.dart';
-import '../../../core/widgets/success_animations.dart';
-import '../../../core/widgets/form_validation.dart';
-import '../../../core/widgets/enhanced_ui_components.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../../../core/services/voice_service.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/core/widgets/enhanced_ui_components.dart';
+import 'package:family_bridge/core/widgets/form_validation.dart';
+import 'package:family_bridge/core/widgets/loading_states.dart';
+import 'package:family_bridge/core/widgets/success_animations.dart';
+import 'package:family_bridge/features/auth/providers/auth_provider.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});

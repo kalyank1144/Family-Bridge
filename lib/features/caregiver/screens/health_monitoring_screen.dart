@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/mixins/hipaa_compliance_mixin.dart';
-import '../../../core/services/access_control_service.dart';
-import '../providers/family_data_provider.dart';
-import '../providers/health_monitoring_provider.dart';
-import '../models/family_member.dart';
-import '../widgets/vitals_card.dart';
-import '../widgets/medication_compliance_card.dart';
-import '../widgets/mood_chart.dart';
-import '../widgets/daily_checkin_card.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/mixins/hipaa_compliance_mixin.dart';
+import 'package:family_bridge/core/services/access_control_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/health_monitoring_provider.dart';
+import 'package:family_bridge/features/caregiver/widgets/daily_checkin_card.dart';
+import 'package:family_bridge/features/caregiver/widgets/medication_compliance_card.dart';
+import 'package:family_bridge/features/caregiver/widgets/mood_chart.dart';
+import 'package:family_bridge/features/caregiver/widgets/vitals_card.dart';
 
 class HealthMonitoringScreen extends StatefulWidget {
   final String memberId;

@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '../../models/hive/emergency_contact_model.dart';
 import 'base_offline_repository.dart';
+import 'package:family_bridge/models/hive/emergency_contact_model.dart';
 
 class EmergencyContactRepository extends BaseOfflineRepository<HiveEmergencyContact> {
   EmergencyContactRepository({required Box<HiveEmergencyContact> box})

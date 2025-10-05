@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import '../../../core/theme/app_theme.dart';
-import '../models/health_data.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/health_data.dart';
 
 class MedicationComplianceCard extends StatelessWidget {
   final double compliance;

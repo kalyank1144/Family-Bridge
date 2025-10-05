@@ -1,16 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../providers/elder_provider.dart';
-import '../models/emergency_contact_model.dart';
-import '../../../core/services/voice_service.dart';
-import '../../../core/theme/app_theme.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import '../../elder/widgets/voice_checkin_widget.dart';
-import '../../../services/storage/media_storage_service.dart';
+
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/elder/models/emergency_contact_model.dart';
+import 'package:family_bridge/features/elder/providers/elder_provider.dart';
+import 'package:family_bridge/features/elder/widgets/voice_checkin_widget.dart';
+import 'package:family_bridge/services/storage/media_storage_service.dart';
 
 class EmergencyContactsScreen extends StatefulWidget {
   const EmergencyContactsScreen({super.key});
@@ -215,7 +218,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                               },
                             ),
                 ),
-
 
                 // Emergency Actions Bar
                 Container(

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum UserType { elder, caregiver, youth }

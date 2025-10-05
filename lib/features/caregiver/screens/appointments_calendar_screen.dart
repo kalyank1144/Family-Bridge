@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
-import '../providers/appointments_provider.dart';
-import '../providers/family_data_provider.dart';
-import '../models/appointment.dart';
-import '../widgets/appointment_card.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/appointment.dart';
+import 'package:family_bridge/features/caregiver/providers/appointments_provider.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
+import 'package:family_bridge/features/caregiver/widgets/appointment_card.dart';
 
 class AppointmentsCalendarScreen extends StatefulWidget {
   const AppointmentsCalendarScreen({super.key});

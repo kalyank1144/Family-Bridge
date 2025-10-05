@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../models/alert.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/alert.dart';
 
 class AlertPanel extends StatelessWidget {
   final List<Alert> alerts;

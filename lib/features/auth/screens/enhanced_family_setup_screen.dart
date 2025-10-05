@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../caregiver/providers/family_data_provider.dart';
-import '../../shared/models/family_model.dart';
-import '../../shared/models/user_model.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/auth_service.dart';
+
+import 'package:family_bridge/core/services/auth_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/providers/family_data_provider.dart';
+import 'package:family_bridge/features/shared/models/family_model.dart';
+import 'package:family_bridge/features/shared/models/user_model.dart';
 
 /// Enhanced Family Setup Screen showcasing comprehensive FamilyDataProvider integration
 /// Features: family creation, member invitations, role assignment, privacy settings

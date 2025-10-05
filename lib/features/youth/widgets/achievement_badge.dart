@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/gamification_service.dart';
+
+import 'package:family_bridge/core/services/gamification_service.dart';
 
 class AchievementBadge extends StatelessWidget {
   final Achievement achievement;

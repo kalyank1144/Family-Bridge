@@ -1,7 +1,9 @@
 import 'dart:developer' as developer;
+
 import 'package:flutter/foundation.dart';
-import '../core/config/env_config.dart';
-import '../core/constants/app_constants.dart';
+
+import 'package:family_bridge/shared/core/config/env_config.dart';
+import 'package:family_bridge/shared/core/constants/app_constants.dart';
 
 /// Service for tracking user events and app analytics
 class AnalyticsService {

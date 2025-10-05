@@ -1,6 +1,8 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
+
+import 'package:audioplayers/audioplayers.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
 
 class VoiceNotePlayer extends StatefulWidget {
   final String urlOrPath;

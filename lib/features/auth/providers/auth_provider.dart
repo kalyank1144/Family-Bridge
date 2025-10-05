@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/models/user_model.dart';
-import '../../../core/services/auth_service.dart';
-import '../../../core/services/push_notification_service.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/core/services/auth_service.dart';
+import 'package:family_bridge/core/services/push_notification_service.dart';
 
 enum AuthStatus { unknown, unauthenticated, authenticated, onboarding }
 

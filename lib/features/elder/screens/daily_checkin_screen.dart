@@ -1,21 +1,21 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:record/record.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:async';
-import '../providers/elder_provider.dart';
-import '../models/daily_checkin_model.dart';
-import '../../../core/services/voice_service.dart';
-import '../../../core/theme/app_theme.dart';
-
-import '../widgets/elder_image_picker.dart';
-import '../widgets/voice_checkin_widget.dart';
-import '../../../services/storage/media_storage_service.dart';
-
-import '../../../core/services/storage_service.dart';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:record/record.dart';
+
+import 'package:family_bridge/core/services/storage_service.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/elder/models/daily_checkin_model.dart';
+import 'package:family_bridge/features/elder/providers/elder_provider.dart';
+import 'package:family_bridge/features/elder/widgets/elder_image_picker.dart';
+import 'package:family_bridge/features/elder/widgets/voice_checkin_widget.dart';
+import 'package:family_bridge/services/storage/media_storage_service.dart';
 
 class DailyCheckinScreen extends StatefulWidget {
   const DailyCheckinScreen({super.key});

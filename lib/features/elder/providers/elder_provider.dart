@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/medication_model.dart';
-import '../models/emergency_contact_model.dart';
-import '../models/daily_checkin_model.dart';
-import '../services/medication_service.dart';
-import '../services/emergency_contact_service.dart';
-import '../services/daily_checkin_service.dart';
+
+import 'package:family_bridge/features/elder/models/daily_checkin_model.dart';
+import 'package:family_bridge/features/elder/models/emergency_contact_model.dart';
+import 'package:family_bridge/features/elder/models/medication_model.dart';
+import 'package:family_bridge/features/elder/services/daily_checkin_service.dart';
+import 'package:family_bridge/features/elder/services/emergency_contact_service.dart';
+import 'package:family_bridge/features/elder/services/medication_service.dart';
 
 class ElderProvider extends ChangeNotifier {
   final _supabase = Supabase.instance.client;
@@ -171,7 +173,6 @@ class ElderProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   Future<List<Medication>> getTodayDueMedications() async {
     await _medicationService.initialize();

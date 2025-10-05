@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
 
 class LargeActionButton extends StatelessWidget {
   final IconData icon;

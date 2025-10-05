@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:crypto/crypto.dart';
+
 import 'package:flutter/foundation.dart';
+
+import 'package:crypto/crypto.dart';
 
 enum AuditEventType {
   // PHI Access Events

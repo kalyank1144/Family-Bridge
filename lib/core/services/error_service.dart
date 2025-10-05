@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import 'package:logging/logging.dart';
 
 /// Centralized error handling and logging service

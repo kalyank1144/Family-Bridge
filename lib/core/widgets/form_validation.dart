@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:async';
-import '../utils/accessibility_helper.dart';
+
+import 'package:family_bridge/core/utils/accessibility_helper.dart';
 
 // Enhanced form field with real-time validation
 class ValidatedFormField extends StatefulWidget {

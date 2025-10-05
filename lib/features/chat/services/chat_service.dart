@@ -1,21 +1,23 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+
+import 'package:hive/hive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:hive/hive.dart';
 
-import '../../../repositories/offline_first/chat_repository.dart';
-import '../../../services/network/network_manager.dart';
-import '../../../services/offline/offline_manager.dart';
-import '../../../services/sync/data_sync_service.dart';
-import '../../../services/sync/sync_queue.dart';
-import '../../../core/models/message_model.dart';
-import '../../../core/services/notification_service.dart';
-import '../../../core/services/notification_preferences_service.dart';
-import '../../../core/services/notification_router.dart';
-import '../../../core/models/notification_preferences.dart';
-import '../models/presence_model.dart';
+import 'package:family_bridge/core/models/message_model.dart';
+import 'package:family_bridge/core/models/notification_preferences.dart';
+import 'package:family_bridge/core/services/notification_preferences_service.dart';
+import 'package:family_bridge/core/services/notification_router.dart';
+import 'package:family_bridge/core/services/notification_service.dart';
+import 'package:family_bridge/features/chat/models/presence_model.dart';
+import 'package:family_bridge/repositories/offline_first/chat_repository.dart';
+import 'package:family_bridge/services/network/network_manager.dart';
+import 'package:family_bridge/services/offline/offline_manager.dart';
+import 'package:family_bridge/services/sync/data_sync_service.dart';
+import 'package:family_bridge/services/sync/sync_queue.dart';
 
 class ChatService {
   final SupabaseClient _supabase = Supabase.instance.client;

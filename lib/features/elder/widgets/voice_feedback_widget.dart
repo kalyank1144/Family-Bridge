@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/voice_service.dart';
+
+import 'package:family_bridge/core/services/voice_service.dart';
 
 class VoiceFeedbackWidget extends StatefulWidget {
   final String message;

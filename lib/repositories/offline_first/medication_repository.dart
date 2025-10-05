@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '../../models/hive/medication_model.dart';
 import 'base_offline_repository.dart';
+import 'package:family_bridge/models/hive/medication_model.dart';
 
 class MedicationRepository extends BaseOfflineRepository<HiveMedicationSchedule> {
   MedicationRepository({required Box<HiveMedicationSchedule> box})

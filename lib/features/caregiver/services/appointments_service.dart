@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../repositories/offline_first/appointment_repository.dart';
-import '../../../services/sync/data_sync_service.dart';
-import '../../../models/hive/appointment_model.dart';
-import '../models/appointment.dart';
-import '../../../core/services/notification_service.dart';
+import 'package:family_bridge/core/services/notification_service.dart';
+import 'package:family_bridge/features/caregiver/models/appointment.dart';
+import 'package:family_bridge/models/hive/appointment_model.dart';
+import 'package:family_bridge/repositories/offline_first/appointment_repository.dart';
+import 'package:family_bridge/services/sync/data_sync_service.dart';
 
 class AppointmentsService {
   final SupabaseClient _supabase = Supabase.instance.client;

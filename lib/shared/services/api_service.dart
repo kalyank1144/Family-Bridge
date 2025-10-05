@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/config/env_config.dart';
-import '../core/constants/app_constants.dart';
+
+import 'package:family_bridge/shared/core/config/env_config.dart';
+import 'package:family_bridge/shared/core/constants/app_constants.dart';
 
 /// Base API service for handling HTTP requests
 class ApiService {

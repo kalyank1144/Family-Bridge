@@ -1,6 +1,7 @@
 import 'dart:math';
-import '../../features/caregiver/models/family_member.dart';
-import '../../features/caregiver/models/health_data.dart';
+
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
+import 'package:family_bridge/features/caregiver/models/health_data.dart';
 
 class HealthAnomaly {
   final String memberId;

@@ -2,17 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
+import 'package:crypto/crypto.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/user_model.dart';
-import '../models/family_model.dart';
 import 'hipaa_audit_service.dart';
+import 'package:family_bridge/core/models/family_model.dart';
+import 'package:family_bridge/core/models/user_model.dart';
 
 /// Device information for authentication
 class DeviceInfo {

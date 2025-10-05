@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../core/models/user_model.dart';
-import '../../features/subscription/models/payment_method.dart';
-import '../../features/subscription/models/subscription_status.dart';
 import 'notification_service.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/features/subscription/models/payment_method.dart';
+import 'package:family_bridge/features/subscription/models/subscription_status.dart';
 import 'subscription_backend_service.dart';
 import 'subscription_lifecycle_service.dart';
 

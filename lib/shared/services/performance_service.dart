@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import '../core/config/env_config.dart';
+
 import 'analytics_service.dart';
+import 'package:family_bridge/shared/core/config/env_config.dart';
 
 /// Service for monitoring app performance and health
 class PerformanceService {

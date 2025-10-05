@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '../utils/accessibility_helper.dart';
+
+import 'package:flutter/material.dart';
+
+import 'package:family_bridge/core/utils/accessibility_helper.dart';
 
 // Animated success checkmark
 class AnimatedCheckmark extends StatefulWidget {

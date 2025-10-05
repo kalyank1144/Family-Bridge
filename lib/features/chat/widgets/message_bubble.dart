@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:intl/intl.dart';
-import '../../../core/models/message_model.dart';
-import 'voice_message_player.dart';
+
 import 'message_reactions.dart';
+import 'package:family_bridge/core/models/message_model.dart';
+import 'voice_message_player.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;

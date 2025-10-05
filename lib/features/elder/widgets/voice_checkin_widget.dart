@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../services/storage/media_storage_service.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/services/storage/media_storage_service.dart';
 import 'voice_note_player.dart';
 
 class VoiceCheckinWidget extends StatefulWidget {

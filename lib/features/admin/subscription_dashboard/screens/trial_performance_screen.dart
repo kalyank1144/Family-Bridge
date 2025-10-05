@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/services/subscription_analytics_service.dart';
+
+import 'package:family_bridge/core/services/subscription_analytics_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
 
 class TrialPerformanceScreen extends StatefulWidget {
   const TrialPerformanceScreen({super.key});

@@ -1,15 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../models/hive/health_data_model.dart';
-import '../../../repositories/offline_first/health_repository.dart';
-import '../../../services/network/network_manager.dart';
-import '../../../services/offline/offline_manager.dart';
-import '../../../services/sync/data_sync_service.dart';
-import '../models/health_data.dart';
+import 'package:family_bridge/features/caregiver/models/health_data.dart';
+import 'package:family_bridge/models/hive/health_data_model.dart';
+import 'package:family_bridge/repositories/offline_first/health_repository.dart';
+import 'package:family_bridge/services/network/network_manager.dart';
+import 'package:family_bridge/services/offline/offline_manager.dart';
+import 'package:family_bridge/services/sync/data_sync_service.dart';
 
 class HealthDataService {
   final SupabaseClient _supabase = Supabase.instance.client;

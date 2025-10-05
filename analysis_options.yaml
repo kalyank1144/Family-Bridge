@@ -15,9 +15,10 @@ analyzer:
     - dart_code_metrics
   
   errors:
+    # Core errors - Keep as errors for safety & correctness
     missing_required_param: error
     missing_return: error
-    unused_import: error
+    unused_import: warning  # Changed to warning to reduce noise during refactoring
     unused_local_variable: warning
     todo: info
     deprecated_member_use_from_same_package: info
@@ -49,7 +50,7 @@ linter:
     unnecessary_statements: true
     valid_regexps: true
     
-    # Style & Formatting
+    # Style & Formatting - Reduced to warnings for less noise
     always_declare_return_types: true
     annotate_overrides: true
     avoid_unnecessary_containers: true
@@ -59,19 +60,19 @@ linter:
     library_names: true
     library_prefixes: true
     non_constant_identifier_names: true
-    prefer_const_constructors: true
+    prefer_const_constructors: false  # Disabled - too noisy
     prefer_const_constructors_in_immutables: true
-    prefer_const_declarations: true
-    prefer_const_literals_to_create_immutables: true
+    prefer_const_declarations: false  # Disabled - too noisy  
+    prefer_const_literals_to_create_immutables: false  # Disabled - too noisy
     prefer_final_fields: true
-    prefer_final_in_for_each: true
-    prefer_final_locals: true
+    prefer_final_in_for_each: false  # Disabled - style preference
+    prefer_final_locals: false  # Disabled - style preference
     prefer_single_quotes: true
-    require_trailing_commas: true
+    require_trailing_commas: false  # Disabled - style preference
     sized_box_for_whitespace: true
-    sort_child_properties_last: true
-    sort_constructors_first: true
-    sort_unnamed_constructors_first: true
+    sort_child_properties_last: false  # Disabled - style preference
+    sort_constructors_first: false  # Disabled - style preference
+    sort_unnamed_constructors_first: false  # Disabled - style preference
     unnecessary_lambdas: true
     unnecessary_parenthesis: true
     unnecessary_string_escapes: true
@@ -79,9 +80,9 @@ linter:
     use_colored_box: true
     use_decorated_box: true
     use_full_hex_values_for_flutter_colors: true
-    use_key_in_widget_constructors: true
+    use_key_in_widget_constructors: false  # Disabled - too noisy
     use_raw_strings: true
-    use_string_buffers: true
+    use_string_buffers: false  # Disabled - performance preference
     use_super_parameters: true
     
     # Performance
@@ -96,14 +97,8 @@ linter:
     prefer_spread_collections: true
     unnecessary_await_in_return: true
     
-    # Widget specific
-    avoid_unnecessary_containers: true
-    prefer_const_constructors_in_immutables: true
-    sized_box_for_whitespace: true
+    # Widget specific - Removed duplicates already covered above
     sized_box_shrink_expand: true
-    use_colored_box: true
-    use_decorated_box: true
-    use_key_in_widget_constructors: true
     
     # Documentation (disabled for initial development, enable for production)
     # public_member_api_docs: true
@@ -119,21 +114,14 @@ linter:
     unawaited_futures: true
     use_build_context_synchronously: false
     
-    # Import organization
-    always_use_package_imports: false
-    avoid_relative_lib_imports: true
+    # Import organization - Consistent policy: prefer package imports
+    always_use_package_imports: true  # Changed to true for consistency
+    avoid_relative_lib_imports: true  # Keep enforcing no relative imports from lib
     directives_ordering: true
     
-    # Flutter specific
+    # Flutter specific - Removed duplicates already covered above  
     avoid_field_initializers_in_const_classes: true
-    avoid_web_libraries_in_flutter: true
-    no_logic_in_create_state: true
-    prefer_const_constructors_in_immutables: true
-    prefer_const_declarations: true
-    prefer_const_literals_to_create_immutables: true
     use_build_context_synchronously: false
-    use_full_hex_values_for_flutter_colors: true
-    use_key_in_widget_constructors: true
     
     # Accessibility & HIPAA compliance
     use_if_null_to_convert_nulls_to_bools: true

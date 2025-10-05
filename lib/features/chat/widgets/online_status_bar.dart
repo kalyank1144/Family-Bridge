@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/presence_model.dart';
-import '../providers/chat_providers.dart';
+
+import 'package:family_bridge/features/chat/models/presence_model.dart';
+import 'package:family_bridge/features/chat/providers/chat_providers.dart';
 
 class OnlineStatusBar extends ConsumerWidget {
   final String familyId;

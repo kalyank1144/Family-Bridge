@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/appointment.dart';
-import '../services/appointments_service.dart';
+
+import 'package:family_bridge/features/caregiver/models/appointment.dart';
+import 'package:family_bridge/features/caregiver/services/appointments_service.dart';
 
 class AppointmentsProvider extends ChangeNotifier {
   final AppointmentsService _service = AppointmentsService();

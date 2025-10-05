@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_tts/flutter_tts.dart';
 
-import '../../../core/services/voice_service.dart';
-import '../../../core/theme/app_theme.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
 
 /// Elder-friendly authentication helper widget
 class ElderAuthHelper extends StatefulWidget {

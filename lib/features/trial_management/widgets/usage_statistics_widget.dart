@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/subscription_model.dart';
-import '../providers/subscription_provider.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
+import 'package:family_bridge/features/trial_management/providers/subscription_provider.dart';
 
 class UsageStatisticsWidget extends ConsumerWidget {
   final bool showFullStats;

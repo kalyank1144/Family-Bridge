@@ -1,16 +1,17 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:stripe_flutter/stripe_flutter.dart' as stripe;
 
-import '../../core/models/user_model.dart';
-import '../../features/subscription/models/payment_method.dart';
-import '../../features/subscription/models/subscription_status.dart';
-import 'subscription_backend_service.dart';
 import 'auth_service.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/features/subscription/models/payment_method.dart';
+import 'package:family_bridge/features/subscription/models/subscription_status.dart';
+import 'subscription_backend_service.dart';
 
 class PaymentService {
   final stripe.Stripe _stripe = stripe.Stripe.instance;

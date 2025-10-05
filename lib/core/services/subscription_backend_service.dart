@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../core/models/user_model.dart';
-import '../../features/subscription/models/subscription_status.dart';
-import '../../features/subscription/models/payment_method.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/features/subscription/models/payment_method.dart';
+import 'package:family_bridge/features/subscription/models/subscription_status.dart';
 
 class SubscriptionBackendService {
   final SupabaseClient _supabase;

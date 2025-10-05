@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
-import '../models/subscription_model.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
 
 class SubscriptionService {
   final String _baseUrl = 'https://api.familybridge.app';

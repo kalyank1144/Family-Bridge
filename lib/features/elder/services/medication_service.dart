@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 import 'package:uuid/uuid.dart';
 
-import '../../../repositories/offline_first/medication_repository.dart';
-import '../../../services/sync/data_sync_service.dart';
-import '../../../models/hive/medication_model.dart';
-import '../models/medication_model.dart';
-import '../../../core/services/notification_service.dart';
-import 'package:flutter/material.dart';
+import 'package:family_bridge/core/services/notification_service.dart';
+import 'package:family_bridge/features/elder/models/medication_model.dart';
+import 'package:family_bridge/models/hive/medication_model.dart';
+import 'package:family_bridge/repositories/offline_first/medication_repository.dart';
+import 'package:family_bridge/services/sync/data_sync_service.dart';
 
 class ElderMedicationService {
   final _uuid = const Uuid();

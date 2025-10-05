@@ -1,19 +1,22 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:image_picker/image_picker.dart';
-import '../providers/photo_sharing_provider.dart';
-import '../providers/youth_provider.dart';
-import '../widgets/care_points_display.dart';
-import '../widgets/family_avatar_row.dart';
-import '../widgets/achievement_badge.dart';
-import '../../chat/services/media_service.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../chat/screens/family_chat_screen.dart';
+import 'package:provider/provider.dart';
+
+import 'achievements_screen.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/chat/services/media_service.dart';
+import 'package:family_bridge/features/youth/providers/photo_sharing_provider.dart';
+import 'package:family_bridge/features/youth/providers/youth_provider.dart';
+import 'package:family_bridge/features/youth/widgets/achievement_badge.dart';
+import 'package:family_bridge/features/youth/widgets/care_points_display.dart';
+import 'package:family_bridge/features/youth/widgets/family_avatar_row.dart';
 import 'photo_sharing_screen.dart';
 import 'story_recording_screen.dart';
 import 'youth_games_screen.dart';
-import 'achievements_screen.dart';
 
 /// Enhanced Youth Dashboard showcasing comprehensive PhotoSharingProvider integration
 /// Features: photo sharing, family connection, care points, achievements, gamification

@@ -2,9 +2,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../core/models/user_model.dart';
-import '../../features/subscription/models/subscription_status.dart';
 import 'notification_service.dart';
+import 'package:family_bridge/core/models/user_model.dart';
+import 'package:family_bridge/features/subscription/models/subscription_status.dart';
 import 'subscription_backend_service.dart';
 
 class SubscriptionLifecycleService {

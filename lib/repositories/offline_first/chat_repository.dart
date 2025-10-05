@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '../../core/models/message_model.dart';
 import 'base_offline_repository.dart';
+import 'package:family_bridge/core/models/message_model.dart';
 
 class ChatRepository extends BaseOfflineRepository<Message> {
   ChatRepository({required Box<Message> box})

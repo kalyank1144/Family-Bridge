@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/hipaa_audit_service.dart';
-import '../../../core/services/access_control_service.dart';
-import '../../../core/services/encryption_service.dart';
-import '../../../core/services/breach_detection_service.dart';
+
+import 'package:family_bridge/core/services/access_control_service.dart';
+import 'package:family_bridge/core/services/breach_detection_service.dart';
+import 'package:family_bridge/core/services/encryption_service.dart';
+import 'package:family_bridge/core/services/hipaa_audit_service.dart';
 
 class HipaaComplianceProvider extends ChangeNotifier {
   final HipaaAuditService _auditService = HipaaAuditService.instance;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../utils/accessibility_helper.dart';
+
+import 'package:family_bridge/core/utils/accessibility_helper.dart';
 
 class LoadingStates {
   // Custom loading indicator with FamilyBridge branding

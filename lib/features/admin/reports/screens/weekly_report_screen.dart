@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../reports/services/report_generator_service.dart';
-import '../../../../core/services/subscription_analytics_service.dart';
+
+import 'package:family_bridge/core/services/subscription_analytics_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/admin/reports/services/report_generator_service.dart';
 
 class WeeklyReportScreen extends StatefulWidget {
   const WeeklyReportScreen({super.key});

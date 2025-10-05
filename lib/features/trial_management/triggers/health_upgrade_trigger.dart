@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/subscription_model.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
 
 class HealthUpgradeTrigger {
   static const List<String> PREMIUM_HEALTH_FEATURES = [

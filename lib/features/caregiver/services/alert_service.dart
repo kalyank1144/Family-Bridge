@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/alert.dart';
+
+import 'package:family_bridge/features/caregiver/models/alert.dart';
 
 class AlertService {
   final SupabaseClient _supabase = Supabase.instance.client;

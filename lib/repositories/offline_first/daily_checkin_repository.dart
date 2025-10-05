@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '../../models/hive/daily_checkin_model.dart';
 import 'base_offline_repository.dart';
+import 'package:family_bridge/models/hive/daily_checkin_model.dart';
 
 class DailyCheckinRepository extends BaseOfflineRepository<HiveDailyCheckin> {
   DailyCheckinRepository({required Box<HiveDailyCheckin> box})

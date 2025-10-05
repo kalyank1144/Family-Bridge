@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:family_bridge/features/trial_management/widgets/trial_countdown_widget.dart';
-import 'package:family_bridge/features/trial_management/widgets/usage_statistics_widget.dart';
-import 'package:family_bridge/features/trial_management/widgets/upgrade_prompt_widget.dart';
-import 'package:family_bridge/features/trial_management/triggers/storage_upgrade_trigger.dart';
-import 'package:family_bridge/features/trial_management/triggers/health_upgrade_trigger.dart';
+
 import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
 import 'package:family_bridge/features/trial_management/providers/subscription_provider.dart';
+import 'package:family_bridge/features/trial_management/triggers/health_upgrade_trigger.dart';
+import 'package:family_bridge/features/trial_management/triggers/storage_upgrade_trigger.dart';
+import 'package:family_bridge/features/trial_management/widgets/trial_countdown_widget.dart';
+import 'package:family_bridge/features/trial_management/widgets/upgrade_prompt_widget.dart';
+import 'package:family_bridge/features/trial_management/widgets/usage_statistics_widget.dart';
 
 /// Example integration for Elder Dashboard
 class ElderDashboardWithTrial extends ConsumerWidget {

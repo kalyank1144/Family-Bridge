@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import '../../../core/theme/app_theme.dart';
-import '../models/family_member.dart';
+
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/caregiver/models/family_member.dart';
 
 class FamilyMemberCard extends StatelessWidget {
   final FamilyMember member;

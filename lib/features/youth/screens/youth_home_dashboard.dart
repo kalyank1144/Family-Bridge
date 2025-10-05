@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import '../../chat/screens/family_chat_screen.dart';
-import '../providers/youth_provider.dart';
-import '../widgets/care_points_display.dart';
-import '../widgets/family_avatar_row.dart';
-import '../widgets/youth_action_card.dart';
-import '../widgets/achievement_badge.dart';
-import '../widgets/leaderboard_widget.dart';
-import 'story_recording_screen.dart';
-import 'photo_sharing_screen.dart';
-import 'youth_games_screen.dart';
-import 'tech_help_screen.dart';
+
 import 'achievements_screen.dart';
+import 'package:family_bridge/features/chat/screens/family_chat_screen.dart';
+import 'package:family_bridge/features/youth/providers/youth_provider.dart';
+import 'package:family_bridge/features/youth/widgets/achievement_badge.dart';
+import 'package:family_bridge/features/youth/widgets/care_points_display.dart';
+import 'package:family_bridge/features/youth/widgets/family_avatar_row.dart';
+import 'package:family_bridge/features/youth/widgets/leaderboard_widget.dart';
+import 'package:family_bridge/features/youth/widgets/youth_action_card.dart';
+import 'photo_sharing_screen.dart';
+import 'story_recording_screen.dart';
+import 'tech_help_screen.dart';
+import 'youth_games_screen.dart';
 
 class YouthHomeDashboard extends StatelessWidget {
   const YouthHomeDashboard({super.key});

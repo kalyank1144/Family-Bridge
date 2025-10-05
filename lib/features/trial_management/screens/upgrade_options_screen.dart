@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/subscription_model.dart';
-import '../providers/subscription_provider.dart';
-import '../services/payment_service.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
+import 'package:family_bridge/features/trial_management/providers/subscription_provider.dart';
+import 'package:family_bridge/features/trial_management/services/payment_service.dart';
 import 'payment_flow_screen.dart';
 
 class UpgradeOptionsScreen extends ConsumerStatefulWidget {

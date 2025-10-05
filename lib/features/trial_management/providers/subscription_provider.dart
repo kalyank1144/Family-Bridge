@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/subscription_model.dart';
-import '../services/subscription_service.dart';
-import '../services/payment_service.dart';
+
+import 'package:family_bridge/features/trial_management/models/subscription_model.dart';
+import 'package:family_bridge/features/trial_management/services/payment_service.dart';
+import 'package:family_bridge/features/trial_management/services/subscription_service.dart';
 
 final subscriptionServiceProvider = Provider<SubscriptionService>((ref) {
   return SubscriptionService();

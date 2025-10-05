@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '../../services/offline/offline_manager.dart';
-import '../../services/sync/sync_queue.dart';
+import 'package:family_bridge/services/offline/offline_manager.dart';
+import 'package:family_bridge/services/sync/sync_queue.dart';
 
 typedef Json = Map<String, dynamic>;
 

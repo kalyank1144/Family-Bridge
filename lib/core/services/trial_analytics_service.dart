@@ -1,5 +1,6 @@
 import 'dart:math';
-import '../models/user_profile_model.dart';
+
+import 'package:family_bridge/core/models/user_profile_model.dart';
 
 class TrialAnalyticsService {
   final Map<String, Duration> _featureTime = {};

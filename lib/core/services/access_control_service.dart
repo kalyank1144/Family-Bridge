@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:crypto/crypto.dart';
+
 import 'package:flutter/foundation.dart';
-import 'hipaa_audit_service.dart';
+
+import 'package:crypto/crypto.dart';
+
 import 'encryption_service.dart';
+import 'hipaa_audit_service.dart';
 
 enum UserRole {
   patient,        // Family members (elders, youth)

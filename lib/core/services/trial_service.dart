@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
-import '../models/user_profile_model.dart';
+
+import 'package:family_bridge/core/models/user_profile_model.dart';
 
 abstract class CacheStore {
   Future<void> setString(String key, String value);

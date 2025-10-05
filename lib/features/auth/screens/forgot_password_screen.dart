@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/services/auth_service.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/voice_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import 'package:family_bridge/core/services/auth_service.dart';
+import 'package:family_bridge/core/services/voice_service.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

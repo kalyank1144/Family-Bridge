@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../providers/subscription_provider.dart';
-import '../models/subscription_status.dart';
-import 'trial_upgrade_screen.dart';
-import 'payment_methods_screen.dart';
 import 'billing_history_screen.dart';
+import 'package:family_bridge/core/theme/app_theme.dart';
+import 'package:family_bridge/features/subscription/models/subscription_status.dart';
+import 'package:family_bridge/features/subscription/providers/subscription_provider.dart';
+import 'payment_methods_screen.dart';
 import 'subscription_settings_screen.dart';
+import 'trial_upgrade_screen.dart';
 
 /// Main subscription management screen with overview and navigation
 class SubscriptionManagementScreen extends StatefulWidget {
