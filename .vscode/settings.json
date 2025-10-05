@@ -1,0 +1,29 @@
+// Monorepo workspace-scoped analyzer settings to prevent cross-project linting/indexing.
+// Root ESLint lints only JS at root (scripts, web service worker). Caregiver dashboard and Flutter are isolated.
+{
+  "eslint.workingDirectories": [
+    { "directory": "./", "changeProcessCWD": true },
+    { "directory": "./caregiver-dashboard", "changeProcessCWD": true }
+  ],
+  "dart.analysisExcludedFolders": [
+    "${workspaceFolder}/caregiver-dashboard",
+    "${workspaceFolder}/security",
+    "${workspaceFolder}/supabase"
+  ],
+  "files.watcherExclude": {
+    "**/node_modules": true,
+    "**/.dart_tool": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/.next": true,
+    "**/.expo": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.dart_tool": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/.next": true,
+    "**/.expo": true
+  }
+}
