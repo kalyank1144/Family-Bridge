@@ -1,297 +1,288 @@
-# FamilyBridge - Intergenerational Care Coordination App
+# FamilyBridge
 
-<img src="https://img.shields.io/badge/Flutter-3.0+-blue.svg" alt="Flutter Version">
-<img src="https://img.shields.io/badge/Dart-3.0+-blue.svg" alt="Dart Version">
-<img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+A comprehensive multi-generational family care coordination app built with Flutter, focusing on accessibility, HIPAA compliance, and seamless communication between family members.
 
-## Overview
+## 📋 Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Development](#development)
+- [Testing](#testing)
+- [Code Quality](#code-quality)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
 
-FamilyBridge is an innovative intergenerational care coordination mobile application designed to bridge the technology gap between elderly family members, their caregivers, and younger family members. The app features three distinct user interfaces optimized for different age groups:
+## 🎯 Overview
 
-- **Elder Interface**: Simplified, voice-first interface with large buttons and high contrast
-- **Caregiver Dashboard**: Comprehensive health monitoring and task coordination
-- **Youth Interface**: Engaging, gamified experience with care points and achievements
+FamilyBridge connects three generations of family members through tailored interfaces:
+- **Elders**: Simplified UI with large buttons, voice control, and easy medication tracking
+- **Caregivers**: Comprehensive health monitoring, appointment management, and family coordination
+- **Youth**: Gamified engagement with story recording, photo sharing, and care points system
 
-## Features
+## ✨ Features
 
-### Elder Interface
-- ✅ Voice-first interaction system
-- ✅ Large, accessible UI elements (60px minimum touch targets)
-- ✅ Emergency contact system with one-tap calling
-- ✅ Medication management with photo verification
-- ✅ Daily check-in with mood tracking
-- ✅ High contrast design optimized for vision impairments
+### For Elders
+- Large, accessible interface with voice control
+- Daily check-ins with voice recording
+- Medication reminders with photo confirmation
+- One-tap emergency contacts
+- Simplified family chat
 
-### Caregiver Dashboard
-- ✅ Real-time health monitoring
-- ✅ Medication compliance tracking
-- ✅ Shared medical appointment calendar
-- ✅ Task delegation and family coordination
-- ✅ Activity and mood analytics
-- ✅ Multi-information display with clear data visualization
+### For Caregivers
+- Real-time health monitoring dashboard
+- Appointment scheduling and reminders
+- Professional health reports generation
+- Family member management
+- Advanced analytics and insights
+- HIPAA-compliant data handling
 
-### Youth Interface
-- ✅ Gamification with care points and achievements
-- ✅ Story recording and sharing
-- ✅ Photo sharing with automatic optimization
-- ✅ Interactive games and activities
-- ✅ Tech helper mode for remote assistance
-- ✅ Modern, engaging UI design
+### For Youth
+- Story recording and sharing
+- Photo memories with family
+- Educational games
+- Care points and achievements
+- Modern chat interface with reactions
 
-### Shared Features
-- ✅ Family chat with voice and text messaging
-- ✅ Real-time synchronization
-- ✅ Secure authentication
-- ✅ Cross-platform support (iOS & Android)
+## 🏗 Architecture
 
-## Technology Stack
-
-- **Frontend**: Flutter 3.0+ / Dart 3.0+
-- **Backend**: Supabase (PostgreSQL, Real-time, Auth, Storage)
-- **State Management**: Provider
-- **Voice Recognition**: speech_to_text, flutter_tts
-- **Permissions**: permission_handler
-- **Health Integration**: health package
-- **UI Components**: Material Design 3
-
-## Project Structure
+The project follows **Clean Architecture** principles with clear separation of concerns:
 
 ```
 lib/
-├── config/
-│   └── app_config.dart          # App-wide configuration
-├── models/
-│   └── user_model.dart          # Data models
-├── routes/
-│   └── app_routes.dart          # Navigation routes
-├── screens/
-│   ├── common/                  # Shared screens
-│   │   ├── welcome_screen.dart
-│   │   ├── user_type_selection_screen.dart
-│   │   └── family_chat_screen.dart
-│   ├── elder/                   # Elder interface screens
-│   │   ├── elder_home_screen.dart
-│   │   ├── elder_emergency_contacts_screen.dart
-│   │   ├── elder_medication_screen.dart
-│   │   └── elder_daily_checkin_screen.dart
-│   ├── caregiver/               # Caregiver interface screens
-│   │   ├── caregiver_home_screen.dart
-│   │   ├── caregiver_health_monitoring_screen.dart
-│   │   └── caregiver_appointments_screen.dart
-│   └── youth/                   # Youth interface screens
-│       ├── youth_home_screen.dart
-│       └── youth_story_time_screen.dart
-├── services/
-│   ├── supabase_service.dart    # Supabase integration
-│   └── auth_service.dart        # Authentication service
-├── utils/
-│   ├── constants.dart           # App constants
-│   ├── helpers.dart             # Helper functions
-│   └── validators.dart          # Form validators
-├── widgets/
-│   ├── elder/                   # Elder interface widgets
-│   │   ├── elder_action_button.dart
-│   │   ├── elder_contact_card.dart
-│   │   └── elder_medication_card.dart
-│   ├── caregiver/               # Caregiver interface widgets
-│   │   ├── family_member_card.dart
-│   │   ├── quick_action_button.dart
-│   │   └── health_metric_card.dart
-│   └── youth/                   # Youth interface widgets
-│       ├── care_points_card.dart
-│       └── youth_action_card.dart
-└── main.dart                    # App entry point
+├── core/           # Core functionality
+├── features/       # Feature modules
+├── models/         # Data models
+├── repositories/   # Data repositories
+├── services/       # Application services
+└── shared/         # Shared resources
 ```
 
-## Getting Started
+### State Management
+- **Provider** for state management (standardized across the app)
+- Reactive UI updates with ChangeNotifier pattern
+- Immutable state with controlled mutations
+
+### Key Technologies
+- **Flutter 3.x** - Cross-platform framework
+- **Supabase** - Backend and authentication
+- **Provider** - State management
+- **GoRouter** - Navigation
+- **Hive** - Local storage
+- **Encryption** - HIPAA-compliant data protection
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
-Before you begin, ensure you have the following installed:
-- Flutter SDK (3.0 or higher)
-- Dart SDK (3.0 or higher)
-- Android Studio / Xcode (for mobile development)
-- Git
+- Flutter SDK >= 3.0.0
+- Dart SDK >= 3.0.0
+- Android Studio / VS Code with Flutter extensions
+- iOS development setup (for iOS builds)
 
 ### Installation
 
-1. **Clone the repository**
+1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/family-bridge.git
-cd family-bridge
+git clone https://github.com/kalyank1144/Family-Bridge.git
+cd Family-Bridge
 ```
 
-2. **Install dependencies**
+2. Install dependencies:
 ```bash
+make setup
+# OR
 flutter pub get
 ```
 
-3. **Configure Supabase**
-
-Create a Supabase project at [https://supabase.com](https://supabase.com)
-
-Update the Supabase configuration in `lib/config/app_config.dart`:
-```dart
-static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-Or use environment variables:
+4. Run the app:
 ```bash
-flutter run --dart-define=SUPABASE_URL=your_url --dart-define=SUPABASE_ANON_KEY=your_key
-```
-
-4. **Run the app**
-```bash
-# For development
+make run
+# OR
 flutter run
-
-# For specific platform
-flutter run -d ios
-flutter run -d android
 ```
 
-## Development
+## 💻 Development
 
-### Code Style
+### Available Commands
 
-This project follows the official [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style) and uses `flutter_lints` for code analysis.
+Use the Makefile for common tasks:
 
-Run linter:
 ```bash
-flutter analyze
+make help          # Show all available commands
+make setup         # Initial project setup
+make clean         # Clean build artifacts
+make format        # Format code
+make analyze       # Analyze code
+make test          # Run all tests
+make coverage      # Generate coverage report
+make build-apk     # Build Android APK
+make build-ios     # Build iOS app
 ```
 
-Format code:
+### Code Generation
+
 ```bash
-flutter format .
+make generate      # Run build_runner once
+make watch         # Watch for changes and regenerate
 ```
 
-### Testing
+### Git Hooks
 
-Run tests:
+Install pre-commit hooks for code quality:
+
 ```bash
-flutter test
+make install-hooks
 ```
 
-### Building
+## 🧪 Testing
 
-Build for release:
+### Test Structure
+
+```
+test/
+├── unit/          # Unit tests
+├── widget/        # Widget tests
+├── helpers/       # Test utilities
+└── fixtures/      # Test data
+integration_test/  # Integration tests
+```
+
+### Running Tests
+
 ```bash
-# Android
-flutter build apk --release
-flutter build appbundle --release
-
-# iOS
-flutter build ios --release
+make test              # Run all tests
+make test-unit         # Run unit tests
+make test-widget       # Run widget tests
+make test-integration  # Run integration tests
+make coverage          # Generate coverage report
 ```
 
-## Configuration
+### Test Coverage
 
-### Android Configuration
-
-Update `android/app/build.gradle`:
-- Minimum SDK: 21
-- Target SDK: 33
-- Compile SDK: 33
-
-### iOS Configuration
-
-Update `ios/Podfile`:
-- iOS Deployment Target: 12.0
-
-Add required permissions in `ios/Runner/Info.plist`:
-```xml
-<key>NSMicrophoneUsageDescription</key>
-<string>We need microphone access for voice recording</string>
-<key>NSCameraUsageDescription</key>
-<string>We need camera access for photo sharing</string>
-<key>NSPhotoLibraryUsageDescription</key>
-<string>We need photo library access for sharing photos</string>
+View coverage reports:
+```bash
+make serve-coverage    # Serve HTML coverage report
+open coverage/html/index.html
 ```
 
-## Environment Variables
+## 📊 Code Quality
 
-Create a `.env` file in the root directory (not committed to git):
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+### Linting & Analysis
+
+The project enforces strict code quality standards:
+
+- **analysis_options.yaml** - Comprehensive linting rules
+- **dart_code_metrics** - Code complexity analysis
+- **Pre-commit hooks** - Automated checks before commit
+
+Run analysis:
+```bash
+make analyze       # Flutter analyze + metrics
+make metrics       # Detailed code metrics
+make lint          # Run linter
+make fix           # Auto-fix issues
 ```
 
-## Contributing
+### Code Standards
+
+- Follow [Effective Dart](https://dart.dev/guides/language/effective-dart) guidelines
+- Use trailing commas for better diffs
+- Maximum line length: 80 characters
+- Consistent naming conventions
+- Comprehensive documentation for public APIs
+
+See [docs/STANDARDS.md](docs/STANDARDS.md) for detailed coding standards.
+
+## 📚 Documentation
+
+### Architecture Documentation
+- [Architecture Overview](docs/ARCHITECTURE.md) - System design and patterns
+- [Code Standards](docs/STANDARDS.md) - Coding guidelines and best practices
+
+### API Documentation
+Generate API documentation:
+```bash
+dart doc .
+```
+
+## 🔧 VS Code Configuration
+
+The project includes VS Code configurations for optimal development:
+
+- **settings.json** - Editor and Flutter settings
+- **launch.json** - Debug configurations
+- **extensions.json** - Recommended extensions
+
+## 🔒 Security & Compliance
+
+### HIPAA Compliance
+- End-to-end encryption for PHI data
+- Audit logging for all data access
+- Automatic session timeout
+- Secure storage with encryption
+
+### Security Features
+- Biometric authentication
+- Secure token storage
+- Certificate pinning
+- Input validation and sanitization
+
+## 🚀 Performance
+
+### Monitoring
+- Built-in performance tracking
+- Memory leak detection
+- Network request monitoring
+- Crash reporting
+
+### Optimization
+- Lazy loading
+- Image caching and compression
+- Code splitting
+- Efficient state management
+
+## 🤝 Contributing
+
+Please read our contributing guidelines before submitting PRs:
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## Architecture Decisions
+### Commit Convention
 
-### Three-Generation Approach
-FamilyBridge's unique three-generation design addresses the needs of elderly users, caregivers, and youth simultaneously within a single platform, creating a sustainable ecosystem of family support.
+Follow conventional commits:
+```
+feat(scope): add new feature
+fix(scope): fix bug
+docs(scope): update documentation
+refactor(scope): refactor code
+test(scope): add tests
+```
 
-### Accessibility-First Design
-Every interface element is designed with accessibility as a primary consideration, including WCAG 2.1 AA compliance standards, screen reader support, and alternative input methods.
+## 📝 License
 
-### Modular Architecture
-The codebase is organized into distinct modules (screens, widgets, models, services, utils) to ensure scalability, maintainability, and code reusability.
+This project is proprietary software. All rights reserved.
 
-### State Management
-Provider is used for state management due to its simplicity, performance, and official support from the Flutter team.
+## 🙏 Acknowledgments
 
-## Security & Privacy
+- Flutter team for the amazing framework
+- Supabase for backend infrastructure
+- All contributors and testers
+- Families using FamilyBridge to stay connected
 
-- End-to-end encryption for sensitive communications
-- HIPAA compliance for healthcare data
-- Role-based access control
-- Secure authentication with Supabase
-- Family-controlled data management
+## 📞 Support
 
-## Roadmap
-
-### Phase 1 - MVP (Current)
-- [x] Basic user interfaces for all three generations
-- [x] Authentication and user management
-- [x] Core features for each interface
-- [x] Supabase integration
-
-### Phase 2 - Enhanced Features
-- [ ] Voice recognition implementation
-- [ ] Health monitoring device integration
-- [ ] Push notifications
-- [ ] Offline mode support
-
-### Phase 3 - AI Features
-- [ ] Communication translation
-- [ ] Predictive health insights
-- [ ] Smart scheduling
-- [ ] Intelligent notifications
-
-### Phase 4 - Integrations
-- [ ] Healthcare provider integration
-- [ ] Pharmacy integration
-- [ ] Telehealth support
-- [ ] Third-party service integration
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Designed based on comprehensive research on intergenerational care coordination
-- Built with Flutter and Supabase
-- Inspired by the need to bridge the technology gap between generations
-
-## Support
-
-For support, email support@familybridge.com or join our Slack channel.
-
-## Contact
-
-Project Link: [https://github.com/yourusername/family-bridge](https://github.com/yourusername/family-bridge)
+For support, email support@familybridge.app or create an issue in this repository.
 
 ---
 
-Made with ❤️ for families everywhere
+Built with ❤️ for families everywhere

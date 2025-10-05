@@ -1,3 +1,4 @@
+
 # Miscellaneous
 *.class
 *.log
@@ -19,11 +20,17 @@ migrate_working_dir/
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-.vscode/
+#.vscode/
+
+
 
 # Flutter/Dart/Pub related
 **/doc/api/
-**/ios/Flutter/.last_build_id
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+
+**/ios/Runner/GeneratedPluginRegistrant.*
+
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -31,6 +38,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+
 
 # Symbolication related
 app.*.symbols
@@ -43,7 +51,19 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# iOS related
+# iOS specific
+
+# Android related
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+
+# iOS/XCode related
+
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside
@@ -60,29 +80,278 @@ app.*.map.json
 **/ios/**/profile
 **/ios/**/xcuserdata
 **/ios/.generated/
-**/ios/Flutter/.last_build_id
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Flutter.podspec
 **/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/ephemeral
+**/ios/Flutter/ephemeral/
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
 **/ios/Flutter/flutter_export_environment.sh
+
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
+# Android specific
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
 
-# Environment files
+# Web specific
+lib/generated_plugin_registrant.dart
+
+# Windows specific
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+
+# Linux specific
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+**/linux/flutter/generated_plugins.cmake
+
+# macOS specific
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Coverage files
+coverage/
+lcov.info
+*.lcov
+
+# Test related
+test/.test_coverage.dart
+flutter_*.png
+
+# Environment variables
 .env
 .env.local
-.env.*.local
+.env.development
+.env.staging
+.env.production
+
+# API keys and secrets
+secrets.yaml
+firebase_options.dart
+
+# Code generation
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.chopper.dart
+*.config.dart
+
+# Build runner
+*.part
+
+# FVM (Flutter Version Management)
+.fvm/
+
+# Editor directories and files
+.vscode/settings.json
+.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+
+# Web related
+
+# Windows related
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+
+# Linux related
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+
+# macOS related
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Logs
+*.log
+
+
+# Temporary files
+*.tmp
+*.temp
+
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+logs/
+*.log
+
+# Node.js (if using for web or tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor backup files
+*~
+*.bak
+*.swp
+*.swo
+
+# IDE files
+*.sublime-project
+*.sublime-workspace
+
+# Local configuration files
+local.properties
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+
+# Firebase
+.firebaserc
+firebase-debug.log
+firebase-debug.*.log
+
+# AppCenter
+appcenter-pre-build.sh
+appcenter-post-build.sh
+
+# Sentry
+.sentryclirc
+
+# Certificates
+*.p12
+*.pem
+*.key
+*.crt
+*.cer
+*.mobileprovision
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+/*.gcno
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+# CocoaPods
+/ios/Pods/
+/ios/Podfile.lock
+
+# App Store Connect API Key
+AuthKey_*.p8
 
 # Supabase
-supabase/.env
+.supabase/
+
+# Generated files
+/lib/generated/
+
+# Coverage
+coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+
+# Allow tracking workspace settings for analyzer scoping
+!.vscode/settings.json

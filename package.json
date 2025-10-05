@@ -1,0 +1,30 @@
+{
+  "name": "family-bridge-security",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier -w .",
+    "audit": "npm audit --audit-level=moderate || true",
+    "security:verify-logs": "tsx scripts/verifyAuditChain.ts",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "otplib": "^12.0.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.14.12",
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3",
+    "tsx": "^4.16.2",
+    "typescript": "^5.6.2",
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.8"
+  }
+}

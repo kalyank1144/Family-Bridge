@@ -1,105 +1,244 @@
 # Contributing to FamilyBridge
 
-Thank you for your interest in contributing to FamilyBridge! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to FamilyBridge! This document provides guidelines and information for contributors.
+
+## Table of Contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Setup](#development-setup)
+- [Coding Standards](#coding-standards)
+- [Submitting Changes](#submitting-changes)
+- [Pull Request Process](#pull-request-process)
+- [Issue Reporting](#issue-reporting)
+- [Testing Guidelines](#testing-guidelines)
 
 ## Code of Conduct
 
-By participating in this project, you agree to maintain a respectful and inclusive environment for all contributors.
+This project adheres to a code of conduct that we expect all participants to uphold. Please be respectful, inclusive, and constructive in all interactions.
 
-## How to Contribute
+## Getting Started
 
-### Reporting Bugs
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Family-Bridge.git
+   cd Family-Bridge
+   ```
+3. **Set up the development environment**:
+   ```bash
+   ./scripts/setup_env.sh
+   make setup
+   ```
 
-Before creating bug reports, please check existing issues to avoid duplicates. When creating a bug report, include:
+## Development Setup
 
-- A clear and descriptive title
-- Detailed steps to reproduce the issue
-- Expected behavior vs actual behavior
-- Screenshots if applicable
-- Device and OS information
-- Flutter and Dart versions
+### Prerequisites
 
-### Suggesting Enhancements
+- Flutter SDK (>= 3.16.0)
+- Dart SDK (>= 3.0.0)
+- Android Studio / VS Code
+- Git
+- Make (for build commands)
 
-Enhancement suggestions are tracked as GitHub issues. When creating an enhancement suggestion, include:
+### Environment Configuration
 
-- A clear and descriptive title
-- A detailed description of the proposed feature
-- Explain why this enhancement would be useful
-- List any potential drawbacks or concerns
+1. Copy `.env.example` to `.env`
+2. Update environment variables with your configuration
+3. Run `make setup` to install dependencies
 
-### Pull Requests
+### VS Code Setup
 
-1. Fork the repository
-2. Create a new branch from `main`
-3. Make your changes
-4. Write or update tests as needed
-5. Ensure all tests pass
-6. Update documentation if needed
-7. Submit a pull request
+The project includes VS Code configuration in `.vscode/`. Recommended extensions will be suggested automatically.
 
-## Development Guidelines
+## Coding Standards
 
-### Code Style
+### Dart/Flutter Standards
 
-- Follow the [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style)
-- Use `flutter format` to format your code
-- Run `flutter analyze` before committing
-- Use meaningful variable and function names
-- Add comments for complex logic
-- Keep functions small and focused
+- Follow the official [Dart style guide](https://dart.dev/guides/language/effective-dart/style)
+- Use `dart format` to format code (configured to run on save)
+- Line length limit: 100 characters
+- Use trailing commas for better diffs
+- Prefer `const` constructors where possible
+
+### Code Organization
+
+- **Feature-based architecture**: Organize code by features, not by file types
+- **Separation of concerns**: Keep business logic separate from UI
+- **Provider pattern**: Use Riverpod for state management
+- **Repository pattern**: Abstract data access behind repositories
+
+### File Naming
+
+- Use `snake_case` for file names
+- Use descriptive names that indicate the file's purpose
+- Suffix with the appropriate type (e.g., `_screen.dart`, `_widget.dart`, `_provider.dart`)
+
+### Documentation
+
+- Add dartdoc comments for public APIs
+- Include usage examples for complex widgets
+- Update README when adding new features
+- Document breaking changes in commit messages
+
+## Submitting Changes
+
+### Branch Naming
+
+Use descriptive branch names with prefixes:
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation changes
+- `refactor/` - Code refactoring
+- `test/` - Test additions/modifications
+
+Example: `feature/caregiver-medication-alerts`
 
 ### Commit Messages
 
-- Use clear and descriptive commit messages
-- Start with a verb in present tense (e.g., "Add", "Fix", "Update")
-- Reference issue numbers when applicable
-- Example: "Fix medication reminder notification timing (#123)"
+Follow conventional commit format:
+```
+type(scope): brief description
 
-### Testing
+Longer description if necessary
 
-- Write unit tests for new functionality
-- Ensure all existing tests pass
-- Test on both iOS and Android when possible
-- Test with different user types (Elder, Caregiver, Youth)
+Closes #issue-number
+```
 
-### Accessibility
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
-- Follow WCAG 2.1 AA standards
-- Test with screen readers
-- Ensure sufficient color contrast
-- Maintain minimum touch target sizes (especially for Elder interface)
+Examples:
+- `feat(caregiver): add medication reminder notifications`
+- `fix(chat): resolve message ordering issue`
+- `docs(readme): update installation instructions`
 
-## Project-Specific Guidelines
+## Pull Request Process
 
-### Elder Interface
-- Minimum font size: 18px
-- Button font size: 24px
-- Header font size: 36px
-- Minimum touch target: 60px
-- High contrast colors required
-- Simple, clear language
+1. **Create a feature branch** from `main`
+2. **Write tests** for new functionality
+3. **Run the test suite**: `make test`
+4. **Run linting**: `make analyze`
+5. **Format code**: `make format`
+6. **Update documentation** if needed
+7. **Create a pull request** with:
+   - Clear title and description
+   - Reference to related issues
+   - Screenshots for UI changes
+   - Test coverage information
 
-### Caregiver Interface
-- Professional, healthcare-inspired design
-- Clear data visualization
-- Efficient information density
-- Multiple information streams
+### PR Requirements
 
-### Youth Interface
-- Modern, engaging design
-- Gamification elements
-- Social interaction features
-- Clear point values and rewards
+- [ ] All tests pass
+- [ ] Code follows style guidelines
+- [ ] Documentation updated
+- [ ] No merge conflicts
+- [ ] Reviewers assigned
+
+## Issue Reporting
+
+### Bug Reports
+
+Include:
+- **Clear title** describing the issue
+- **Steps to reproduce** the problem
+- **Expected behavior**
+- **Actual behavior**
+- **Device/OS information**
+- **Screenshots** if applicable
+- **Log output** if relevant
+
+### Feature Requests
+
+Include:
+- **Clear description** of the feature
+- **Use case** and rationale
+- **Acceptance criteria**
+- **Mockups/wireframes** if applicable
+
+## Testing Guidelines
+
+### Test Types
+
+1. **Unit Tests** (`test/unit/`)
+   - Test individual functions and classes
+   - Mock external dependencies
+   - Fast execution
+
+2. **Widget Tests** (`test/widget/`)
+   - Test UI components in isolation
+   - Verify widget rendering and interactions
+   - Use `WidgetTester`
+
+3. **Integration Tests** (`test/integration/`)
+   - Test complete user workflows
+   - Test app behavior end-to-end
+   - Use `IntegrationTester`
+
+### Writing Tests
+
+- Write tests for all new features
+- Maintain at least 80% code coverage
+- Use descriptive test names
+- Follow AAA pattern (Arrange, Act, Assert)
+- Mock external dependencies
+
+### Running Tests
+
+```bash
+# Run all tests
+make test
+
+# Run specific test files
+flutter test test/unit/caregiver/providers/alert_provider_test.dart
+
+# Run tests with coverage
+flutter test --coverage
+```
+
+## Development Workflow
+
+1. **Pick an issue** from the GitHub issues
+2. **Create a branch** for your work
+3. **Write tests** first (TDD approach)
+4. **Implement the feature**
+5. **Run quality checks**:
+   ```bash
+   make test
+   make analyze
+   make format
+   ```
+6. **Commit changes** with descriptive messages
+7. **Push to your fork**
+8. **Create a pull request**
+
+## Code Review
+
+### For Authors
+
+- Keep PRs focused and small
+- Provide context in PR description
+- Respond to feedback promptly
+- Be open to suggestions
+
+### For Reviewers
+
+- Be constructive and respectful
+- Focus on code quality, not personal preferences
+- Suggest improvements with examples
+- Approve when ready, don't nitpick
 
 ## Getting Help
 
-If you need help:
-- Check the README.md for setup instructions
-- Review existing issues and discussions
-- Create a new issue with the "question" label
-- Join our community Slack channel
+- **Documentation**: Check the `docs/` directory
+- **Discussions**: Use GitHub Discussions for questions
+- **Issues**: Report bugs and request features
+- **Discord**: Join our development Discord server
 
-## License
+## Recognition
 
-By contributing, you agree that your contributions will be licensed under the same license as the project (MIT License).
+Contributors will be recognized in:
+- `CONTRIBUTORS.md` file
+- GitHub repository contributors page
+- Release notes for significant contributions
+
+Thank you for contributing to FamilyBridge! 🚀

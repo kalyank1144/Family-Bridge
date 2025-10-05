@@ -1,0 +1,8 @@
+title = "family-bridge"
+
+[allowlist]
+  description = "global allowlist"
+  regexes = [
+    "dev-secret",
+    "BEGIN PUBLIC KEY",
+  ]

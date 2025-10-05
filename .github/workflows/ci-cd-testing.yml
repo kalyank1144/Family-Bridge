@@ -1,0 +1,611 @@
+name: CI/CD Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run nightly tests
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - unit
+          - widget
+          - integration
+          - e2e
+          - performance
+          - security
+          - accessibility
+
+env:
+  FLUTTER_VERSION: '3.16.0'
+  JAVA_VERSION: '11'
+  ANDROID_API_LEVEL: 33
+  IOS_DEVICE: 'iPhone 14 Pro'
+  COVERAGE_THRESHOLD: 80
+
+jobs:
+  # Code quality checks
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          dart pub global activate dart_code_metrics
+      
+      - name: Run Flutter Analyze
+        run: flutter analyze --no-fatal-warnings
+      
+      - name: Check Dart formatting
+        run: dart format --set-exit-if-changed lib test
+      
+      - name: Run Code Metrics
+        run: |
+          dart pub global run dart_code_metrics:metrics analyze lib \
+            --reporter=github \
+            --fatal-style \
+            --fatal-performance \
+            --fatal-warnings
+      
+      - name: Check for security vulnerabilities
+        run: |
+          dart pub global activate very_good_cli
+          dart pub global run very_good_cli:very_good test --coverage --min-coverage 0
+      
+      - name: Upload code quality results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-quality-results
+          path: |
+            coverage/
+            metrics/
+
+  # Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'unit'
+    
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4]
+        total-shards: [4]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Run unit tests (shard ${{ matrix.shard }})
+        run: |
+          flutter test \
+            --coverage \
+            --shard-index ${{ matrix.shard }} \
+            --total-shards ${{ matrix.total-shards }} \
+            --reporter expanded \
+            test/unit/
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
+          flags: unit-tests
+          name: unit-coverage-shard-${{ matrix.shard }}
+      
+      - name: Generate test report
+        if: always()
+        run: |
+          flutter test \
+            --reporter json \
+            --file-reporter json:test-results-${{ matrix.shard }}.json \
+            test/unit/
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-results-${{ matrix.shard }}
+          path: test-results-${{ matrix.shard }}.json
+
+  # Widget Tests
+  widget-tests:
+    name: Widget Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'widget'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Run widget tests
+        run: |
+          flutter test \
+            --coverage \
+            --reporter expanded \
+            test/widget/
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
+          flags: widget-tests
+          name: widget-coverage
+
+  # Integration Tests - Android
+  integration-tests-android:
+    name: Integration Tests (Android)
+    runs-on: macos-latest
+    needs: [unit-tests, widget-tests]
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'integration'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Setup Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            flutter test \
+              integration_test/ \
+              --device-id emulator-5554 \
+              --reporter expanded
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-results-android
+          path: test_results/
+
+  # Integration Tests - iOS
+  integration-tests-ios:
+    name: Integration Tests (iOS)
+    runs-on: macos-13
+    needs: [unit-tests, widget-tests]
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'integration'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd ios && pod install
+      
+      - name: Start iOS simulator
+        run: |
+          xcrun simctl create test_simulator com.apple.CoreSimulator.SimDeviceType.iPhone-14-Pro com.apple.CoreSimulator.SimRuntime.iOS-16-2
+          xcrun simctl boot test_simulator
+      
+      - name: Run integration tests
+        run: |
+          flutter test \
+            integration_test/ \
+            --device-id test_simulator \
+            --reporter expanded
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-results-ios
+          path: test_results/
+
+  # E2E Tests
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [integration-tests-android, integration-tests-ios]
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'e2e'
+    
+    services:
+      supabase:
+        image: supabase/postgres:14.1.0
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Setup test environment
+        run: |
+          flutter pub get
+          cp .env.test .env
+      
+      - name: Initialize database
+        run: |
+          psql -h localhost -U postgres -d postgres -f supabase/schema.sql
+          psql -h localhost -U postgres -d postgres -f supabase/seeds/test_seed.sql
+        env:
+          PGPASSWORD: postgres
+      
+      - name: Run E2E tests
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=test/e2e/scenarios/elder_user_journey_test.dart \
+            --reporter expanded
+      
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results
+          path: test_results/
+
+  # Performance Tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'performance'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Run performance tests
+        run: |
+          flutter test \
+            test/performance/ \
+            --reporter expanded \
+            --timeout 10m
+      
+      - name: Analyze performance results
+        run: |
+          dart run test/scripts/analyze_performance.dart
+      
+      - name: Upload performance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report
+          path: performance_report.html
+
+  # Security and HIPAA Compliance Tests
+  security-tests:
+    name: Security & HIPAA Compliance Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'security'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install security tools
+        run: |
+          flutter pub get
+          pip install safety bandit
+          npm install -g snyk
+      
+      - name: Run security tests
+        run: |
+          flutter test \
+            test/security/ \
+            --reporter expanded
+      
+      - name: Scan for vulnerabilities
+        run: |
+          safety check --json > safety_report.json || true
+          bandit -r lib/ -f json -o bandit_report.json || true
+      
+      - name: HIPAA compliance check
+        run: |
+          dart run test/scripts/hipaa_compliance_check.dart
+      
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: |
+            safety_report.json
+            bandit_report.json
+            hipaa_compliance_report.html
+
+  # Accessibility Tests
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'accessibility'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Run accessibility tests
+        run: |
+          flutter test \
+            test/accessibility/ \
+            --reporter expanded
+      
+      - name: Generate accessibility report
+        run: |
+          dart run test/scripts/generate_a11y_report.dart
+      
+      - name: Upload accessibility report
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-report
+          path: accessibility_report.html
+
+  # Coverage Analysis
+  coverage-analysis:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    needs: [unit-tests, widget-tests]
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Download all coverage reports
+        uses: actions/download-artifact@v3
+        with:
+          path: coverage-reports/
+      
+      - name: Merge coverage reports
+        run: |
+          flutter pub get
+          dart run coverage:merge_coverage \
+            coverage-reports/**/lcov.info \
+            --output coverage/lcov.info
+      
+      - name: Generate coverage report
+        run: |
+          flutter pub global activate lcov_dart
+          flutter pub global run lcov_dart:lcov_dart \
+            --input coverage/lcov.info \
+            --output coverage/html \
+            --html
+      
+      - name: Check coverage threshold
+        run: |
+          dart run test/scripts/check_coverage.dart \
+            --threshold ${{ env.COVERAGE_THRESHOLD }}
+      
+      - name: Upload final coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
+          flags: all-tests
+          name: final-coverage
+      
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: coverage/lcov.info
+
+  # Test Report Generation
+  test-report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [
+      unit-tests,
+      widget-tests,
+      integration-tests-android,
+      integration-tests-ios,
+      e2e-tests,
+      performance-tests,
+      security-tests,
+      accessibility-tests
+    ]
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Download all test results
+        uses: actions/download-artifact@v3
+        with:
+          path: test-artifacts/
+      
+      - name: Generate comprehensive test report
+        run: |
+          flutter pub get
+          dart run test/scripts/generate_test_report.dart \
+            --input test-artifacts/ \
+            --output test_report.html
+      
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: comprehensive-test-report
+          path: test_report.html
+      
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Results
+          path: 'test-artifacts/**/*.json'
+          reporter: flutter-json
+      
+      - name: Update status check
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('test_summary.json', 'utf8'));
+            
+            github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Test Summary',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: report.passed ? 'success' : 'failure',
+              output: {
+                title: `Tests: ${report.passed_count}/${report.total_count} passed`,
+                summary: report.summary,
+              },
+            });
+
+  # Deploy to staging (if all tests pass)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: test-report
+    if: github.ref == 'refs/heads/develop' && success()
+    environment:
+      name: staging
+      url: https://staging.familybridge.app
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Build for staging
+        run: |
+          flutter build web --release --dart-define=ENV=staging
+          flutter build apk --release --dart-define=ENV=staging
+          flutter build ios --release --no-codesign --dart-define=ENV=staging
+      
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment..."
+          # Add actual deployment commands here
+
+  # Production deployment (manual approval required)
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: test-report
+    if: github.ref == 'refs/heads/main' && success()
+    environment:
+      name: production
+      url: https://familybridge.app
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Build for production
+        run: |
+          flutter build web --release --dart-define=ENV=production
+          flutter build apk --release --dart-define=ENV=production
+          flutter build ios --release --no-codesign --dart-define=ENV=production
+      
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment..."
+          # Add actual deployment commands here
+      
+      - name: Notify team
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Production deployment ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
